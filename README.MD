@@ -146,4 +146,14 @@ Now you can start, enable, stop, view logs, restart BBBStatus using the systemd 
 
 # Deployment Docker (minimal)
 
+I will assume that you have docker setup and running, you have the privileges to use docker compose and run containers.
+I'm going to assume that you do not have a requirement to use docker secrets.
+
+Make a directory to hold the docker compose file, the .env file and the data folder.
+
+Create a file named `docker-compose.yml` using your favorite text editor, and insert the contents
+of [the example docker compose file](docker-compose.yml). Save the changes, and create a new file called `.env` insert
+the contents of the [example file](dotenv) and change the configuration parameters to your needs. you should change the
+database username, and the database password.
+
 # Deployment Docker full

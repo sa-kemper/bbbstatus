@@ -1,0 +1,60 @@
+<!--
+Copyright 2025 Samuel Kemper
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+{{define "report"}}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{t "ReportHeader"}}</title>
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    </head>
+    <body>
+    <div class="container">
+        <div class="action-buttons">
+            <button class="action-button" onclick="window.print()">
+                <i class="fas fa-print"></i>
+                <span>{{t "ReportPrintReportButton"}}</span>
+            </button>
+            <a class="action-button" href="{{reverse "reportCsv" .InternalMeetingID}}">
+                <i class="fas fa-file-excel"></i>
+                <span>{{t "ReportOpenInExcelButton"}}</span>
+            </a>
+        </div>
+
+        <div class="card header">
+            <h1>{{t "ReportHeader"}}</h1>
+        </div>
+        <a class="meeting-button report-back-meeting-button" href="{{reverse "meetings"}}" id="topBackToMeetings">
+            <i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
+        </a>
+
+        <!-- Meeting Details -->
+        {{template "meetingdetails" .Report.Details}}
+        <!-- Participants -->
+        {{template "participants" .Report.Participants}}
+        <!-- Timeline -->
+        {{template "timeline" .Report.Timeline}}
+
+        <a class="meeting-button report-back-meeting-button" href="{{reverse "meetings"}}" id="bottomBackToMeetings">
+            <i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
+        </a>
+    </div>
+    </body>
+    </html>
+{{end}}

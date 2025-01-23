@@ -39,54 +39,57 @@ limitations under the License.
                     <label for="end-date">{{t "meetingListFilterEndDate"}}</label>
                     <input type="date" id="end-date" name="end-date" value="{{.Request.EndDate}}">
                 </div>
-                <div class="filter-group">
+                <div class="filter-group filter-action">
                     <button type="submit" class="meeting-button">{{t "meetingListFilterFilterButton"}}</button>
                 </div>
             </form>
+        </div>
 
-            <div class="meetings-list">
-                <!-- Example Meeting Card -->
-                {{ range .Meetings}}
-                    <div class="meeting-card" tabindex="0">
-                        <div class="status-badge status-{{if .BBBEventsMeeting.Active}}active{{else}}ended{{end}}">{{ if .BBBEventsMeeting.Active}}{{t "MeetingActive"}}{{else}}{{t "MeetingEnded"}}{{end}}</div>
-                        <h3>{{ .BBBEventsMeeting.Name}}</h3>
+
+        <div class="meetings-list">
+            <!-- Example Meeting Card -->
+            {{ range .Meetings}}
+                <div class="meeting-card" tabindex="0">
+                    <div class="status-badge status-{{if .BBBEventsMeeting.Active}}active{{else}}ended{{end}}">{{ if .BBBEventsMeeting.Active}}{{t "MeetingActive"}}{{else}}{{t "MeetingEnded"}}{{end}}</div>
+                    <h3>{{ .BBBEventsMeeting.Name}}</h3>
+                    <div class="detail-item">
+                        <span class="detail-label">{{t "MeetingCreated"}}</span>
+                        <span class="detail-value">{{ .BBBEventsMeeting.CreateDate }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <a class="meeting-button meeting-button-to-report"
+                           href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}"
+                           onclick="window.location.href='{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}'">
+                            {{t "MeetingToReport"}}
+                        </a>
+                        <a class="meeting-button meeting-button-details">
+                            {{t "MeetingOpenDetails"}}
+                        </a>
+                    </div>
+                    <div class="meeting-details">
                         <div class="detail-item">
-                            <span class="detail-label">{{t "MeetingCreated"}}</span>
-                            <span class="detail-value">{{ .BBBEventsMeeting.CreateDate }}</span>
+                            <span class="detail-label">{{t "MeetingExternalID"}}</span>
+                            <span class="detail-value">{{ .BBBEventsMeeting.ExternalMeetingID }}</span>
                         </div>
                         <div class="detail-item">
-                            <a class="meeting-button meeting-button-to-report" href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}"
-                               onclick="window.location.href='{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}'">
-                                {{t "MeetingToReport"}}
-                            </a>
-                            <a class="meeting-button meeting-button-details">
-                                {{t "MeetingOpenDetails"}}
-                            </a>
+                            <span class="detail-label">{{t "MeetingMaxUsers"}}</span>
+                            <span class="detail-value">{{ .BBBEventsMeeting.MaxUsers }}</span>
                         </div>
-                        <div class="meeting-details">
-                            <div class="detail-item">
-                                <span class="detail-label">{{t "MeetingExternalID"}}</span>
-                                <span class="detail-value">{{ .BBBEventsMeeting.ExternalMeetingID }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">{{t "MeetingMaxUsers"}}</span>
-                                <span class="detail-value">{{ .BBBEventsMeeting.MaxUsers }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">{{t "MeetingDuration"}}</span>
-                                <span class="detail-value">{{ .BBBEventsMeeting.Duration }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">{{t "MeetingRecordingStatusHeader"}}</span>
-                                <span class="detail-value">{{if .BBBEventsMeeting.Record }}{{t "MeetingRecordingEnabled"}}{{else}}{{t "MeetingRecordingDisabled"}}{{end}}</span>
-                            </div>
+                        <div class="detail-item">
+                            <span class="detail-label">{{t "MeetingDuration"}}</span>
+                            <span class="detail-value">{{ .BBBEventsMeeting.Duration }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">{{t "MeetingRecordingStatusHeader"}}</span>
+                            <span class="detail-value">{{if .BBBEventsMeeting.Record }}{{t "MeetingRecordingEnabled"}}{{else}}{{t "MeetingRecordingDisabled"}}{{end}}</span>
                         </div>
                     </div>
-                {{ else }}
-                    <div class="meeting-card" tabindex="0">{{t "MeetingNoMeetingsExist"}}</div>
-                {{ end }}
-            </div>
+                </div>
+            {{ else }}
+                <div class="meeting-card" tabindex="0">{{t "MeetingNoMeetingsExist"}}</div>
+            {{ end }}
         </div>
+    </div>
     </div>
     </body>
     </html>

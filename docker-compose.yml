@@ -10,7 +10,7 @@ services:
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - ${DATABASE_DIRECTORY:-.}/data:/var/lib/postgresql/data
     restart: unless-stopped
 
   bbbstatus:
@@ -25,6 +25,3 @@ services:
     depends_on:
       - db
     restart: unless-stopped
-
-volumes:
-  db_data:  # Define the volume

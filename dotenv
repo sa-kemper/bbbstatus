@@ -18,3 +18,6 @@ APP_PORT=8080
 
 # the database connection string according to https://www.postgresql.org/docs/12/libpq-connect.html#id-1.7.3.8.3.6 change username, password and database name accordingly.
 DB_CONNECTION_STRING=postgresql://bbbstatus:bbbstatus@db:5432/bbbstatus
+
+# Where the data should be stored defaults to current folder (carefull, if you use the default only run the docker compose file within the same folder)
+DATABASE_DIRECTORY=.

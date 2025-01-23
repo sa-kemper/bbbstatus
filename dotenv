@@ -1,0 +1,20 @@
+# The name of the database for the application
+POSTGRES_DB=bbbstatus
+
+# the username of the user that will be used by the application
+POSTGRES_USER=bbbstatus
+
+# the password of the user that will be used by the application
+POSTGRES_PASSWORD=bbbstatus
+
+# The port the postgresql database should bind to
+DB_PORT=5432
+
+# The IP the application should bind to
+HOST=0.0.0.0
+
+# The port the application should bind to
+APP_PORT=8080
+
+# the database connection string according to https://www.postgresql.org/docs/12/libpq-connect.html#id-1.7.3.8.3.6 change username, password and database name accordingly.
+DB_CONNECTION_STRING=postgresql://bbbstatus:bbbstatus@db:5432/bbbstatus

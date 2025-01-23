@@ -29,9 +29,6 @@ var conf = map[string]string{
 	"HOST":                 "localhost",
 	"DB_CONNECTION_STRING": "postgres://myapp:coolAppPassword!1@localhost/appdb",
 	"CSV_STRUCTURE":        "time,user,action,text representation",
-	"PROTOCOL":             "http",
-	"SSL_KEY":              "",
-	"SSL_CERT":             "",
 	"SERVE_STATIC_CONTENT": "true",
 }
 var confFileExists bool

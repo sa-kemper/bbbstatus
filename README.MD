@@ -43,14 +43,14 @@ automatically generated.
 
 ## Notes
 
-You may serve static files separately in you environment, therefore there is a option to disable it. BBBStatus will use
+You may serve static files separately in you environment, therefore there is an option to disable it. BBBStatus will use
 the path /static in any case.
 
-# Customisation
+# Customization
 
 You may override locales, templates, static content (like CSS) and even database migrations at runtime without
 recompiling BBBStatus. Be advised that even though this is possible, it may lead to problems, as only the embedded /
-offical versions are tested. You may override multiple files at once. to do that you need to override every file
+official versions are tested. You may override multiple files at once. to do that you need to override every file
 individually, just as described [here](markdown-documentation/Customisation.md).
 
 To read on how to do this customisation read [here](markdown-documentation/Customisation.md)
@@ -58,13 +58,13 @@ To read on how to do this customisation read [here](markdown-documentation/Custo
 # Deployment Native
 
 For native deployment, you technically just have to run the binary from any location that you want with either a
-configuration file or exported environment variables but here is a example on how deployment is intended for production
+configuration file or exported environment variables but here is an example on how deployment is intended for production
 use.
 
 ## install dependencies
 
 This step will be different depending on your operating system. In this deployment example we will assume a debian 12
-install.
+installation.
 
 Install postgres 15
 
@@ -72,7 +72,7 @@ Install postgres 15
 sudo apt install postgresql-common -y;
 ```
 
-## Setup a database and a user with write permissions
+## Set up a database and a user with write permissions
 
 In your shell of choice run this command
 
@@ -103,7 +103,7 @@ sudo curl --output /tmp/bbbstatus-release.zip # TODO: INSERT RELEASE URL HERE.
 sudo unzip /opt/bbbstatus/release.zip -d /opt/bbbstatus/
 ```
 
-## Setup a service file and enable the service
+## Set up a service file and enable the service
 
 ```shell
 systemctl edit --force --full bbbstatus
@@ -135,8 +135,8 @@ WantedBy=multi-user.target
 ```
 
 You may configure more or different configuration options at this point, see [configuration](README.MD#configuration).
-You will most defenetly need to update the Environment=DB_CONNECTION_STRING line, to the database credentials you've
-setup [here](README.MD#setup-a-database-and-a-user-with-write-permissions).
+You will most definitely need to update the Environment=DB_CONNECTION_STRING line, to the database credentials you've
+setup [here](README.MD#set-up-a-database-and-a-user-with-write-permissions).
 
 Save the changed content (on a fresh installation use `ctrl + O`)
 

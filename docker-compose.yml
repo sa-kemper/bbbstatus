@@ -5,8 +5,8 @@ services:
     container_name: bbbstatus-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-bbbstatus}
-      POSTGRES_USER: ${POSTGRES_USER:-bbbstatus_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-securepassword}
+      POSTGRES_USER: ${POSTGRES_USER:-bbbstatus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bbbstatus}
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
@@ -14,12 +14,12 @@ services:
     restart: unless-stopped
 
   bbbstatus:
-    image: mydockerapp
+    image: bbbstatus:latest
     container_name: bbbstatus
     ports:
       - "${APP_PORT:-8080}:8080"
     environment:
-      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-postgresql://bbbstatus_user:securepassword@db:5432/bbbstatus}
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-postgresql://bbbstatus:bbbstatus@db:5432/bbbstatus}
       - HOST=${HOST:-0.0.0.0}
       - PORT=${APP_PORT:-8080}
     depends_on:

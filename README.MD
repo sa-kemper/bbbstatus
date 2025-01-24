@@ -1,12 +1,12 @@
-# BBBStatus
+# bbbstatus
 
-BBBStatus is a utility to safe and view events from [bbb-webhooks](https://github.com/bigbluebutton/bbb-webhooks)
+bbbstatus is a utility to safe and view events from [bbb-webhooks](https://github.com/bigbluebutton/bbb-webhooks)
 
 # Configuration
 
 ## Overview
 
-BBBStatus uses a configuration system to manage runtime settings. It supports both a default configuration (
+bbbstatus uses a configuration system to manage runtime settings. It supports both a default configuration (
 `config.toml`) and environment variables to override specific values. If the `config.toml` file is not present, a
 default configuration file is generated in the current working directory.
 
@@ -18,9 +18,9 @@ Configuration Sources:
 
 | **Parameter**          | **Default Value**                                    | **Description**                                                  |
 |------------------------|------------------------------------------------------|------------------------------------------------------------------|
-| `PORT`                 | `8080`                                               | The port on which the application will run.                      |
-| `HOST`                 | `localhost`                                          | The hostname or IP address of the application.                   |
-| `DB_CONNECTION_STRING` | `postgres://myapp:coolAppPassword!1@localhost/appdb` | Database connection string (PostgreSQL).                         |
+| `PORT`                 | `8080`                                               | The port on which bbbstatus will run.                            |
+| `HOST`                 | `localhost`                                          | The hostname or IP address of bbbstatus.                         |
+| `DB_CONNECTION_STRING` | `postgres://bbbstatus:bbbstatus@localhost/bbbstatus` | Database connection string (PostgreSQL).                         |
 | `CSV_STRUCTURE`        | `time,user,action,text representation`               | Defines the structure of the CSV format expected by the program. |
 | `SERVE_STATIC_CONTENT` | `true`                                               | Whether to serve static content (`true` or `false`).             |
 
@@ -43,13 +43,13 @@ automatically generated.
 
 ## Notes
 
-You may serve static files separately in you environment, therefore there is an option to disable it. BBBStatus will use
+You may serve static files separately in you environment, therefore there is an option to disable it. bbbstatus will use
 the path /static in any case.
 
 # Customization
 
 You may override locales, templates, static content (like CSS) and even database migrations at runtime without
-recompiling BBBStatus. Be advised that even though this is possible, it may lead to problems, as only the embedded /
+recompiling bbbstatus. Be advised that even though this is possible, it may lead to problems, as only the embedded /
 official versions are tested. You may override multiple files at once. to do that you need to override every file
 individually, just as described [here](markdown-documentation/Customisation.md).
 
@@ -77,15 +77,16 @@ sudo apt install postgresql-common -y;
 In your shell of choice run this command
 
 ```shell
-sudo -u postgres psql;
+su postgres;
+psql;
 ```
 
 you should now be in a SQL Shell. create a database and a user, **please DO NOT USE THE PROVIDED PASSWORD**.
 
 ```postgresql
 CREATE DATABASE bbbstatus;
-CREATE USER bbbstatus_user WITH PASSWORD 'Your-Creative-And-Long-Password-Here';
-GRANT ALL PRIVILEGES ON DATABASE bbbstatus TO bbbstatus_user;
+CREATE USER bbbstatus WITH PASSWORD 'Your-Creative-And-Long-Password-Here';
+GRANT ALL PRIVILEGES ON DATABASE bbbstatus TO bbbstatus;
 ```
 
 ## Create a system user that will run the service
@@ -94,13 +95,13 @@ GRANT ALL PRIVILEGES ON DATABASE bbbstatus TO bbbstatus_user;
 sudo useradd -r -s /bin/false bbbstatus
 ```
 
-## Install BBBStatus into a directory
+## Install bbbstatus into a directory
 
 ```shell
-sudo mkdir -m 500 "/opt/bbbstatus";
-sudo chown bbbstatus:bbbstatus /opt/bbbstatus
-sudo curl --output /tmp/bbbstatus-release.zip # TODO: INSERT RELEASE URL HERE.
-sudo unzip /opt/bbbstatus/release.zip -d /opt/bbbstatus/
+mkdir -m 500 "/opt/bbbstatus";
+chown bbbstatus:bbbstatus /opt/bbbstatus
+curl --output /tmp/bbbstatus-release.zip # TODO: INSERT RELEASE URL HERE.
+unzip /opt/bbbstatus/release.zip -d /opt/bbbstatus/
 ```
 
 ## Set up a service file and enable the service
@@ -113,7 +114,7 @@ insert this service file template:
 
 ```ini
 [Unit]
-Description=BBBStatus is a utility to safe and view events from bbb-webhooks
+Description=bbbstatus is a utility to safe and view events from bbb-webhooks
 After=network.target
 
 [Service]
@@ -126,7 +127,7 @@ Restart=on-failure
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=bbbstatus
-Environment=DB_CONNECTION_STRING=postgres://bbbstatus_user:securepassword@localhost/bbbstatus
+Environment=DB_CONNECTION_STRING=postgres://bbbstatus:bbbstatus@localhost/bbbstatus
 Environment=HOST=0.0.0.0
 Environment=PORT=8080
 
@@ -142,7 +143,7 @@ Save the changed content (on a fresh installation use `ctrl + O`)
 
 Exit the editor (on a fresh installation use `ctrl + C`)
 
-Now you can start, enable, stop, view logs, restart BBBStatus using the systemd utils.
+Now you can start, enable, stop, view logs, restart bbbstatus using the systemd utils.
 
 # Deployment Docker (minimal)
 

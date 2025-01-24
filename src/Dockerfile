@@ -18,17 +18,17 @@ LABEL authors="user"
 
 RUN apk update
 RUN adduser -D -g '' www
-WORKDIR /myapp
+WORKDIR /bbbstatus
 COPY go.mod go.sum ./
 
 RUN go mod download
 
 COPY . ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s" -o /myapp/bin.elf
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s" -o /bbbstatus/bin.elf
 FROM scratch
 WORKDIR /app
-COPY --from=builder /myapp/bin.elf /app/bin
+COPY --from=builder /bbbstatus/bin.elf /app/bin
 COPY --from=builder /etc/passwd /etc/passwd
 
 USER www

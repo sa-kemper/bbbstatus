@@ -26,8 +26,8 @@ import (
 
 var conf = map[string]string{
 	"PORT":                 "8080",
-	"HOST":                 "localhost",
-	"DB_CONNECTION_STRING": "postgres://myapp:coolAppPassword!1@localhost/appdb",
+	"HOST":                 "0.0.0.0",
+	"DB_CONNECTION_STRING": "postgres://bbbstatus:bbbstatus@localhost/bbbstatus",
 	"CSV_STRUCTURE":        "time,user,action,text representation",
 	"SERVE_STATIC_CONTENT": "true",
 }
@@ -74,7 +74,7 @@ func confGet(key string) string {
 		if host, _ = os.Hostname(); host != "" {
 			return host
 		}
-		return "localhost"
+		return "0.0.0.0"
 
 	case "PORT":
 		if port := os.Getenv("PORT"); port != "" {
@@ -86,7 +86,7 @@ func confGet(key string) string {
 		connStr := os.Getenv("DB_CONNECTION_STRING")
 		if connStr == "" {
 			fmt.Println("https://www.postgresql.org/docs/12/libpq-connect.html#id-1.7.3.8.3.6")
-			fmt.Println("DB_CONNECTION_STRING example: postgres://myapp:coolAppPassword!1@localhost/appdb")
+			fmt.Println("DB_CONNECTION_STRING example: postgres://bbbstatus:bbbstatus@localhost/bbbstatus")
 			panic("DB_CONNECTION_STRING environment variable not set")
 		}
 

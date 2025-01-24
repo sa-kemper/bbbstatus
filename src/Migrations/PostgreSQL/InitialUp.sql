@@ -1,4 +1,3 @@
-
 CREATE TABLE meetings
 (
     internal_meeting_id VARCHAR(255) PRIMARY KEY,

@@ -1,4 +1,4 @@
 ../.idea
-active*.toml
+/active*.toml
 translate*.toml
 config.toml

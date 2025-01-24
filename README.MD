@@ -60,6 +60,10 @@ To read on how to do this customisation read [here](markdown-documentation/Custo
 For native deployment, you technically just have to run the binary from any location that you want with either a
 configuration file or exported environment variables but here is an example on how deployment is intended for production
 use.
+Every distro and version **other than debian 12 has limited support.** Use docker or make a pull request for distro
+specific documentation.
+
+The Native deployment guide assumes that you are logged in as root.
 
 ## install dependencies
 

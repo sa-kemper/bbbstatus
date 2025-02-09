@@ -50,7 +50,7 @@ limitations under the License.
             <!-- Example Meeting Card -->
             {{ range .Meetings}}
                 <div class="meeting-card" tabindex="0">
-                    <div class="status-badge status-{{if .BBBEventsMeeting.Active}}active{{else}}ended{{end}}">{{ if .BBBEventsMeeting.Active}}{{t "MeetingActive"}}{{else}}{{t "MeetingEnded"}}{{end}}</div>
+                    <div class="status-badge status-{{if .Active}}active{{else}}ended{{end}}">{{ if .Active}}{{t "MeetingActive"}}{{else}}{{t "MeetingEnded"}}{{end}}</div>
                     <h3>{{ .BBBEventsMeeting.Name}}</h3>
                     <div class="detail-item">
                         <span class="detail-label">{{t "MeetingCreated"}}</span>

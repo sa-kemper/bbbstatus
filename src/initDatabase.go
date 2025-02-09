@@ -17,44 +17,39 @@
 package main
 
 import (
-	"context"
+	"database/sql"
+	"embed"
 	_ "embed"
-	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
 )
 
-//go:embed Migrations/PostgreSQL/InitialUp.sql
-var postgresInitialUp []byte
-
-var RequiredTables = [7]string{"chat_messages", "meeting_events", "meetings", "polls", "poll_responses", "user_events", "users"}
+//go:embed Migrations/PostgreSQL/*.sql
+var postgresInitialUp embed.FS
 
 func initDatabase() error {
-	var ctx = context.Background()
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
-	defer conn.Close(ctx)
+	db, err := sql.Open("pgx", confGet("DB_CONNECTION_STRING"))
+	defer db.Close()
 	if err != nil {
 		panic(fmt.Errorf("Unable to connect to database: %v\n", err))
 	}
-	err = conn.Ping(ctx)
+	err = db.Ping()
 	if err != nil {
 		panic(fmt.Errorf("Unable to connect to database: %v\n", err))
 	}
 
-	for _, table := range RequiredTables {
-		var tableExists bool
-		err := conn.QueryRow(ctx, "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1)", table).Scan(&tableExists)
-		if errors.Is(err, pgx.ErrNoRows) || !tableExists {
-			fmt.Printf("Table %s does not exist\n", table)
-			_, err = conn.Exec(ctx, string(postgresInitialUp))
-			if err != nil {
-				return err
-			}
-			return nil
-		}
-		if err != nil {
-			return err
-		}
+	err = goose.SetDialect("pgx")
+	if err != nil {
+		panic(fmt.Errorf("Unable to connect to database: %v\n", err))
+	}
+	goose.SetBaseFS(postgresInitialUp)
+
+	if err := goose.Up(db, "Migrations/PostgreSQL"); err != nil { //
+		panic(err)
+	}
+	if err := goose.Version(db, "Migrations/PostgreSQL"); err != nil {
+		panic(err)
 	}
 	return nil
 }

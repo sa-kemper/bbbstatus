@@ -88,9 +88,8 @@ psql;
 you should now be in a SQL Shell. create a database and a user, **please DO NOT USE THE PROVIDED PASSWORD**.
 
 ```postgresql
-CREATE DATABASE bbbstatus;
 CREATE USER bbbstatus WITH PASSWORD 'Your-Creative-And-Long-Password-Here';
-GRANT ALL PRIVILEGES ON DATABASE bbbstatus TO bbbstatus;
+CREATE DATABASE bbbstatus OWNER bbbstatus;
 ```
 
 ## Create a system user that will run the service

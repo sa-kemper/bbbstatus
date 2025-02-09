@@ -71,9 +71,9 @@ func initEchoFramework() {
 	echof.Renderer = Templates
 	echof.Use(middleware.Logger())
 	echof.Use(middleware.Recover())
-	echof.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+	/*echof.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
 		TokenLookup: "header:X-XSRF-TOKEN",
-	}))
+	}))*/
 	echof.Logger.SetLevel(log.INFO)
 
 	if _, err := os.Stat(staticContentOverwriteFolder); err == nil {

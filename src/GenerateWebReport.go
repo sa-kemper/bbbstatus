@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"os"
 	"sort"
 	"time"
 )
@@ -77,7 +76,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	var polls []string
 
 	// Connect to the db using
-	conn, err := pgx.Connect(ctx, os.Getenv("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
 		return Report{}, fmt.Errorf("Unable to connect to database: %v\n", err)
 	}
@@ -159,7 +158,7 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 			}
 
 			// we cannot use the same connection while the row is not closed.
-			conn2, err := pgx.Connect(ctx, os.Getenv("DB_CONNECTION_STRING"))
+			conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 			if err != nil {
 				fmt.Println("error connecting to the database at least twice. ->", err)
 				return err, timeline
@@ -219,7 +218,7 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 		}
 
 		// we cannot use the same connection while the row is not closed.
-		conn2, err := pgx.Connect(ctx, os.Getenv("DB_CONNECTION_STRING"))
+		conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
 			return err, timeline
@@ -261,7 +260,7 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, con
 		}
 
 		// we cannot use the same connection while the row is not closed.
-		conn2, err := pgx.Connect(ctx, os.Getenv("DB_CONNECTION_STRING"))
+		conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
 		} else {
@@ -295,7 +294,7 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, conn *
 		var userName string
 		var eventType string
 
-		con2, err := pgx.Connect(ctx, os.Getenv("DB_CONNECTION_STRING"))
+		con2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
 			return err, timeline

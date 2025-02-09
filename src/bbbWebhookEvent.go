@@ -25,7 +25,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -81,7 +80,7 @@ func bbbWebHookEvent(c echo.Context) error {
 		event.Data.Attributes.Meeting.BbbHostname = strings.TrimRight(addr[0], ".")
 	}
 
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(context.Background(), confGet("DB_CONNECTION_STRING"))
 	if err != nil {
 		fmt.Println(err)
 		return err

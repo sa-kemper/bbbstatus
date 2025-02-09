@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"os"
 	"sort"
 	"strings"
 	"time"
@@ -143,7 +142,7 @@ func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, conn *p
 		}
 
 		// we cannot use the same connection while the row is not closed.
-		conn2, err := pgx.Connect(ctx, os.Getenv("DB_CONNECTION_STRING"))
+		conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
 		} else {
@@ -177,7 +176,7 @@ func FillCSVUserEvents(ctx context.Context, internalMeetingID string, conn *pgx.
 		var userID string
 		var eventType string
 
-		con2, err := pgx.Connect(ctx, os.Getenv("DB_CONNECTION_STRING"))
+		con2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
 			return err, timeline
@@ -227,7 +226,7 @@ func FillCsvPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.
 		}
 
 		// we cannot use the same connection while the row is not closed.
-		conn2, err := pgx.Connect(ctx, os.Getenv("DB_CONNECTION_STRING"))
+		conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
 			return err, timeline
@@ -279,7 +278,7 @@ func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *
 			}
 
 			// we cannot use the same connection while the row is not closed.
-			conn2, err := pgx.Connect(ctx, os.Getenv("DB_CONNECTION_STRING"))
+			conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 			if err != nil {
 				fmt.Println("error connecting to the database at least twice. ->", err)
 				return err, timeline

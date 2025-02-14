@@ -1,0 +1,8 @@
+{
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+    email   root@example.com
+}
+
+bbbstatus.example.com {
+    reverse_proxy bbstatus:8080
+}

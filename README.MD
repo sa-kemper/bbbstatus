@@ -1,82 +1,80 @@
 # bbbstatus
 
-bbbstatus is a utility to safe and view events from [bbb-webhooks](https://github.com/bigbluebutton/bbb-webhooks)
+bbbstatus is an utility to view and save events (and their details) from [bbb-webhooks](https://github.com/bigbluebutton/bbb-webhooks)
 
 # Configuration
 
 ## Overview
 
-bbbstatus uses a configuration system to manage runtime settings. It supports both a default configuration (
+bbbstatus uses a configuration system to manage runtime settings. It supports a default configuration (
 `config.toml`) and environment variables to override specific values. If the `config.toml` file is not present, a
-default configuration file is generated in the current working directory.
+default configuration file is generated in the current working directory for later modifications.
 
-Configuration Sources:
+Configuration sources:
 
-1. Default Configuration: Hardcoded default settings.
-2. config.toml: Overrides defaults if present.
-3. Environment Variables: Overrides specific settings when provided.
+1. default configuration: hardcoded default settings.
+2. config.toml: overrides existing defaults if correctly set.
+3. environment variables: overrides specific settings by runtime when provided.
 
-| **Parameter**          | **Default Value**                                    | **Description**                                                  |
+| **Parameter**          | **default value**                                    | **description**                                                  |
 |------------------------|------------------------------------------------------|------------------------------------------------------------------|
-| `PORT`                 | `8080`                                               | The port on which bbbstatus will run.                            |
-| `HOST`                 | `localhost`                                          | The hostname or IP address of bbbstatus.                         |
+| `PORT`                 | `8080`                                               | Port on which bbbstatus will run (default 8080).                 |
+| `HOST`                 | `localhost`                                          | Hostname or IP address of bbbstatus.                             |
 | `DB_CONNECTION_STRING` | `postgres://bbbstatus:bbbstatus@localhost/bbbstatus` | Database connection string (PostgreSQL).                         |
-| `CSV_STRUCTURE`        | `time,user,action,text representation`               | Defines the structure of the CSV format expected by the program. |
-| `SERVE_STATIC_CONTENT` | `true`                                               | Whether to serve static content (`true` or `false`).             |
+| `CSV_STRUCTURE`        | `time,user,action,text representation`               | Defines the structure of the CSV format for exports.             |
+| `SERVE_STATIC_CONTENT` | `true`                                               | Serving static content (`true` or `false`).                      |
 
-## Configuration Behavior
+## Configuration behavior
 
-### 1. Default Values
+### 1. Default values
 
-If `config.toml` is missing or a parameter is not defined, the program falls back to default values.
+If `config.toml` is missing or a parameter is not defined, the program falls back to the hardcoded default values.
 
-### 2. Environment Variables
-
-Environment variables can override default values and `config.toml` settings. For example:
-
-- `HOST` set in the environment takes precedence over the `HOST` defined in `config.toml`.
-
-### 3. `config.toml`
+### 2. `config.toml`
 
 If present, `config.toml` settings override the default configuration. If missing, a default `config.toml` is
-automatically generated.
+automatically generated and you can later modify it to your needs.
+
+### 3. Environment variables
+
+Environment variables will always override default values and `config.toml` settings by runtime.
+For example:
+
+- `HOST` set in the environment overwrites the set hostname or ip defined in `config.toml`.
 
 ## Notes
 
-You may serve static files separately in you environment, therefore there is an option to disable it. bbbstatus will use
-the path /static in any case.
+You may serve static files separately in your environment, therefore there is an option to disable it.
+bbbstatus will use the path /static in any case.
 
 # Customization
 
 You may override locales, templates, static content (like CSS) and even database migrations at runtime without
-recompiling bbbstatus. Be advised that even though this is possible, it may lead to problems, as only the embedded /
-official versions are tested. You may override multiple files at once. to do that you need to override every file
-individually, just as described [here](markdown-documentation/Customisation.md).
+recompiling bbbstatus. But be aware that even though this is possible, it may lead to problems, as only the embedded /
+official versions are tested.
+You may even override multiple files at once. To do that you need to override every file individually, just as described [here](markdown-documentation/Customisation.md).
 
-To read on how to do this customisation read [here](markdown-documentation/Customisation.md)
+# Native deployment
 
-# Deployment Native
+To deploy bbbstatus natively (without docker), you can simply run the binary from any location that you want with either a
+configuration file or exported environment variables.
+Here is an example on how deployment is intended for production use.
+Every distro and version **other than debian 12** has limited support.
+It is advised to use docker or make a pull request for distro specific requests/modifications.
 
-For native deployment, you technically just have to run the binary from any location that you want with either a
-configuration file or exported environment variables but here is an example on how deployment is intended for production
-use.
-Every distro and version **other than debian 12 has limited support.** Use docker or make a pull request for distro
-specific documentation.
+The native deployment guide assumes that you are logged in as root.
 
-The Native deployment guide assumes that you are logged in as root.
+## Install dependencies
 
-## install dependencies
+This step is depending on your operating system. The example will be given for a Debian 12 installation.
 
-This step will be different depending on your operating system. In this deployment example we will assume a debian 12
-installation.
-
-Install postgres 15
+### Install postgres 15
 
 ```shell
 sudo apt install postgresql-common -y;
 ```
 
-## Set up a database and a user with write permissions
+### Set up a database and a user with write permissions
 
 In your shell of choice run this command
 
@@ -85,20 +83,21 @@ su postgres;
 psql;
 ```
 
-you should now be in a SQL Shell. create a database and a user, **please DO NOT USE THE PROVIDED PASSWORD**.
+You should now be in a SQL Shell.
+Now create a database and an user, **please DO NOT USE THE PROVIDED PASSWORD**!
 
 ```postgresql
 CREATE USER bbbstatus WITH PASSWORD 'Your-Creative-And-Long-Password-Here';
 CREATE DATABASE bbbstatus OWNER bbbstatus;
 ```
 
-## Create a system user that will run the service
+### Create a system user that will run the service
 
 ```sh
-sudo useradd -r -s /bin/false bbbstatus
+useradd -r -s /bin/false bbbstatus
 ```
 
-## Install bbbstatus into a directory
+### Download bbbstatus into a directory
 
 ```shell
 mkdir -m 500 "/opt/bbbstatus";
@@ -107,17 +106,17 @@ curl --output /tmp/bbbstatus-release.zip # TODO: INSERT RELEASE URL HERE.
 unzip /opt/bbbstatus/release.zip -d /opt/bbbstatus/
 ```
 
-## Set up a service file and enable the service
+### Setting up and enabling a service
 
 ```shell
 systemctl edit --force --full bbbstatus
 ```
 
-insert this service file template:
+Copy the following content to the now opened service file:
 
 ```ini
 [Unit]
-Description=bbbstatus is a utility to safe and view events from bbb-webhooks
+Description=bbbstatus is an utility to view and save events from bbb-webhooks
 After=network.target
 
 [Service]
@@ -138,26 +137,21 @@ Environment=PORT=8080
 WantedBy=multi-user.target
 ```
 
-You may configure more or different configuration options at this point, see [configuration](README.MD#configuration).
-You will most definitely need to update the Environment=DB_CONNECTION_STRING line, to the database credentials you've
-setup [here](README.MD#set-up-a-database-and-a-user-with-write-permissions).
+Please adapt the given sample configuration to your needs and values, see [configuration](README.MD#configuration).
+You will most definitely need to update the Environment=DB_CONNECTION_STRING line to the database credentials you have setup [here](README.MD#set-up-a-database-and-a-user-with-write-permissions).
 
 Save the changed content (on a fresh installation use `ctrl + O`)
 
 Exit the editor (on a fresh installation use `ctrl + C`)
 
-Now you can start, enable, stop, view logs, restart bbbstatus using the systemd utils.
+Now you can start, enable, stop, view logs, restart bbbstatus using the common systemd commands.
 
 # Deployment Docker (minimal)
 
-I will assume that you have docker setup and running, you have the privileges to use docker compose and run containers.
-I'm going to assume that you do not have a requirement to use docker secrets.
+Make a directory to hold the docker compose file, the .env file and the data folder from bbbstatus and Caddy (the default webserver).
 
-Make a directory to hold the docker compose file, the .env file and the data folder.
-
-Create a file named `docker-compose.yml` using your favorite text editor, and insert the contents
-of [the example docker compose file](docker-compose.yml). Save the changes, and create a new file called `.env` insert
-the contents of the [example file](dotenv) and change the configuration parameters to your needs. you should change the
-database username, and the database password.
-
-# Deployment Docker full
+Create a file named `docker-compose.yml` using your favorite text editor, and insert the contents of [the example docker compose file](docker-compose.yml).
+Or just simply download the given example of this repository.
+Save the changes, and create a new file called `.env`
+Insert the contents of the [example file](dotenv) and change the configuration parameters to your needs.
+You should change at least the database username, and the database password.

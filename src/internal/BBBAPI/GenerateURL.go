@@ -24,7 +24,7 @@ import (
 	"strings"
 )
 
-func GenerateURL(config URLConfig) string {
+func generateURL(config URLConfig) string {
 	var paramString string
 	result := fmt.Sprintf("https://%s/bigbluebutton/api/%s?", config.Hostname, config.Methode)
 

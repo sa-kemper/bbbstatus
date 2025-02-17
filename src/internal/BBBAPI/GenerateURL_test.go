@@ -51,8 +51,8 @@ func TestGenerateURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GenerateURL(tt.args.config); got != tt.want {
-				t.Errorf("GenerateURL() = %v, want %v", got, tt.want)
+			if got := generateURL(tt.args.config); got != tt.want {
+				t.Errorf("generateURL() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -1,4 +1,4 @@
 # This is an example .env file. Adjust it with a valid BigBlueButton (BBB) server to make the tests pass. Alternatively, you can set the named parameters as environment variables. If this file is found, it is preferred over environment variables. The syntax is extremely simple: there is no quote support, entries are separated by new lines, key and value are separated by equal signs, and every line without a key-value pair is ignored.
 bbbHostname=bbb.example.com
 bbbSharedSecret=yourcoolsharedsecretandall123
-https://bbb.example.com/bigbluebutton/api/create?allowStartStopRecording=true&attendeePW=AttendeePassword&autoStartRecording=false&meetingID=TestMeetingID&moderatorPW=ModeratorPassword&name=TestMeetingID&record=false&voiceBridge=71225&checksum=14777141c8bafaface897174e2559314079d66e3
+bbbCreateURL=https://bbb.example.com/bigbluebutton/api/create?allowStartStopRecording=true&attendeePW=AttendeePassword&autoStartRecording=false&meetingID=TestMeetingID&moderatorPW=ModeratorPassword&name=TestMeetingID&record=false&voiceBridge=71225&checksum=14777141c8bafaface897174e2559314079d66e3

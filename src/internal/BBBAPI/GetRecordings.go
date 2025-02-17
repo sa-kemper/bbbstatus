@@ -20,11 +20,29 @@ import (
 	"context"
 	"encoding/xml"
 	"net/http"
+	"strconv"
 )
 
-func (a *API) GetRecordings(ctx context.Context, MeetingID string) (result Recordings, err error) {
+type getRecordingsParameters struct {
+	MeetingID *string
+	RecordID  *string
+	State     *string
+	Meta      *string
+	Offset    *int
+	Limit     *int
+}
+
+func (a *API) GetRecordings(ctx context.Context, params getRecordingsParameters) (result Recordings, err error) {
 	var client = a.getHTTPClient()
-	request, err := http.NewRequestWithContext(ctx, "GET", generateURL(URLConfig{Hostname: a.Hostname, Methode: "getRecordings", Parameters: map[string]string{}, SharedSecret: a.SharedSecret}), nil)
+	var requestParameters = make(map[string]string)
+	populateRequestParameters(requestParameters, params)
+
+	request, err := http.NewRequestWithContext(ctx, "GET", generateURL(URLConfig{
+		Hostname:     a.Hostname,
+		Methode:      "getRecordings",
+		Parameters:   requestParameters,
+		SharedSecret: a.SharedSecret,
+	}), nil)
 	response, err := client.Do(request)
 	if err != nil {
 		return Recordings{}, err
@@ -36,4 +54,25 @@ func (a *API) GetRecordings(ctx context.Context, MeetingID string) (result Recor
 	}
 
 	return result, nil
+}
+
+func populateRequestParameters(paramMap map[string]string, params getRecordingsParameters) {
+	if params.MeetingID != nil {
+		paramMap["meeting_id"] = *params.MeetingID
+	}
+	if params.RecordID != nil {
+		paramMap["record_id"] = *params.RecordID
+	}
+	if params.State != nil {
+		paramMap["state"] = *params.State
+	}
+	if params.Meta != nil {
+		paramMap["meta"] = *params.Meta
+	}
+	if params.Offset != nil {
+		paramMap["offset"] = strconv.Itoa(*params.Offset)
+	}
+	if params.Limit != nil {
+		paramMap["limit"] = strconv.Itoa(*params.Limit)
+	}
 }

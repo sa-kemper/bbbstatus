@@ -18,15 +18,29 @@ package BBBAPI
 
 import (
 	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
+	"sort"
+	"strings"
 )
 
 func GenerateURL(config URLConfig) string {
-	result := fmt.Sprintf("https://%s/api/%s?", config.Hostname, config.Methode)
-	for key, value := range config.Parameters {
-		result += fmt.Sprintf("%s=%s&", key, value)
+	var paramString string
+	result := fmt.Sprintf("https://%s/bigbluebutton/api/%s?", config.Hostname, config.Methode)
+
+	keys := make([]string, 0, len(config.Parameters))
+	for k := range config.Parameters {
+		keys = append(keys, k)
 	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		result += fmt.Sprintf("%s=%s&", key, config.Parameters[key])
+		paramString += fmt.Sprintf("%s=%s&", key, config.Parameters[key])
+	}
+
+	checksumString := config.Methode + strings.TrimRight(paramString, "&") + config.SharedSecret
 	checksum := sha1.New()
-	checksum.Write([]byte(result + config.SharedSecret))
-	return fmt.Sprintf("%s&checksum=%s", result, checksum.Sum(nil))
+	checksum.Write([]byte(checksumString))
+	return fmt.Sprintf("%schecksum=%s", result, hex.EncodeToString(checksum.Sum(nil)))
 }

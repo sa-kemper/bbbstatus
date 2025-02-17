@@ -23,16 +23,28 @@ import (
 	"strconv"
 )
 
-type getRecordingsParameters struct {
+// GetRecordingsParameters holds the parameters for fetching recordings from the API.
+type GetRecordingsParameters struct {
+	// MeetingID is a meeting ID for getting the recordings. It can be a set of meetingIDs separated by commas. If the meeting ID is not specified, it will get ALL the recordings. If a recordID is specified, the meetingID is ignored.
 	MeetingID *string
-	RecordID  *string
-	State     *string
-	Meta      *string
-	Offset    *int
-	Limit     *int
+
+	// RecordID is a record ID for getting the recordings. It can be a set of recordIDs separated by commas. If the record ID is not specified, it will use meeting ID as the main criteria. If neither the meeting ID nor record ID is specified, it will get ALL the recordings. The recordID can also be used as a wildcard by including only the first characters in the string.
+	RecordID *string
+
+	// State indicates the state of the recording. It can be one of [processing|processed|published|unpublished|deleted]. The parameter state can be used to filter results. If it is not specified, only the states [published|unpublished] are considered. If specified as “any”, recordings in all states are included.
+	State *string
+
+	// Meta allows passing one or more metadata values to filter the recordings returned. The format of these parameters is the same as the metadata passed to the create call.
+	Meta *string
+
+	// Offset is the starting index for returned recordings. The number must be greater than or equal to 0.
+	Offset *int
+
+	// Limit is the maximum number of recordings to be returned. The number must be between 1 and 100.
+	Limit *int
 }
 
-func (a *API) GetRecordings(ctx context.Context, params getRecordingsParameters) (result Recordings, err error) {
+func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters) (result Recordings, err error) {
 	var client = a.getHTTPClient()
 	var requestParameters = make(map[string]string)
 	populateRequestParameters(requestParameters, params)
@@ -56,7 +68,7 @@ func (a *API) GetRecordings(ctx context.Context, params getRecordingsParameters)
 	return result, nil
 }
 
-func populateRequestParameters(paramMap map[string]string, params getRecordingsParameters) {
+func populateRequestParameters(paramMap map[string]string, params GetRecordingsParameters) {
 	if params.MeetingID != nil {
 		paramMap["meeting_id"] = *params.MeetingID
 	}

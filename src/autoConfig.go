@@ -89,7 +89,7 @@ func confGet(key string) string {
 			fmt.Println("DB_CONNECTION_STRING example: postgres://bbbstatus:bbbstatus@localhost/bbbstatus")
 			panic("DB_CONNECTION_STRING environment variable not set")
 		}
-
+		return connStr
 	case "CSV_STRUCTURE":
 		if csvStructure := os.Getenv("CSV_STRUCTURE"); csvStructure != "" {
 			valid := ValidateCSVStructureConfig(csvStructure)

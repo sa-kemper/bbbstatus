@@ -22,7 +22,7 @@ import (
 )
 
 func getConf(name string) string {
-	var env map[string]string
+	var env = make(map[string]string)
 	envConf, err := os.ReadFile(".env")
 	if err != nil {
 		panic(err)

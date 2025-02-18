@@ -19,6 +19,7 @@ package BBBAPI
 import (
 	"context"
 	"encoding/xml"
+	"io"
 	"net/http"
 	"strconv"
 )
@@ -47,6 +48,7 @@ type GetRecordingsParameters struct {
 func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters) (result Recordings, err error) {
 	var client = a.getHTTPClient()
 	var requestParameters = make(map[string]string)
+	var apiResponse GetRecordingsResponse
 	populateRequestParameters(requestParameters, params)
 
 	request, err := http.NewRequestWithContext(ctx, "GET", generateURL(URLConfig{
@@ -60,12 +62,18 @@ func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters)
 		return Recordings{}, err
 	}
 
-	err = xml.NewDecoder(response.Body).Decode(&result)
+	defer response.Body.Close()
+	responseBytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		return Recordings{}, err
 	}
 
-	return result, nil
+	err = xml.Unmarshal(responseBytes, &apiResponse)
+	if err != nil {
+		return Recordings{}, err
+	}
+
+	return apiResponse.Recordings, nil
 }
 
 func populateRequestParameters(paramMap map[string]string, params GetRecordingsParameters) {

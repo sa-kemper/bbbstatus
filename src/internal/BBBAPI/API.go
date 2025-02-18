@@ -23,6 +23,7 @@ import (
 
 type API struct {
 	Hostname     string
+	Port         string
 	SharedSecret string
 	timeout      *time.Duration
 }

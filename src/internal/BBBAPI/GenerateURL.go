@@ -26,7 +26,18 @@ import (
 
 func generateURL(config URLConfig) string {
 	var paramString string
-	result := fmt.Sprintf("https://%s/bigbluebutton/api/%s?", config.Hostname, config.Methode)
+	if config.ApiPort != nil {
+		// ensure port prefix.
+		if !strings.HasPrefix(*config.ApiPort, ":") {
+			*config.ApiPort = ":" + (*config.ApiPort)
+		}
+	} else {
+		// prevent nil pointer dereference
+		var empty string
+		config.ApiPort = &empty
+	}
+
+	result := fmt.Sprintf("https://%s%s/bigbluebutton/api/%s?", config.Hostname, *config.ApiPort, config.Methode)
 
 	keys := make([]string, 0, len(config.Parameters))
 	for k := range config.Parameters {

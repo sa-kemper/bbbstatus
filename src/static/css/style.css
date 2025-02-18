@@ -462,6 +462,27 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     margin-bottom: 1rem;
 }
 
+.recordings-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* Space between links */
+}
+
+.recording-link {
+    padding: 0.5rem 1rem;
+    background-color: #e3f2fd; /* Light background for links */
+    color: #1976d2; /* Link color */
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.recording-link:hover {
+    background-color: #bbdefb; /* Darker background on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+
 /* Responsive Filters Section */
 
 .filters {

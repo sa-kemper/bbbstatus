@@ -17,6 +17,7 @@
 package main
 
 import (
+	"BbbStatus/internal/BBBAPI"
 	"BbbStatus/internal/BBBEvents"
 	"context"
 	"encoding/json"
@@ -42,6 +43,7 @@ type Report struct {
 	Details      []Detail
 	Participants []BBBEvents.User
 	Timeline     []Event
+	Recordings   []BBBAPI.Recording
 }
 
 func init() { // Add all messages that are related to this file into the localization bundle
@@ -61,6 +63,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "ReportMeetingDetailCreationDate", Other: "Creation Date"},
 		{ID: "meetingListHeader", Other: "Meeting List"},
 		{ID: "BackToMeetingsButton", Other: "Back to Meetings"},
+		{ID: "RecordingsHeader", Other: "Recordings"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -74,6 +77,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	var participants []BBBEvents.User
 	var timeline []Event
 	var polls []string
+	var meetingServerAPI BBBAPI.API
 
 	// Connect to the db using
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
@@ -89,12 +93,31 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 		return Report{}, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
 
+	if meeting.BbbHostname != "" {
+		for _, server := range conf.BBBServers {
+			if server.Hostname == meeting.BbbHostname {
+				if server.APITimeout != 0 {
+					apitimeout := time.Duration(server.APITimeout) * time.Second
+					meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apitimeout}
+				} else {
+					meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret}
+				}
+			}
+		}
+	}
+
 	details = FillMeetingDetails(details, meeting)
 
 	err, participants = FillMeetingParticipants(ctx, internalMeetingID, conn)
 	if err != nil {
 		return Report{}, err
 	}
+
+	r, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID})
+	if err != nil {
+		return Report{}, err
+	}
+	recordings := r.Recording
 
 	err, userEvents := FillMeetingUserEvents(ctx, internalMeetingID, conn)
 	if err != nil {
@@ -129,7 +152,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 		return timeline[i].Time.Before(timeline[j].Time)
 	})
 
-	return Report{Details: details, Participants: participants, Timeline: timeline}, nil
+	return Report{Details: details, Participants: participants, Recordings: recordings, Timeline: timeline}, nil
 }
 
 func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, polls *[]string, conn *pgx.Conn) (err error, timeline []Event) {

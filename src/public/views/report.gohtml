@@ -48,6 +48,10 @@ limitations under the License.
         {{template "meetingdetails" .Report.Details}}
         <!-- Participants -->
         {{template "participants" .Report.Participants}}
+        <!-- Recordings -->
+        {{ if .Report.Recordings }}
+            {{template "recordings" .Report.Recordings}}
+        {{ end }}
         <!-- Timeline -->
         {{template "timeline" .Report.Timeline}}
 

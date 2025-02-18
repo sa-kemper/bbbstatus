@@ -79,6 +79,19 @@ func bbbWebHookEvent(c echo.Context) error {
 	if len(addr) != 0 {
 		event.Data.Attributes.Meeting.BbbHostname = strings.TrimRight(addr[0], ".")
 	}
+	// Simple host based webhook safety, not really great but better than nothing at all.
+	if len(conf.BBBServers) > 0 && c.RealIP() != event.Data.Attributes.Meeting.BbbHostname {
+		validHost := false
+		for _, server := range conf.BBBServers {
+			if server.Hostname == event.Data.Attributes.Meeting.BbbHostname {
+				validHost = true
+				break
+			}
+		}
+		if !validHost {
+			return c.String(http.StatusUnauthorized, "Unauthorized")
+		}
+	}
 
 	conn, err := pgx.Connect(context.Background(), confGet("DB_CONNECTION_STRING"))
 	if err != nil {

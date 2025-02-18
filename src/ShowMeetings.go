@@ -1,18 +1,18 @@
 /*
-Copyright 2025 Samuel Kemper
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2025 Samuel Kemper
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package main
 
 import (
@@ -51,9 +51,9 @@ func init() { // Add all messages that are related to this file into the localiz
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 }
 
-// MeetingListMeetingWraper is a container for BBBEvents.MeetingListMeetingWraper.
+// MeetingListMeetingWrapper is a container for BBBEvents.MeetingListMeetingWrapper.
 // I need this so, I can add a meeting URL parameter because I can't get the reverse function inside the template to work.
-type MeetingListMeetingWraper struct {
+type MeetingListMeetingWrapper struct {
 	BBBEventsMeeting BBBEvents.Meeting
 	BbbHostname      string
 	Active           bool
@@ -82,7 +82,7 @@ func showMeetings(c echo.Context) error {
 	}
 	//goland:noinspection ALL
 	defer conn.Close(context.Background())
-	var meetings []MeetingListMeetingWraper
+	var meetings []MeetingListMeetingWrapper
 	var rows pgx.Rows
 	if isFilteredRequest {
 		if endDate.IsZero() {
@@ -98,7 +98,7 @@ func showMeetings(c echo.Context) error {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var m MeetingListMeetingWraper
+		var m MeetingListMeetingWrapper
 		err = rows.Scan(&m.BBBEventsMeeting.InternalMeetingID, &m.BBBEventsMeeting.ExternalMeetingID, &m.BBBEventsMeeting.Name, &m.BBBEventsMeeting.IsBreakout, &m.BBBEventsMeeting.ParentID, &m.BBBEventsMeeting.Duration, &m.BBBEventsMeeting.CreateTime, &m.BBBEventsMeeting.ModeratorPass, &m.BBBEventsMeeting.ViewerPass, &m.BBBEventsMeeting.Record, &m.BBBEventsMeeting.VoiceConf, &m.BBBEventsMeeting.DialNumber, &m.BBBEventsMeeting.MaxUsers, &m.BBBEventsMeeting.Metadata, &m.BbbHostname, &m.Active)
 		m.BBBEventsMeeting.CreateDate = m.BBBEventsMeeting.CreateTime.Format("02.01.2006")
 		meetings = append(meetings, m)

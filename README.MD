@@ -26,21 +26,21 @@ Configuration sources:
 
 ## Configuration behavior
 
-### 1. Default values
-
-If `config.toml` is missing or a parameter is not defined, the program falls back to the hardcoded default values.
-
-### 2. `config.toml`
-
-If present, `config.toml` settings override the default configuration. If missing, a default `config.toml` is
-automatically generated and you can later modify it to your needs.
-
-### 3. Environment variables
+### 1. Environment variables
 
 Environment variables will always override default values and `config.toml` settings by runtime.
 For example:
 
 - `HOST` set in the environment overwrites the set hostname or ip defined in `config.toml`.
+
+### 2. `config.toml`
+
+If present, `config.toml` settings override the default configuration. If missing, a default `config.toml` is
+automatically generated, and you can later modify it to your needs.
+
+### 3. Default values
+If `config.toml` is missing or a parameter is not defined, the program falls back to the hardcoded default values.
+
 
 ## Notes
 

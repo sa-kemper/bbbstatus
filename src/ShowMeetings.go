@@ -88,6 +88,7 @@ func showMeetings(c echo.Context) error {
 		if endDate.IsZero() {
 			endDate = time.Now()
 		}
+		endDate = endDate.Add(time.Hour * 25) // make the end date inclusive.
 		rows, err = conn.Query(context.Background(), "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, duration, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, active FROM meetings WHERE create_time BETWEEN $1 AND $2", startDate, endDate)
 
 	} else {

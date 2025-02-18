@@ -16,13 +16,14 @@ Configuration sources:
 2. config.toml: overrides existing defaults if correctly set.
 3. environment variables: overrides specific settings by runtime when provided.
 
-| **Parameter**          | **default value**                                    | **description**                                                  |
-|------------------------|------------------------------------------------------|------------------------------------------------------------------|
-| `PORT`                 | `8080`                                               | Port on which bbbstatus will run (default 8080).                 |
-| `HOST`                 | `localhost`                                          | Hostname or IP address of bbbstatus.                             |
-| `DB_CONNECTION_STRING` | `postgres://bbbstatus:bbbstatus@localhost/bbbstatus` | Database connection string (PostgreSQL).                         |
-| `CSV_STRUCTURE`        | `time,user,action,text representation`               | Defines the structure of the CSV format for exports.             |
-| `SERVE_STATIC_CONTENT` | `true`                                               | Serving static content (`true` or `false`).                      |
+| **Parameter**          | **default value**                                    | **description**                                                                                       | Section        |
+|------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------|----------------|
+| `PORT`                 | `8080`                                               | Port on which bbbstatus will run (default 8080).                                                      | BaseConfig     |
+| `HOST`                 | `localhost`                                          | Hostname or IP address of bbbstatus.                                                                  | BaseConfig     |
+| `DB_CONNECTION_STRING` | `postgres://bbbstatus:bbbstatus@localhost/bbbstatus` | Database connection string (PostgreSQL).                                                              | DatabaseConfig |
+| `CSV_STRUCTURE`        | `time,user,action,text representation`               | Defines the structure of the CSV format for exports.                                                  | ReportConfig   |
+| `SERVE_STATIC_CONTENT` | `true`                                               | Serving static content (`true` or `false`).                                                           | BaseConfig     |
+| `BBBServers`           | *None*                                               | A list of Big Blue Button servers used for webhook validation, API functions and Report configuration | BBBServers     |
 
 ## Configuration behavior
 
@@ -37,10 +38,16 @@ For example:
 
 If present, `config.toml` settings override the default configuration. If missing, a default `config.toml` is
 automatically generated, and you can later modify it to your needs.
+If Environment variables are set, they override both the default configuration **and** the config.toml configuration
 
 ### 3. Default values
 If `config.toml` is missing or a parameter is not defined, the program falls back to the hardcoded default values.
 
+### 4. BBBServers
+
+At the time of writing, the BBBServer configuration has no lookup or usage, it is reserved for later use, the design
+philosiphy is to use the information available, now matter how little there may be, to deliver the best experience
+possible, whilst being verbose of missing information.
 
 ## Notes
 

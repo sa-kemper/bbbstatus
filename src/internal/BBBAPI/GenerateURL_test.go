@@ -31,7 +31,7 @@ func TestGenerateURL(t *testing.T) {
 			name: "Generate Valid URL",
 			args: args{
 				config: URLConfig{
-					Hostname: getConf("bbbHostname"),
+					Hostname: confGet("bbbHostname"),
 					Methode:  "create",
 					Parameters: map[string]string{
 						"allowStartStopRecording": "true",
@@ -43,10 +43,10 @@ func TestGenerateURL(t *testing.T) {
 						"record":                  "false",
 						"voiceBridge":             "71225",
 					},
-					SharedSecret: getConf("bbbSharedSecret"),
+					SharedSecret: confGet("bbbSharedSecret"),
 				},
 			},
-			want: getConf("bbbCreateURL"),
+			want: confGet("bbbCreateURL"),
 		},
 	}
 	for _, tt := range tests {

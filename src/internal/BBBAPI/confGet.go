@@ -21,7 +21,7 @@ import (
 	"strings"
 )
 
-func getConf(name string) string {
+func confGet(name string) string {
 	var env = make(map[string]string)
 	envConf, err := os.ReadFile(".env")
 	if err != nil {

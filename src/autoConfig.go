@@ -24,22 +24,59 @@ import (
 	"strings"
 )
 
-var conf = map[string]string{
-	"PORT":                 "8080",
-	"HOST":                 "0.0.0.0",
-	"DB_CONNECTION_STRING": "postgres://bbbstatus:bbbstatus@localhost/bbbstatus",
-	"CSV_STRUCTURE":        "time,user,action,text representation",
-	"SERVE_STATIC_CONTENT": "true",
+var defaultHTTPSPort = "443"
+
+type config struct {
+	BaseConfig     baseConfig
+	ReportConfig   reportConfig
+	DatabaseConfig dbConfig
+	BBBServers     []bbbServer
 }
+
+type baseConfig struct {
+	Host               string `toml:"HOST"`
+	Port               string `toml:"PORT"`
+	ServeStaticContent bool   `toml:"SERVE_STATIC_CONTENT"`
+}
+
+type reportConfig struct {
+	CsvStructure string `toml:"CSV_STRUCTURE"`
+}
+
+type dbConfig struct {
+	DatabaseConnectionString string `toml:"DB_CONNECTION_STRING"`
+}
+
+type bbbServer struct {
+	Hostname     string `toml:"HOSTNAME"`      // required
+	ApiPort      string `toml:"API_PORT"`      // required only if not 443
+	SharedSecret string `toml:"SHARED_SECRET"` // required only if API usage is needed
+	APITimeout   int    `toml:"API_TIMEOUT"`   // defaults to 2 (seconds)
+	FriendlyName string `toml:"FRIENDLY_NAME"` // not required
+}
+
+var defaultConfiguration = config{
+	BaseConfig:     baseConfig{Host: "0.0.0.0", Port: "8080", ServeStaticContent: true},
+	ReportConfig:   reportConfig{CsvStructure: "time,user,action,text representation"},
+	DatabaseConfig: dbConfig{DatabaseConnectionString: "postgres://bbbstatus:bbbstatus@localhost/bbbstatus"},
+	BBBServers: []bbbServer{
+		{Hostname: "localhost", ApiPort: "443", SharedSecret: "aDefaultSharedSecret", APITimeout: 5},
+		{Hostname: "otherhost", ApiPort: "443", SharedSecret: "aDefaultSharedSecret", APITimeout: 2},
+	},
+}
+
 var confFileExists bool
+var conf config
 
 func init() {
-	var configFileConf = make(map[string]string)
+	var configFileConf config
 	var content, err = os.ReadFile("config.toml")
-	if err != nil {
-		fmt.Println("config.toml does not exist")
+
+	if err != nil { // error reading the config
+		// TODO: handle the error differently depending on why the file couldn't be read.
+		fmt.Println("config.toml does not exist") // the config file may be unreadable. further error handling is required.
 		confFileExists = false
-		defaultConfig, err := toml.Marshal(conf)
+		defaultConfig, err := toml.Marshal(defaultConfiguration)
 		if err != nil {
 			fmt.Println("Error occurred marshaling the default config file to the current work directory:", err)
 			return
@@ -52,24 +89,30 @@ func init() {
 		}
 		return
 	}
+
 	err = toml.Unmarshal(content, &configFileConf)
 	if err != nil {
 		fmt.Println("Error occurred unmarshaling the default config file to the current work directory:", err)
 	}
+
 	confFileExists = true
 	conf = configFileConf
+
+	if len(conf.BBBServers) < 1 {
+		fmt.Println("No servers configured. Expect API config to not work at all, The webhook validator will consider any package as valid.")
+	}
 }
 
 // A function to safely obtain configured values and sensible defaults
 func confGet(key string) string {
-	if confFileExists {
-		return conf[key]
-	}
 	switch key {
 	case "HOST":
 		var host string
 		if host = os.Getenv("HOST"); host != "" {
 			return host
+		}
+		if conf.BaseConfig.Host != "" {
+			return conf.BaseConfig.Host
 		}
 		if host, _ = os.Hostname(); host != "" {
 			return host
@@ -80,24 +123,41 @@ func confGet(key string) string {
 		if port := os.Getenv("PORT"); port != "" {
 			return port
 		}
+		if conf.BaseConfig.Port != "" {
+			return conf.BaseConfig.Port
+		}
 		return "8080"
 
 	case "DB_CONNECTION_STRING":
 		connStr := os.Getenv("DB_CONNECTION_STRING")
-		if connStr == "" {
-			fmt.Println("https://www.postgresql.org/docs/12/libpq-connect.html#id-1.7.3.8.3.6")
-			fmt.Println("DB_CONNECTION_STRING example: postgres://bbbstatus:bbbstatus@localhost/bbbstatus")
-			panic("DB_CONNECTION_STRING environment variable not set")
+		if connStr != "" {
+			return connStr
 		}
-		return connStr
+
+		connStr = conf.DatabaseConfig.DatabaseConnectionString
+		if connStr != "" {
+			return connStr
+		}
+
+		fmt.Println("https://www.postgresql.org/docs/12/libpq-connect.html#id-1.7.3.8.3.6")
+		fmt.Println("DB_CONNECTION_STRING example: postgres://bbbstatus:bbbstatus@localhost/bbbstatus")
+		panic("DB_CONNECTION_STRING environment variable not set")
+
 	case "CSV_STRUCTURE":
 		if csvStructure := os.Getenv("CSV_STRUCTURE"); csvStructure != "" {
 			valid := ValidateCSVStructureConfig(csvStructure)
 			if valid != nil {
-				panic(valid)
+				panic("The provided CSV_STRUCTURE environment variable is not valid.")
 			}
 			return csvStructure
 		}
+		if csvStructure := conf.ReportConfig.CsvStructure; csvStructure != "" {
+			valid := ValidateCSVStructureConfig(csvStructure)
+			if valid != nil {
+				panic("The provided CSV_STRUCTURE config.toml variable is not valid.")
+			}
+		}
+
 		return "time,user,action,text representation"
 
 	case "SERVE_STATIC_CONTENT":
@@ -105,12 +165,15 @@ func confGet(key string) string {
 		if strings.ToLower(strings.TrimSpace(serveStaticContent)) == "true" {
 			return "true"
 		}
+
 		if strings.ToLower(strings.TrimSpace(serveStaticContent)) == "false" {
 			return "false"
 		}
 
-		fmt.Printf("we have trouble understanding your configuration. Please check the content of the SERVE_STATIC_CONTENT environment variable.\n")
-		return "true"
+		if conf.BaseConfig.ServeStaticContent {
+			return "true"
+		}
+		return "false"
 	}
 	fmt.Printf("ISSUES REGARDING CONFIGURATION KEY: '%s'\r\n", key)
 	return os.Getenv(key)

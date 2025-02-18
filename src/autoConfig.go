@@ -62,7 +62,7 @@ var defaultConfiguration = config{
 	DatabaseConfig: dbConfig{DatabaseConnectionString: "postgres://bbbstatus:bbbstatus@localhost/bbbstatus"},
 	BBBServers: []bbbServer{
 		{Hostname: "localhost", ApiPort: "443", SharedSecret: "aDefaultSharedSecret", APITimeout: 5},
-		{Hostname: "otherhost", ApiPort: "443", SharedSecret: "aDefaultSharedSecret", APITimeout: 2},
+		{Hostname: "other-host", ApiPort: "443", SharedSecret: "aDefaultSharedSecret", APITimeout: 2},
 	},
 }
 
@@ -75,7 +75,6 @@ func init() {
 	if err != nil { // error reading the config
 		// TODO: handle the error differently depending on why the file couldn't be read.
 		fmt.Println("config.toml does not exist") // the config file may be unreadable. further error handling is required.
-		confFileExists = false
 		defaultConfig, err := toml.Marshal(defaultConfiguration)
 		if err != nil {
 			fmt.Println("Error occurred marshaling the default config file to the current work directory:", err)
@@ -92,10 +91,9 @@ func init() {
 
 	err = toml.Unmarshal(content, &configFileConf)
 	if err != nil {
-		fmt.Println("Error occurred unmarshaling the default config file to the current work directory:", err)
+		fmt.Println("Error occurred unmarshalling the default config file to the current work directory:", err)
 	}
 
-	confFileExists = true
 	conf = configFileConf
 
 	if len(conf.BBBServers) < 1 {
@@ -106,9 +104,9 @@ func init() {
 		APITimeout := time.Duration(server.APITimeout) * time.Second
 		var api BBBAPI.API
 		if APITimeout != 0 {
-			api = BBBAPI.API{server.Hostname, server.ApiPort, server.SharedSecret, &APITimeout}
+			api = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &APITimeout}
 		} else {
-			api = BBBAPI.API{server.Hostname, server.ApiPort, server.SharedSecret, nil}
+			api = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret}
 		}
 		valid, err := api.ValidateApiSettings(context.Background())
 		if !valid {

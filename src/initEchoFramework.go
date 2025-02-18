@@ -23,7 +23,9 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"html/template"
+	"net"
 	"os"
+	"strings"
 )
 
 var echof *echo.Echo
@@ -71,10 +73,21 @@ func initEchoFramework() {
 	echof.Renderer = Templates
 	echof.Use(middleware.Logger())
 	echof.Use(middleware.Recover())
-	/*echof.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-		TokenLookup: "header:X-XSRF-TOKEN",
-	}))*/
 	echof.Logger.SetLevel(log.INFO)
+
+	// setup trusted proxies in order to trust x-forwarded-for.
+	var proxyTrustOptions []echo.TrustOption
+	for _, strCIDR := range strings.Split(confGet("TRUSTED_PROXIES"), ",") {
+		_, cidr, err := net.ParseCIDR(strCIDR)
+		if err != nil {
+			fmt.Println("Echo framework init -> proxy trust options")
+			fmt.Printf("Error parsing CIDR: %v\n", err)
+			panic(err)
+		}
+		proxyTrustOptions = append(proxyTrustOptions, echo.TrustIPRange(cidr))
+	}
+
+	echof.IPExtractor = echo.ExtractIPFromXFFHeader(proxyTrustOptions...)
 
 	if _, err := os.Stat(staticContentOverwriteFolder); err == nil {
 		echof.Static("/static", staticContentOverwriteFolder)

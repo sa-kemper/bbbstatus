@@ -38,6 +38,7 @@ type baseConfig struct {
 	Host               string `toml:"HOST"`
 	Port               string `toml:"PORT"`
 	ServeStaticContent bool   `toml:"SERVE_STATIC_CONTENT"`
+	TrustedProxies     string `toml:"TRUSTED_PROXIES"`
 }
 
 type reportConfig struct {
@@ -187,7 +188,17 @@ func confGet(key string) string {
 			return "true"
 		}
 		return "false"
+	case "TRUSTED_PROXIES":
+		var trustedProxies = os.Getenv("TRUSTED_PROXIES")
+		if trustedProxies != "" {
+			return trustedProxies
+		}
+		if trustedProxies = conf.BaseConfig.TrustedProxies; trustedProxies != "" {
+			return trustedProxies
+		}
+		return "127.0.0.1/8,172.17.0.1/16,::1/128" // In my opinion, a sane default.
 	}
+
 	fmt.Printf("ISSUES REGARDING CONFIGURATION KEY: '%s'\r\n", key)
 	return os.Getenv(key)
 }

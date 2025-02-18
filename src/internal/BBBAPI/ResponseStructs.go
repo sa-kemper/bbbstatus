@@ -16,8 +16,6 @@
 
 package BBBAPI
 
-import "time"
-
 type GetRecordingsResponse struct {
 	ReturnCode string     `xml:"returncode"`
 	Recordings Recordings `xml:"recordings"`
@@ -32,8 +30,8 @@ type Recording struct {
 	IsBreakout   bool              `xml:"isBreakout"`
 	Published    string            `xml:"published"`
 	State        string            `xml:"state"`
-	StartTime    time.Time         `xml:"startTime"`
-	EndTime      time.Time         `xml:"endTime"`
+	StartTime    string            `xml:"startTime"`
+	EndTime      string            `xml:"endTime"`
 	Participants int               `xml:"participants"`
 	MetaData     RecordingMetadata `xml:"metadata"`
 	Playback     struct {

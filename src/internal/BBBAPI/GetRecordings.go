@@ -53,6 +53,7 @@ func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters)
 
 	request, err := http.NewRequestWithContext(ctx, "GET", generateURL(URLConfig{
 		Hostname:     a.Hostname,
+		ApiPort:      &a.Port,
 		Methode:      "getRecordings",
 		Parameters:   requestParameters,
 		SharedSecret: a.SharedSecret,

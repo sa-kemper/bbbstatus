@@ -25,7 +25,7 @@ type API struct {
 	Hostname     string
 	Port         string
 	SharedSecret string
-	timeout      *time.Duration
+	Timeout      *time.Duration
 }
 
 func (a *API) getHTTPClient() (client *http.Client) {

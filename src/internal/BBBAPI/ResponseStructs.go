@@ -50,3 +50,62 @@ type RecordingMetadata struct {
 	GreenLightListed bool   `xml:"gl-listed"`
 	MeetingId        string `xml:"meetingId"`
 }
+
+type GetMeetingsResponse struct {
+	ReturnCode string      `xml:"returncode"`
+	Meetings   allMeetings `xml:"meetings"`
+	MessageKey string      `xml:"messageKey"`
+}
+type allMeetings struct {
+	MeetingInfo []GetMeetingInfoResponse `xml:"meeting"`
+}
+
+type GetMeetingInfoResponse struct {
+	ReturnCode            string    `xml:"returncode"`
+	MeetingName           string    `xml:"meetingName"`
+	MeetingID             string    `xml:"meetingID"`
+	InternalMeetingID     string    `xml:"internalMeetingID"`
+	CreateTime            string    `xml:"createTime"`
+	CreateDate            string    `xml:"createDate"`
+	VoiceBridge           string    `xml:"voiceBridge"`
+	DialNumber            string    `xml:"dialNumber"`
+	AttendeePW            string    `xml:"attendeePW"`
+	ModeratorPW           string    `xml:"moderatorPW"`
+	Running               bool      `xml:"running"`
+	Duration              int       `xml:"duration"`
+	HasUserJoined         bool      `xml:"hasUserJoined"`
+	Recording             bool      `xml:"recording"`
+	HasBeenForciblyEnded  bool      `xml:"hasBeenForciblyEnded"`
+	StartTime             string    `xml:"startTime"`
+	EndTime               string    `xml:"endTime"`
+	ParticipantCount      int       `xml:"participantCount"`
+	ListenerCount         int       `xml:"listenerCount"`
+	VoiceParticipantCount int       `xml:"voiceParticipantCount"`
+	VideoCount            int       `xml:"videoCount"`
+	MaxUsers              int       `xml:"maxUsers"`
+	ModeratorCount        int       `xml:"moderatorCount"`
+	Attendees             attendees `xml:"attendees"`
+	Metadata              string    `xml:"metadata"`
+	MessageKey            string    `xml:"messageKey"`
+	Message               string    `xml:"message"`
+	//untested
+	BreakoutRooms breakoutRooms `xml:"breakoutRooms"`
+}
+type breakoutRooms struct {
+	BreakoutRooms []string `xml:"breakout"`
+}
+
+type attendees struct {
+	Attendees []attendee `xml:"attendee"`
+}
+
+type attendee struct {
+	UserID          string `xml:"userID"`
+	FullName        string `xml:"fullName"`
+	Role            string `xml:"role"`
+	IsPresenter     bool   `xml:"isPresenter"`
+	IsListeningOnly bool   `xml:"isListeningOnly"`
+	HasJoinedVoice  bool   `xml:"hasJoinedVoice"`
+	HasVideo        bool   `xml:"hasVideo"`
+	Customdata      string `xml:"customdata"`
+}

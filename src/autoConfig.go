@@ -27,8 +27,6 @@ import (
 	"time"
 )
 
-var defaultHTTPSPort = "443"
-
 type config struct {
 	BaseConfig     baseConfig
 	ReportConfig   reportConfig
@@ -68,7 +66,6 @@ var defaultConfiguration = config{
 	},
 }
 
-var confFileExists bool
 var conf config
 
 func init() {

@@ -22,6 +22,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // GetRecordingsParameters holds the parameters for fetching recordings from the API.
@@ -73,16 +74,22 @@ func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters)
 	if err != nil {
 		return Recordings{}, err
 	}
+	for recordIndex, recording := range apiResponse.Recordings.Recording {
+		for formatIndex, format := range recording.Playback.Format {
+			apiResponse.Recordings.Recording[recordIndex].Playback.Format[formatIndex].Url = strings.ReplaceAll(format.Url, "\n", "")
+			apiResponse.Recordings.Recording[recordIndex].Playback.Format[formatIndex].Url = strings.TrimSpace(format.Url)
+		}
+	}
 
 	return apiResponse.Recordings, nil
 }
 
 func populateRequestParameters(paramMap map[string]string, params GetRecordingsParameters) {
 	if params.MeetingID != nil {
-		paramMap["meeting_id"] = *params.MeetingID
+		paramMap["meetingID"] = *params.MeetingID
 	}
 	if params.RecordID != nil {
-		paramMap["record_id"] = *params.RecordID
+		paramMap["recordID"] = *params.RecordID
 	}
 	if params.State != nil {
 		paramMap["state"] = *params.State

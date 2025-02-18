@@ -28,7 +28,7 @@ type Recording struct {
 	MeetingID    string            `xml:"meetingID"`
 	Name         string            `xml:"name"`
 	IsBreakout   bool              `xml:"isBreakout"`
-	Published    string            `xml:"published"`
+	Published    bool              `xml:"published"`
 	State        string            `xml:"state"`
 	StartTime    string            `xml:"startTime"`
 	EndTime      string            `xml:"endTime"`

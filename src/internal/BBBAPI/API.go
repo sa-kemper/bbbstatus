@@ -29,8 +29,8 @@ type API struct {
 }
 
 func (a *API) getHTTPClient() (client *http.Client) {
-	if a.timeout != nil {
-		client = &http.Client{Timeout: *a.timeout}
+	if a.Timeout != nil {
+		client = &http.Client{Timeout: *a.Timeout}
 	} else {
 		client = &http.Client{Timeout: time.Second * 2}
 	}

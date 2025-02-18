@@ -17,11 +17,14 @@
 package main
 
 import (
+	"BbbStatus/internal/BBBAPI"
+	"context"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"os"
 	"slices"
 	"strings"
+	"time"
 )
 
 var defaultHTTPSPort = "443"
@@ -100,6 +103,21 @@ func init() {
 
 	if len(conf.BBBServers) < 1 {
 		fmt.Println("No servers configured. Expect API config to not work at all, The webhook validator will consider any package as valid.")
+	}
+	// Validate the read BBBServers config by checking for API access
+	for _, server := range conf.BBBServers {
+		APITimeout := time.Duration(server.APITimeout) * time.Second
+		var api BBBAPI.API
+		if APITimeout != 0 {
+			api = BBBAPI.API{server.Hostname, server.ApiPort, server.SharedSecret, &APITimeout}
+		} else {
+			api = BBBAPI.API{server.Hostname, server.ApiPort, server.SharedSecret, nil}
+		}
+		valid, err := api.ValidateApiSettings(context.Background())
+		if !valid {
+			fmt.Println(server.Hostname + ": Invalid API settings")
+			fmt.Println("Error occurred validating the API settings: ", err)
+		}
 	}
 }
 

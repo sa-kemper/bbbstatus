@@ -78,6 +78,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	var timeline []Event
 	var polls []string
 	var meetingServerAPI BBBAPI.API
+	var recordings []BBBAPI.Recording
 
 	// Connect to the db using
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
@@ -113,11 +114,13 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 		return Report{}, err
 	}
 
-	r, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID})
-	if err != nil {
-		return Report{}, err
+	if meetingServerAPI.Hostname != "" && meetingServerAPI.SharedSecret != "" {
+		getRecordingsResponse, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID})
+		if err != nil {
+			return Report{}, err
+		}
+		recordings = getRecordingsResponse.Recording
 	}
-	recordings := r.Recording
 
 	err, userEvents := FillMeetingUserEvents(ctx, internalMeetingID, conn)
 	if err != nil {

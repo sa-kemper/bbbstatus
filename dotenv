@@ -21,3 +21,5 @@ DB_CONNECTION_STRING=postgresql://bbbstatus:bbbstatus@db:5432/bbbstatus
 
 # Where the data should be stored defaults to current folder (careful, if you use the default only run the docker compose file within the same folder)
 DATABASE_DIRECTORY=.
+
+TRUSTED_PROXIES=127.0.0.1/8,172.17.0.1/16,::1/128

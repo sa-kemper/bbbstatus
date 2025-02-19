@@ -76,18 +76,22 @@ func initEchoFramework() {
 	echof.Logger.SetLevel(log.INFO)
 
 	// setup trusted proxies in order to trust x-forwarded-for.
-	var proxyTrustOptions []echo.TrustOption
-	for _, strCIDR := range strings.Split(confGet("TRUSTED_PROXIES"), ",") {
-		_, cidr, err := net.ParseCIDR(strCIDR)
-		if err != nil {
-			fmt.Println("Echo framework init -> proxy trust options")
-			fmt.Printf("Error parsing CIDR: %v\n", err)
-			panic(err)
+	if len(confGet("TRUSTED_PROXIES")) > 3 {
+		var proxyTrustOptions []echo.TrustOption
+		for _, strCIDR := range strings.Split(confGet("TRUSTED_PROXIES"), ",") {
+			if len(strCIDR) < 3 {
+				panic("Something is seriously wrong with the TRUSTED_PROXIES configuration. CIDR read:" + strCIDR + ", Full config: " + confGet("TRUSTED_PROXIES"))
+			}
+			_, cidr, err := net.ParseCIDR(strCIDR)
+			if err != nil {
+				fmt.Println("Echo framework init -> proxy trust options")
+				fmt.Printf("Error parsing CIDR: %v\n", err)
+				panic(err)
+			}
+			proxyTrustOptions = append(proxyTrustOptions, echo.TrustIPRange(cidr))
 		}
-		proxyTrustOptions = append(proxyTrustOptions, echo.TrustIPRange(cidr))
+		echof.IPExtractor = echo.ExtractIPFromXFFHeader(proxyTrustOptions...)
 	}
-
-	echof.IPExtractor = echo.ExtractIPFromXFFHeader(proxyTrustOptions...)
 
 	if _, err := os.Stat(staticContentOverwriteFolder); err == nil {
 		echof.Static("/static", staticContentOverwriteFolder)

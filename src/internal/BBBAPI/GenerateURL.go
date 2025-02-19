@@ -26,7 +26,7 @@ import (
 
 func generateURL(config URLConfig) string {
 	var paramString string
-	if config.ApiPort != nil {
+	if config.ApiPort != nil && *config.ApiPort != "" {
 		// ensure port prefix.
 		if !strings.HasPrefix(*config.ApiPort, ":") {
 			*config.ApiPort = ":" + (*config.ApiPort)

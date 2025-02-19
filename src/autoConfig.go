@@ -122,8 +122,8 @@ func confGet(key string) string {
 	switch key {
 	case "HOST":
 		var host string
-		if host = os.Getenv("HOST"); host != "" {
-			return host
+		if val, exists := os.LookupEnv(key); exists {
+			return val
 		}
 		if conf.BaseConfig.Host != "" {
 			return conf.BaseConfig.Host
@@ -134,8 +134,8 @@ func confGet(key string) string {
 		return "0.0.0.0"
 
 	case "PORT":
-		if port := os.Getenv("PORT"); port != "" {
-			return port
+		if val, exists := os.LookupEnv(key); exists {
+			return val
 		}
 		if conf.BaseConfig.Port != "" {
 			return conf.BaseConfig.Port
@@ -143,12 +143,11 @@ func confGet(key string) string {
 		return "8080"
 
 	case "DB_CONNECTION_STRING":
-		connStr := os.Getenv("DB_CONNECTION_STRING")
-		if connStr != "" {
-			return connStr
+		if val, exists := os.LookupEnv(key); exists {
+			return val
 		}
 
-		connStr = conf.DatabaseConfig.DatabaseConnectionString
+		connStr := conf.DatabaseConfig.DatabaseConnectionString
 		if connStr != "" {
 			return connStr
 		}
@@ -158,13 +157,10 @@ func confGet(key string) string {
 		panic("DB_CONNECTION_STRING environment variable not set")
 
 	case "CSV_STRUCTURE":
-		if csvStructure := os.Getenv("CSV_STRUCTURE"); csvStructure != "" {
-			valid := ValidateCSVStructureConfig(csvStructure)
-			if valid != nil {
-				panic("The provided CSV_STRUCTURE environment variable is not valid.")
-			}
-			return csvStructure
+		if val, exists := os.LookupEnv(key); exists {
+			return val
 		}
+
 		if csvStructure := conf.ReportConfig.CsvStructure; csvStructure != "" {
 			valid := ValidateCSVStructureConfig(csvStructure)
 			if valid != nil {
@@ -175,13 +171,8 @@ func confGet(key string) string {
 		return "time,user,action,text representation"
 
 	case "SERVE_STATIC_CONTENT":
-		var serveStaticContent = os.Getenv("SERVE_STATIC_CONTENT")
-		if strings.ToLower(strings.TrimSpace(serveStaticContent)) == "true" {
-			return "true"
-		}
-
-		if strings.ToLower(strings.TrimSpace(serveStaticContent)) == "false" {
-			return "false"
+		if val, exists := os.LookupEnv(key); exists {
+			return strings.ToLower(val)
 		}
 
 		if conf.BaseConfig.ServeStaticContent {
@@ -189,11 +180,10 @@ func confGet(key string) string {
 		}
 		return "false"
 	case "TRUSTED_PROXIES":
-		var trustedProxies = os.Getenv("TRUSTED_PROXIES")
-		if trustedProxies != "" {
-			return trustedProxies
+		if val, exists := os.LookupEnv(key); exists {
+			return val
 		}
-		if trustedProxies = conf.BaseConfig.TrustedProxies; trustedProxies != "" {
+		if trustedProxies := conf.BaseConfig.TrustedProxies; trustedProxies != "" {
 			return trustedProxies
 		}
 		return "127.0.0.1/8,172.17.0.1/16,::1/128" // In my opinion, a sane default.

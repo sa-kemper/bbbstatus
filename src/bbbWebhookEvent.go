@@ -66,12 +66,11 @@ func bbbWebHookEvent(c echo.Context) error {
 		return err
 	}
 
-	// Try to obtain the servers Hostname, and choose the first returned one, if none are returned use the IP as hostname.
-	addr, err := net.LookupAddr(c.RealIP()) // TODO: Make the Echo#IPExtractor configurable.
+	addr, err := net.LookupAddr(getIpFromContext(c).String())
 	if err != nil || len(addr) == 0 {
-		fmt.Println("Failed to obtain BBBServer hostname of host:", c.RealIP())
+		fmt.Println("Failed to obtain BBBServer hostname of host:", getIpFromContext(c))
 		fmt.Println(err)
-		event.Data.Attributes.Meeting.BbbHostname = c.RealIP()
+		event.Data.Attributes.Meeting.BbbHostname = getIpFromContext(c).String()
 	}
 	if len(addr) > 1 {
 		fmt.Println("LookupAddr returned more then one addr:", addr)
@@ -80,7 +79,7 @@ func bbbWebHookEvent(c echo.Context) error {
 		event.Data.Attributes.Meeting.BbbHostname = strings.TrimRight(addr[0], ".")
 	}
 	// Simple host based webhook safety, not really great but better than nothing at all.
-	if len(conf.BBBServers) > 0 && c.RealIP() != event.Data.Attributes.Meeting.BbbHostname {
+	if len(conf.BBBServers) > 0 && getIpFromContext(c).String() != event.Data.Attributes.Meeting.BbbHostname {
 		validHost := false
 		for _, server := range conf.BBBServers {
 			if server.Hostname == event.Data.Attributes.Meeting.BbbHostname {

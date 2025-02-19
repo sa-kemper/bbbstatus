@@ -16,14 +16,15 @@ Configuration sources:
 2. config.toml: overrides existing defaults if correctly set.
 3. environment variables: overrides specific settings by runtime when provided.
 
-| **Parameter**          | **default value**                                    | **description**                                                                                       | Section        |
-|------------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------------------|----------------|
-| `PORT`                 | `8080`                                               | Port on which bbbstatus will run (default 8080).                                                      | BaseConfig     |
-| `HOST`                 | `localhost`                                          | Hostname or IP address of bbbstatus.                                                                  | BaseConfig     |
-| `DB_CONNECTION_STRING` | `postgres://bbbstatus:bbbstatus@localhost/bbbstatus` | Database connection string (PostgreSQL).                                                              | DatabaseConfig |
-| `CSV_STRUCTURE`        | `time,user,action,text representation`               | Defines the structure of the CSV format for exports.                                                  | ReportConfig   |
-| `SERVE_STATIC_CONTENT` | `true`                                               | Serving static content (`true` or `false`).                                                           | BaseConfig     |
-| `BBBServers`           | *None*                                               | A list of Big Blue Button servers used for webhook validation, API functions and Report configuration | BBBServers     |
+| **Parameter**          | **default value**                                    | **description**                                                                                                                                                            | Section        |
+|------------------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
+| `PORT`                 | `8080`                                               | Port on which bbbstatus will run (default 8080).                                                                                                                           | BaseConfig     |
+| `HOST`                 | `localhost`                                          | Hostname or IP address of bbbstatus.                                                                                                                                       | BaseConfig     |
+| `DB_CONNECTION_STRING` | `postgres://bbbstatus:bbbstatus@localhost/bbbstatus` | Database connection string (PostgreSQL).                                                                                                                                   | DatabaseConfig |
+| `CSV_STRUCTURE`        | `time,user,action,text representation`               | Defines the structure of the CSV format for exports.                                                                                                                       | ReportConfig   |
+| `SERVE_STATIC_CONTENT` | `true`                                               | Serving static content (`true` or `false`).                                                                                                                                | BaseConfig     |
+| `BBBServers`           | *None*                                               | A list of Big Blue Button servers used for webhook validation, API functions and Report configuration                                                                      | BBBServers     |
+| `TRUSTED_PROXIES`      | `127.0.0.1/8,172.17.0.1/16,::1/128`                  | A comma seperated list of CIDR notated network ranges, used to identify the *real ip* of the client, configure this value to be the list of proxies in your infrastructure | BaseConfig     | 
 
 ## Configuration behavior
 
@@ -155,10 +156,34 @@ Now you can start, enable, stop, view logs, restart bbbstatus using the common s
 
 # Deployment Docker (minimal)
 
-Make a directory to hold the docker compose file, the .env file and the data folder from bbbstatus and Caddy (the default webserver).
+Make a directory to hold the docker compose file, the .env file, the Caddyfile and the data folder from bbbstatus and
+Caddy (the default webserver).
 
 Create a file named `docker-compose.yml` using your favorite text editor, and insert the contents of [the example docker compose file](docker-compose.yml).
 Or just simply download the given example of this repository.
 Save the changes, and create a new file called `.env`
 Insert the contents of the [example file](dotenv) and change the configuration parameters to your needs.
 You should change at least the database username, and the database password.
+
+bbbstatus requires either full ipv6 support or fully disabled ipv6 support.
+If your bbb server sends webhooks using ipv6, bbbstatus **MUST** receive it as ipv6 as well.
+
+### For the next step Choose **ONE** of the two config options
+
+1. Fully enable IPV6 for the docker host
+
+   On your docker host edit `/etc/docker/daemon.json`
+   and paste this configuration:
+    ```json
+    {
+        "ipv6": true,
+        "fixed-cidr-v6": "fd00::/80"
+    }
+   ```
+
+2. Fully disable IPV6 for the docker host
+
+   On your docker host edit `/etc/sysctl.d/01-disable-ipv6.conf`
+   and paste this configuration:
+   `net.ipv6.conf.all.disable_ipv6 = 1`
+

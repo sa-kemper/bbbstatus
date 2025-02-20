@@ -17,12 +17,14 @@ package main
 
 import (
 	"BbbStatus/internal/BBBEvents"
+	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 	"net/http"
+	"os"
 	"sort"
 	"time"
 )
@@ -95,6 +97,10 @@ func showMeetings(c echo.Context) error {
 		rows, err = conn.Query(ctx, "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, duration, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, active FROM meetings")
 	}
 	if err != nil {
+		if errors.Is(err, os.ErrDeadlineExceeded) {
+			fmt.Println("FATAL: Database timed out")
+		}
+
 		return err
 	}
 	defer rows.Close()

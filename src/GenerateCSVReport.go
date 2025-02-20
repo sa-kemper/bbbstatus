@@ -20,9 +20,11 @@ import (
 	"BbbStatus/internal/BBBEvents"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"os"
 	"sort"
 	"strings"
 	"time"
@@ -66,6 +68,9 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 	var polls *[]string
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
+		if errors.Is(err, os.ErrDeadlineExceeded) {
+			fmt.Println("FATAL Database timed out")
+		}
 		return nil, err
 	}
 	err = conn.Ping(ctx)

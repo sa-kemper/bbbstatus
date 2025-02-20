@@ -17,15 +17,21 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"os"
 )
 
 func downloadMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
 	var report, err = GenerateCSVReport(c.Request().Context(), internalMeetingId)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		if errors.Is(err, os.ErrDeadlineExceeded) { // this function may execute for a considerable amount of time. It's not completely unreasonable to assume that it may exceed time limits.
+			fmt.Println("Generate CSV Report Timed out.")
+		}
+		return c.Render(http.StatusInternalServerError, "error", frontendError{ErrorTitle: Translate("ErrorTitleApplicationTimeout"), ErrorParagraph: Translate("ErrorParagraphApplicationTimeout")})
 	}
 	return c.Blob(http.StatusOK, "text/csv", report)
 }

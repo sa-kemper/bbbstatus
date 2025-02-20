@@ -21,9 +21,11 @@ import (
 	"BbbStatus/internal/BBBEvents"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"os"
 	"sort"
 	"time"
 )
@@ -117,6 +119,9 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	if meetingServerAPI.Hostname != "" && meetingServerAPI.SharedSecret != "" {
 		getRecordingsResponse, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID})
 		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				fmt.Println("FATAL: BBB API Timeout for host:", meetingServerAPI.Hostname)
+			}
 			return Report{}, err
 		}
 		recordings = getRecordingsResponse.Recording

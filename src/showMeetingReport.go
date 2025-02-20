@@ -17,20 +17,33 @@
 package main
 
 import (
-	"context"
+	"BbbStatus/internal/BBBEvents"
+	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 	"net/http"
+	"os"
 )
+
+func init() { // Add all messages that are related to this file into the localization bundle
+	var msgs = []i18n.Message{
+		{ID: "ErrorTitleApplicationTimeout", Other: "Timeout"},
+		{ID: "ErrorParagraphApplicationTimeout", Other: "bbbstatus reached a timeout, please try again."},
+	}
+	FrontendTextMessages = append(FrontendTextMessages, msgs...)
+	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
+		FrontendTextMessages = append(FrontendTextMessages, m)
+	}
+}
 
 func showMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
 	var meetingExtists bool
-	var ctx = context.Background()
+	var ctx = c.Request().Context()
 	localizer = i18n.NewLocalizer(Bundle, requestLanguage, language.English.String())
 
 	// Connect to the db using
@@ -48,8 +61,11 @@ func showMeetingReport(c echo.Context) error {
 		return c.Render(http.StatusNotFound, "notfound", nil)
 	}
 
-	report, err := GenerateWebReport(context.Background(), internalMeetingId)
+	report, err := GenerateWebReport(ctx, internalMeetingId)
 	if err != nil {
+		if errors.Is(err, os.ErrDeadlineExceeded) {
+			return c.Render(http.StatusGatewayTimeout, "errorPage", frontendError{ErrorTitle: Translate("ErrorTitleApplicationTimeout"), ErrorParagraph: Translate("ErrorParagraphApplicationTimeout")})
+		}
 		fmt.Println(err)
 		return err
 	}

@@ -17,7 +17,6 @@ package main
 
 import (
 	"BbbStatus/internal/BBBEvents"
-	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
@@ -64,6 +63,7 @@ func showMeetings(c echo.Context) error {
 	var isFilteredRequest bool
 	var startDate, endDate time.Time
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
+	var ctx = c.Request().Context()
 	localizer = i18n.NewLocalizer(Bundle, requestLanguage, language.English.String())
 
 	// handle filtered request
@@ -76,12 +76,12 @@ func showMeetings(c echo.Context) error {
 	startDate, err = time.Parse("2006-01-02", startDateParam)
 	endDate, err = time.Parse("2006-01-02", endDateParam)
 
-	conn, err := pgx.Connect(context.Background(), confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
 		return err
 	}
 	//goland:noinspection ALL
-	defer conn.Close(context.Background())
+	defer conn.Close(ctx)
 	var meetings []MeetingListMeetingWrapper
 	var rows pgx.Rows
 	if isFilteredRequest {
@@ -89,10 +89,10 @@ func showMeetings(c echo.Context) error {
 			endDate = time.Now()
 		}
 		endDate = endDate.Add(time.Hour * 25) // make the end date inclusive.
-		rows, err = conn.Query(context.Background(), "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, duration, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, active FROM meetings WHERE create_time BETWEEN $1 AND $2", startDate, endDate)
+		rows, err = conn.Query(ctx, "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, duration, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, active FROM meetings WHERE create_time BETWEEN $1 AND $2", startDate, endDate)
 
 	} else {
-		rows, err = conn.Query(context.Background(), "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, duration, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, active FROM meetings")
+		rows, err = conn.Query(ctx, "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, duration, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, active FROM meetings")
 	}
 	if err != nil {
 		return err

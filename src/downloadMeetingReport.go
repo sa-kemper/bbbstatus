@@ -17,14 +17,13 @@
 package main
 
 import (
-	"context"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
 func downloadMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
-	var report, err = GenerateCSVReport(context.Background(), internalMeetingId)
+	var report, err = GenerateCSVReport(c.Request().Context(), internalMeetingId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

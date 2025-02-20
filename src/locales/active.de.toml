@@ -78,13 +78,73 @@ other = "Zeit"
 hash = "sha1-9f8a2389a20ca0752aa9e95093515517e90e194c"
 other = "Benutzer"
 
+[ErrorParagraphApplicationTimeout]
+hash = "sha1-e09bfd4ae4b3758578549646e86cb8478ca2b569"
+other = "Beim bearbeiten der anfrage ist eine zeitüberschreitung aufgetreten, bitte versuchen sie es erneut."
+
+[ErrorTitleApplicationTimeout]
+hash = "sha1-d4c45de0fe64ac43c72a798c67faaadadfaa1b90"
+other = "Zeitüberschreitung"
+
 [EventTimelineHeader]
 hash = "sha1-45d97e8b0133f6ad1bc5c0ef26f67fb2e25a9895"
 other = "Event zeitlinie"
 
+[MeetingActive]
+hash = "sha1-a733b809d2f1233496ab516eed0f3ef75cf3791a"
+other = "Aktiv"
+
+[MeetingCreated]
+hash = "sha1-accf40c89baa4fa88e6a7ff11e1f805beecafd3f"
+other = "Erstellt"
+
+[MeetingDuration]
+hash = "sha1-1370004da76fa4f3b7a5180fd5436065ef4c7d5b"
+other = "Dauer"
+
+[MeetingEnded]
+hash = "sha1-90303d8df23e3832c1582952684b4dbaa58e069c"
+other = "Beendet"
+
+[MeetingExternalID]
+hash = "sha1-40dc448a962e5fe46d99f57ab5bbb9ad1da10770"
+other = "Interne ID"
+
+[MeetingMaxUsers]
+hash = "sha1-b596635d2f535d00bb781d4a143be711cda7488d"
+other = "Maximale Benutzer"
+
+[MeetingNoMeetingsExist]
+hash = "sha1-6c91094f705185eae005c75e7355e7bc29c050a9"
+other = "Es existieren keine Meetings"
+
+[MeetingOpenDetails]
+hash = "sha1-5c866a7a5cf51596a6727857f360018c706e1512"
+other = "Zeige Details"
+
+[MeetingRecordingDisabled]
+hash = "sha1-f4f4473df8cb59f0a369aebee3d1509adc0151c6"
+other = "Deaktiviert"
+
+[MeetingRecordingEnabled]
+hash = "sha1-df174a3f2faa31814e06540acda7af8825403fac"
+other = "Aktiviert"
+
+[MeetingRecordingStatusHeader]
+hash = "sha1-9b98e1a0008e6dc21c64e9b98854c5b018cd0f46"
+other = "Zeichnet auf"
+
+[MeetingToReport]
+hash = "sha1-114c4dd2498e790e45bdba42832d78da0edbe889"
+other = "Zur Zusammenfassung"
+
 [PageNotFoundErrorMessage]
 hash = "sha1-0514d1aa241c1f9d5ea11c534d4aa508b533268a"
 other = "Die aufgerufene seite konnte nicht gefunden werden"
+
+[RecordingsHeader]
+hash = "sha1-38adb0a14125adb510c8b19c1d0b569422e3f564"
+other = "Aufzeichnungen"
 
 [ReportHeader]
 hash = "sha1-9f5e0854a7e28ebf19364bb154d82f4122c6eddc"
@@ -149,6 +209,18 @@ other = "Der Benutzer '{{.Username}}' Startete seine bildschirm übertragung"
 [meeting-screenshare-stopped]
 hash = "sha1-f5b0000263add05996d897844c0faaf2adf718c8"
 other = "Der Benutzer '{{.Username}}' Stopte seine bildschirm übertragung"
+
+[meetingListFilterEndDate]
+hash = "sha1-84b1478125890bad1cc4b36d6d3781773b3fde5a"
+other = "Enddatum"
+
+[meetingListFilterFilterButton]
+hash = "sha1-d7decf1aa22b02ae8abf9a96849ee423eee838e4"
+other = "Filter"
+
+[meetingListFilterStartDate]
+hash = "sha1-9d7ab1a557965be0eae6205c2d860c45a3eafc11"
+other = "Startdatum"
 
 [meetingListHeader]
 hash = "sha1-68e57924420dd31edbfb8fce23f7d3ebbb2ae081"

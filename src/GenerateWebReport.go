@@ -368,9 +368,9 @@ func FillMeetingParticipants(ctx context.Context, internalMeetingID string, conn
 
 	for _, participantID := range participantIds {
 		var user BBBEvents.User
-		err = conn.QueryRow(ctx, "SELECT * FROM users WHERE internal_user_id = $1", participantID).Scan(&user.InternalUserID, &user.ExternalUserID, &user.Name, &user.Role, &user.Guest)
+		err = conn.QueryRow(ctx, "SELECT internal_user_id, external_user_id, name, role, is_guest FROM users WHERE internal_user_id = $1", participantID).Scan(&user.InternalUserID, &user.ExternalUserID, &user.Name, &user.Role, &user.Guest)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error occurred adding user to participants list:", err)
 			continue
 		}
 		participants = append(participants, user)

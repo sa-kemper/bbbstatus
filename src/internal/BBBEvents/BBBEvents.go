@@ -79,6 +79,7 @@ type User struct {
 	Stream         string `json:"stream,omitempty"`
 	RaiseHand      bool   `json:"raise-hand,omitempty"`
 	Emoji          string `json:"emoji,omitempty"`
+	LeaveTimestamp *time.Time
 }
 
 // Poll represents a meeting poll

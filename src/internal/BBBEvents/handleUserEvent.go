@@ -28,6 +28,13 @@ func handleUserEvent(ctx context.Context, conn *pgx.Conn, user *User, tx pgx.Tx,
 	if b.Data.ID == "user-joined" {
 		return handleUserJoined(ctx, conn, user, meeting, b)
 	}
+	if b.Data.ID == "user-left" {
+		_, err = conn.Exec(ctx, "UPDATE users SET leave_timestamp = $1 WHERE internal_user_id = $2", b.GetTimestamp(), user.InternalUserID)
+		if err != nil {
+			fmt.Printf("Data invalidation Error -> updating users.leave_timestamp (userID:%v): %v\n", user.InternalUserID, err)
+			return err
+		}
+	}
 
 	if user == nil {
 		if b.Data.ID == EventMeetingScreenshareStopped || b.Data.ID == EventMeetingScreenshareStarted {

@@ -50,7 +50,6 @@ type Meeting struct {
 	Name              string  `json:"name,omitempty"`
 	IsBreakout        bool    `json:"is-breakout,omitempty"`
 	ParentID          *string `json:"parent-id,omitempty"`
-	Duration          int64   `json:"duration,omitempty"`
 	CreateTimeStamp   int64   `json:"create-time,omitempty"`
 	CreateTime        time.Time
 	CreateDate        string            `json:"create-date,omitempty"`
@@ -62,7 +61,8 @@ type Meeting struct {
 	MaxUsers          int               `json:"max-users,omitempty"`
 	Metadata          map[string]string `json:"metadata,omitempty"`
 	BbbHostname       string
-	Active            bool
+	MeetingEnded      *time.Time
+	ParticipantCount  int
 }
 
 // User represents a meeting participant

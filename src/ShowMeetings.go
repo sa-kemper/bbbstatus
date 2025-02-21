@@ -39,6 +39,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "MeetingOpenDetails", Other: "Open details"},
 		{ID: "MeetingExternalID", Other: "Internal ID"},
 		{ID: "MeetingMaxUsers", Other: "Max Users"},
+		{ID: "MeetingCreateTime", Other: "Create Time"},
 		{ID: "MeetingDuration", Other: "Duration"},
 		{ID: "MeetingRecordingStatusHeader", Other: "Recording"},
 		{ID: "MeetingRecordingEnabled", Other: "Enabled"},
@@ -91,10 +92,10 @@ func showMeetings(c echo.Context) error {
 			endDate = time.Now()
 		}
 		endDate = endDate.Add(time.Hour * 25) // make the end date inclusive.
-		rows, err = conn.Query(ctx, "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, duration, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, active FROM meetings WHERE create_time BETWEEN $1 AND $2", startDate, endDate)
+		rows, err = conn.Query(ctx, "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, meeting_ended FROM meetings WHERE create_time BETWEEN $1 AND $2", startDate, endDate)
 
 	} else {
-		rows, err = conn.Query(ctx, "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, duration, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, active FROM meetings")
+		rows, err = conn.Query(ctx, "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, meeting_ended FROM meetings")
 	}
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
@@ -106,14 +107,19 @@ func showMeetings(c echo.Context) error {
 	defer rows.Close()
 	for rows.Next() {
 		var m MeetingListMeetingWrapper
-		err = rows.Scan(&m.BBBEventsMeeting.InternalMeetingID, &m.BBBEventsMeeting.ExternalMeetingID, &m.BBBEventsMeeting.Name, &m.BBBEventsMeeting.IsBreakout, &m.BBBEventsMeeting.ParentID, &m.BBBEventsMeeting.Duration, &m.BBBEventsMeeting.CreateTime, &m.BBBEventsMeeting.ModeratorPass, &m.BBBEventsMeeting.ViewerPass, &m.BBBEventsMeeting.Record, &m.BBBEventsMeeting.VoiceConf, &m.BBBEventsMeeting.DialNumber, &m.BBBEventsMeeting.MaxUsers, &m.BBBEventsMeeting.Metadata, &m.BbbHostname, &m.Active)
+		err = rows.Scan(&m.BBBEventsMeeting.InternalMeetingID, &m.BBBEventsMeeting.ExternalMeetingID, &m.BBBEventsMeeting.Name, &m.BBBEventsMeeting.IsBreakout, &m.BBBEventsMeeting.ParentID, &m.BBBEventsMeeting.CreateTime, &m.BBBEventsMeeting.ModeratorPass, &m.BBBEventsMeeting.ViewerPass, &m.BBBEventsMeeting.Record, &m.BBBEventsMeeting.VoiceConf, &m.BBBEventsMeeting.DialNumber, &m.BBBEventsMeeting.MaxUsers, &m.BBBEventsMeeting.Metadata, &m.BbbHostname, &m.BBBEventsMeeting.MeetingEnded)
+		if err != nil {
+			fmt.Println("FATAL ERROR occurred, Cannot read meeting from database:", err)
+			return err
+		}
 		m.BBBEventsMeeting.CreateDate = m.BBBEventsMeeting.CreateTime.Format("02.01.2006")
+		if m.BBBEventsMeeting.MeetingEnded == nil {
+			m.Active = true
+		} else {
+			// if a meeting has a end time stamp it's no longer active
+			m.Active = false
+		}
 		meetings = append(meetings, m)
-	}
-
-	if err != nil {
-		fmt.Println(err)
-		return err
 	}
 
 	sort.Slice(meetings, func(i, j int) bool {

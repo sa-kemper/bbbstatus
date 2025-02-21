@@ -94,6 +94,10 @@ other = "Event zeitlinie"
 hash = "sha1-a733b809d2f1233496ab516eed0f3ef75cf3791a"
 other = "Aktiv"
 
+[MeetingCreateTime]
+hash = "sha1-da27e4b5e998c43c50b1672e50886be19f8730ac"
+other = "Erstellungs zeitpunkt"
+
 [MeetingCreated]
 hash = "sha1-accf40c89baa4fa88e6a7ff11e1f805beecafd3f"
 other = "Erstellt"

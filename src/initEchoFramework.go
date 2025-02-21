@@ -26,6 +26,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 )
 
 var echof *echo.Echo
@@ -45,6 +46,7 @@ func initEchoFramework() {
 		"t": func(text string) string {
 			return text
 		}, "reverse": func(string, ...interface{}) string { return "x" },
+		"formatTime": func(t time.Time) string { return t.Format("15:04:05") },
 	}
 
 	if _, err := os.Stat(gohtmlTemplateOverwriteFolder); err == nil {

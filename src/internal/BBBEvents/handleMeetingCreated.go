@@ -25,13 +25,12 @@ import (
 func handleMeetingCreated(tx pgx.Tx, meeting Meeting, b *BaseEvent) error {
 	var err error
 	_, err = tx.Exec(context.Background(),
-		"INSERT INTO meetings (internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, duration, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
+		"INSERT INTO meetings (internal_meeting_id, external_meeting_id, name, is_breakout, parent_id,  create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 		meeting.InternalMeetingID,
 		meeting.ExternalMeetingID,
 		meeting.Name,
 		meeting.IsBreakout,
 		meeting.ParentID,
-		meeting.Duration,
 		b.GetTimestamp(),
 		meeting.ModeratorPass,
 		meeting.ViewerPass,

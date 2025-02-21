@@ -91,7 +91,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	defer conn.Close(ctx)
 
 	// Query and parse meeting using the row.next and row.scan methode of pgx
-	err = conn.QueryRow(ctx, "SELECT * FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingID).Scan(&meeting.InternalMeetingID, &meeting.ExternalMeetingID, &meeting.Name, &meeting.IsBreakout, &meeting.ParentID, &meeting.Duration, &meeting.CreateTime, &meeting.ModeratorPass, &meeting.ViewerPass, &meeting.Record, &meeting.VoiceConf, &meeting.DialNumber, &meeting.MaxUsers, &meeting.Metadata, &meeting.BbbHostname, &meeting.Active)
+	err = conn.QueryRow(ctx, "SELECT * FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingID).Scan(&meeting.InternalMeetingID, &meeting.ExternalMeetingID, &meeting.Name, &meeting.IsBreakout, &meeting.ParentID, &meeting.CreateTime, &meeting.ModeratorPass, &meeting.ViewerPass, &meeting.Record, &meeting.VoiceConf, &meeting.DialNumber, &meeting.MaxUsers, &meeting.Metadata, &meeting.BbbHostname, &meeting.ParticipantCount, &meeting.MeetingEnded)
 	if err != nil {
 		return Report{}, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}

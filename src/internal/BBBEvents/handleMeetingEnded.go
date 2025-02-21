@@ -28,7 +28,7 @@ func handleMeetingEnded(err error, tx pgx.Tx, meeting Meeting, b *BaseEvent) err
 		fmt.Println(err)
 		return err
 	}
-	_, err = tx.Exec(context.Background(), "UPDATE meetings SET active = FALSE WHERE internal_meeting_id = $1", meeting.InternalMeetingID)
+	_, err = tx.Exec(context.Background(), "UPDATE meetings SET meeting_ended = $1 WHERE internal_meeting_id = $2", b.GetTimestamp(), meeting.InternalMeetingID)
 	if err != nil {
 		fmt.Println("Failed ending the meeting.")
 		fmt.Println(err)

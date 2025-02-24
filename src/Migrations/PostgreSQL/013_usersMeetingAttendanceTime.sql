@@ -1,7 +1,8 @@
 -- +goose Up
 ALTER TABLE users
     ADD COLUMN join_timestamp  TIMESTAMP NOT NULL DEFAULT now(),
-    ADD COLUMN leave_timestamp TIMESTAMP DEFAULT NULL;
+    ADD COLUMN leave_timestamp TIMESTAMP DEFAULT now(),
+    ALTER COLUMN leave_timestamp SET DEFAULT NULL;
 -- +goose Down
 ALTER TABLE users
     DROP COLUMN join_timestamp,

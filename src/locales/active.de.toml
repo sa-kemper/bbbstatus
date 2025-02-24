@@ -230,6 +230,10 @@ other = "Startdatum"
 hash = "sha1-68e57924420dd31edbfb8fce23f7d3ebbb2ae081"
 other = "Meeting Liste"
 
+[meetingListHeaderSeeStatisticsButton]
+hash = "sha1-08e4e7f36e6a5f5ced5bbef271e1ada6468eb5a7"
+other = "Statistiken"
+
 [user-audio-muted]
 hash = "sha1-e1ce0a16ae7cef80eb65def56c1f0555380b3bdf"
 other = "Der Benutzer '{{.Username}}' Stellte sich selbst stumm und kann nicht von anderen benutzern gehört werden"

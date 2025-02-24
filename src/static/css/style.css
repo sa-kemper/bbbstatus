@@ -51,12 +51,14 @@ body {
     border-bottom: 2px solid #e9ecef;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
+    display: flex;
 }
 
 .header h1 {
     color: #2c3e50;
     font-size: 1.75rem;
     font-weight: 600;
+    flex: 1;
 }
 
 /* Meeting List Styles */

@@ -23,6 +23,7 @@ import (
 	"html/template"
 	"io"
 	"net"
+	"regexp"
 	"strings"
 )
 
@@ -36,14 +37,23 @@ type Template struct {
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	// Genius move right there, not because it's hard but because I've not seen this documented at the time of writing.
 	t.templates.Funcs(template.FuncMap{"t": func(text string) string {
-		lclizer := i18n.NewLocalizer(Bundle, c.Request().Header.Get("Accept-Language"), language.English.String())
-		text, _ = lclizer.Localize(&i18n.LocalizeConfig{MessageID: text})
-		return text
+		localizer = i18n.NewLocalizer(Bundle, c.Request().Header.Get("Accept-Language"), language.English.String())
+		return Translate(text)
+
 	}, "reverse": c.Echo().Reverse})
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
 func Translate(text string) string {
+	re := regexp.MustCompile("(?i)[0-9]{1,2} ")
+	matched := re.MatchString(text)
+	capture := re.FindAllString(text, -1) // capture must have at least one if matched is true
+	if matched {
+		splitText := strings.Split(text, " ")
+		if len(splitText) > 1 {
+			return capture[0] + localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: splitText[1]})
+		}
+	}
 	return localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: text})
 }
 

@@ -1,0 +1,80 @@
+{{ define "statistics" }}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="StatsPageStatisticsHeader" content="width=device-width, initial-scale=1.0">
+        <title>{{t "StatsPageStatisticsHeader"}}</title>
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/charts.css/dist/charts.min.css">
+    </head>
+    <body>
+    <div class="container">
+        <div class="card header">
+            <h1>{{t "StatsPageStatisticsHeader"}}</h1>
+            <a class="meeting-button" href="{{ reverse "meetings" }}">
+                <i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
+            </a>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-button" onclick="window.print()">
+                <i class="fas fa-print"></i>
+                <span>{{t "ReportPrintReportButton"}}</span>
+            </button>
+            <a class="action-button"
+               href="{{ reverse "statisticsCsv" }}{{if .CurrentScope}}?scope={{.CurrentScope}}{{end}}">
+                <i class="fas fa-file-excel"></i>
+                <span>{{t "ReportOpenInExcelButton"}}</span>
+            </a>
+        </div>
+
+        <div class="link-group">
+            <div class="link">
+                <a href="{{ reverse "statistics" }}?scope=week"
+                   class="name {{if .WeekActive }}active{{end}}">{{t "Week"}}</a>
+            </div>
+            <div class="link">
+                <a href="{{ reverse "statistics" }}?scope=month"
+                   class="name {{if .MonthActive }}active{{end}}">{{t "Month"}}</a>
+            </div>
+            <div class="link">
+                <a href="{{ reverse "statistics" }}?scope=year"
+                   class="name {{if .YearActive }}active{{end}}">{{t "Year"}}</a>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <h2>{{t "StatsPageStatisticsOverviewHeader"}}</h2>
+            <!-- Placeholder for charts -->
+            <table id="conference-count-table"
+                   class="charts-css bar show-heading show-labels data-outside sorted data-spacing-5">
+                <caption> {{t "StatsPageConferenceCountHeader"}} </caption>
+                <thead>
+                <tr>
+                    <th>{{.CurrentScope}}</th>
+                    <th>{{t "StatsPageConferencesTableHeader"}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ range .StatsOrder }}
+                    <tr>
+                        <th scope="row">{{t . }}</th>
+                        <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceCount . }} / {{ $.Statistics.HighestConferenceCount }})">
+                            {{ valFromIndex $.Statistics.ConferenceCount . }} <span
+                                    class="tooltip"> {{t "StatsPageConferencesInToolTip"}} {{ . }}: {{ valFromIndex $.Statistics.ConferenceCount . }} </span>
+                        </td>
+                    </tr>
+                {{ end }}
+
+                </tbody>
+            </table>
+            <div class="chart" id="chart2"></div>
+            <!-- Add more charts as needed -->
+        </div>
+    </div>
+    </body>
+    </html>
+{{ end }}

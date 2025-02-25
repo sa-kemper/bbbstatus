@@ -2,6 +2,14 @@
 hash = "sha1-223a56a6d5f134d9b2f6ec9a91065f0538c1fb93"
 other = "404 - Seite nicht gefunden"
 
+[Apr]
+hash = "sha1-befde54a108cb9dc6ad6e0ebd28720531a6855e6"
+other = "Apr"
+
+[Aug]
+hash = "sha1-75629af51d7c7f120dbb5b462013bfa48af33285"
+other = "Aug"
+
 [BackToMeetingsButton]
 hash = "sha1-a00619a52130bf71a69db12a9b4cda996d3d91cc"
 other = "Zurück zu den meetings"
@@ -78,6 +86,10 @@ other = "Zeit"
 hash = "sha1-9f8a2389a20ca0752aa9e95093515517e90e194c"
 other = "Benutzer"
 
+[Dec]
+hash = "sha1-997f59bc99b2a57280179c3ce09ba8ab57cbdf44"
+other = "Dez"
+
 [ErrorParagraphApplicationTimeout]
 hash = "sha1-e09bfd4ae4b3758578549646e86cb8478ca2b569"
 other = "Beim bearbeiten der anfrage ist eine zeitüberschreitung aufgetreten, bitte versuchen sie es erneut."
@@ -89,6 +101,34 @@ other = "Zeitüberschreitung"
 [EventTimelineHeader]
 hash = "sha1-45d97e8b0133f6ad1bc5c0ef26f67fb2e25a9895"
 other = "Event zeitlinie"
+
+[Feb]
+hash = "sha1-dc8415ccfe52505f1d0a74025c76b3c26c88c59d"
+other = "Feb"
+
+[Fri]
+hash = "sha1-bbd6e32ee1326237814b697269b4368033d50d2f"
+other = "Fre"
+
+[Jan]
+hash = "sha1-efed3690ea2243f5f1ac77cbb0987e5335440258"
+other = "Jan"
+
+[Jul]
+hash = "sha1-b737558468d75ca55b2d9185c0b55eacaea627a0"
+other = "Jul"
+
+[Jun]
+hash = "sha1-6d90df3be4d0d43b08e3fb47f55e09b5b06dae3e"
+other = "Jun"
+
+[Mar]
+hash = "sha1-c4ba0822462e0c373aadd5360a69f205c2a7d036"
+other = "Mer"
+
+[May]
+hash = "sha1-c94f479833c5d401cffdfa7afe6c9c2d56448019"
+other = "May"
 
 [MeetingActive]
 hash = "sha1-a733b809d2f1233496ab516eed0f3ef75cf3791a"
@@ -141,6 +181,22 @@ other = "Zeichnet auf"
 [MeetingToReport]
 hash = "sha1-114c4dd2498e790e45bdba42832d78da0edbe889"
 other = "Zur Zusammenfassung"
+
+[Mon]
+hash = "sha1-24b2a0993d0cfa93c44282d6bba72bcf58b300d6"
+other = "Mon"
+
+[Month]
+hash = "sha1-082bc378cd60e17a38d99898b21955299c5b60c8"
+other = "Monat"
+
+[Nov]
+hash = "sha1-bb9bfefd5391f52be54267e2a938a126661b0ff7"
+other = "Nov"
+
+[Oct]
+hash = "sha1-51327aef9866e85ef5b5b2294a28494d2715ae59"
+other = "Okt"
 
 [PageNotFoundErrorMessage]
 hash = "sha1-0514d1aa241c1f9d5ea11c534d4aa508b533268a"
@@ -202,6 +258,58 @@ other = "Auswertung drucken"
 hash = "sha1-cc93f34f921a9b60c004893a42230ba323335950"
 other = "Zur startseite"
 
+[Sat]
+hash = "sha1-6b782d41b0c29e2f39f93a8352c43300b042c6cd"
+other = "Sam"
+
+[Sep]
+hash = "sha1-fdd289e370bd5cc575f48a16947d05c144ec474b"
+other = "Sep"
+
+[StatsPageConferenceCountHeader]
+hash = "sha1-c5eedd0e192f7f298c4d0d010a5f013b566385cf"
+other = "Konferenz anzahl"
+
+[StatsPageConferencesInToolTip]
+hash = "sha1-b600a53a1940fffecfb8b08956a8fd1111cc7044"
+other = "Konferenzen in"
+
+[StatsPageConferencesTableHeader]
+hash = "sha1-92ee4e6a83562ab2c6cdda0cc8936062a4959568"
+other = "Konferenzen"
+
+[StatsPageStatisticsHeader]
+hash = "sha1-2086b21f8f49274138c38d476bee317a84a8aecc"
+other = "Statistiken"
+
+[StatsPageStatisticsOverviewHeader]
+hash = "sha1-33a0579b2722e4f1b7fc70a41a1f2ff5f80bc6fd"
+other = "Statistik Überblick"
+
+[Sun]
+hash = "sha1-48c98cab7866e606328c99289ed24e339393b5ab"
+other = "Son"
+
+[Thu]
+hash = "sha1-3593ccd96f6c0fad4e362d18ac37226707f2ea46"
+other = "Don"
+
+[Tue]
+hash = "sha1-529541bb390c76152e313351d89de3cd30a1c4bd"
+other = "Die"
+
+[Wed]
+hash = "sha1-23408b19b29e8e8495bb4b68733ada5f85fc2fd6"
+other = "Mit"
+
+[Week]
+hash = "sha1-f82be68a7fb4e7dec88f27463de94ad355242ee5"
+other = "Woche"
+
+[Year]
+hash = "sha1-879e32326c5217968ac8e3a14e4a8a5214957264"
+other = "Jahr"
+
 [chat-group-message-sent]
 hash = "sha1-6629df86e55a247723deb970bafd438e4831b7eb"
 other = "Der Benutzer '{{.Username}}' Wechselte seinen emoji"
@@ -231,8 +339,8 @@ hash = "sha1-68e57924420dd31edbfb8fce23f7d3ebbb2ae081"
 other = "Meeting Liste"
 
 [meetingListHeaderSeeStatisticsButton]
-hash = "sha1-08e4e7f36e6a5f5ced5bbef271e1ada6468eb5a7"
-other = "Statistiken"
+hash = "sha1-1e5040d90ba8b0b64ee15faedbf1950cb0a6a7f9"
+other = "Siehe Statistiken"
 
 [user-audio-muted]
 hash = "sha1-e1ce0a16ae7cef80eb65def56c1f0555380b3bdf"

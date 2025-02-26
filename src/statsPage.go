@@ -18,6 +18,7 @@ package main
 
 import (
 	"BbbStatus/internal/BBBEvents"
+	"BbbStatus/internal/StatsAggregator"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -72,45 +73,20 @@ func init() { // Add all messages that are related to this file into the localiz
 	}
 }
 
-type statistics struct {
-	ConferenceCount                  map[string]int
-	MaxUserCount                     map[string]int
-	ConferenceUsageHours             map[string]int
-	ConferenceUsersUsageHours        map[string]int
-	HighestConferenceCount           int
-	HighestMaxUserCount              int
-	HighestConferenceUsageHours      int
-	HighestConferenceUsersUsageHours int
-}
-
 type templateStruct struct {
 	CurrentScope string
 	WeekActive   bool
 	MonthActive  bool
 	YearActive   bool
-	Statistics   statistics
+	Statistics   StatsAggregator.Statistics
 	StatsOrder   []string
-}
-
-type timeFrame struct {
-	start, end time.Time
-}
-
-// findMaxInMap loops through a map[string]int object, ignores all indexes, and returns the highest value.
-func findMaxInMap(in map[string]int) (max int) {
-	for _, value := range in {
-		if value > max {
-			max = value
-		}
-	}
-	return max
 }
 
 func statsPage(c echo.Context) error {
 	scope := c.QueryParam("scope")
 
 	templateData := templateStruct{}
-	dbStats, err := generateStatsByScope(c.Request().Context(), scope)
+	dbStats, err := StatsAggregator.GenerateStatsByScope(c.Request().Context(), scope, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
 		fmt.Println("A error occured while generating stats page", err)
 		return c.Render(http.StatusInternalServerError, "errorPage", frontendError{ErrorTitle: "Internal Server Error", ErrorParagraph: "Error generating stats page"})

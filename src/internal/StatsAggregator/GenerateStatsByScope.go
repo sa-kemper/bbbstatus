@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package main
+package StatsAggregator
 
 import (
 	"context"
@@ -23,17 +23,17 @@ import (
 	"time"
 )
 
-func generateStatsByScope(ctx context.Context, scope string) (stats statistics, err error) {
+func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString string) (stats Statistics, err error) {
 	stats.ConferenceCount = make(map[string]int)
 	stats.MaxUserCount = make(map[string]int)
 	stats.ConferenceUsageHours = make(map[string]int)
 	stats.ConferenceUsersUsageHours = make(map[string]int)
 
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, dbConnectionString)
 	if err != nil {
 		return stats, fmt.Errorf("statsPage -> generateStatsByScope pgx.Connect: %w", err)
 	}
-	timeFrames := map[string]timeFrame{}
+	timeFrames := map[string]TimeFrame{}
 	if scope == "week" {
 		timeFrames = generateWeekTimeFrames(time.Now())
 	}

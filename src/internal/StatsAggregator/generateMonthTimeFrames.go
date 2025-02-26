@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package main
+package StatsAggregator
 
 import (
 	"strconv"
 	"time"
 )
 
-func generateMonthTimeFrames(start time.Time) map[string]timeFrame {
+func generateMonthTimeFrames(start time.Time) map[string]TimeFrame {
 	//start = start.AddDate(0, -1, 0)
 	start = start.AddDate(0, 0, -start.Day()+1)
 	start = start.Add(-time.Hour * time.Duration(start.Hour()))
 	start = start.Add(-time.Minute * time.Duration(start.Minute()))
 	start = start.Add(-time.Second * time.Duration(start.Second()))
 
-	mtf := make(map[string]timeFrame)
+	mtf := make(map[string]TimeFrame)
 	for {
 		if start.After(time.Now()) {
 			break
 		}
 		_, week := start.ISOWeek()
-		mtf["CW"+strconv.Itoa(week)] = timeFrame{start: start, end: start.AddDate(0, 0, 7)}
+		mtf["CW"+strconv.Itoa(week)] = TimeFrame{start: start, end: start.AddDate(0, 0, 7)}
 		start = start.AddDate(0, 0, 7)
 	}
 	return mtf

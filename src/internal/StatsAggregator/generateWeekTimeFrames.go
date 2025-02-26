@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package main
+package StatsAggregator
 
-import "time"
+import (
+	"time"
+)
 
-func generateWeekTimeFrames(startTime time.Time) map[string]timeFrame {
-	wtf := make(map[string]timeFrame)
+func generateWeekTimeFrames(startTime time.Time) map[string]TimeFrame {
+	wtf := make(map[string]TimeFrame)
 	start := startTime
 	start = start.Add(-time.Hour * time.Duration(start.Hour()))
 	start = start.Add(-time.Minute * time.Duration(start.Minute()))
@@ -35,7 +37,7 @@ func generateWeekTimeFrames(startTime time.Time) map[string]timeFrame {
 		if start.After(time.Now()) {
 			break
 		}
-		wtf[start.Weekday().String()[:3]] = timeFrame{
+		wtf[start.Weekday().String()[:3]] = TimeFrame{
 			start: start,
 			end:   start.AddDate(0, 0, 1),
 		}

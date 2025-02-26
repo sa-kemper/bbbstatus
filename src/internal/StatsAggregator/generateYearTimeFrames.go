@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package main
+package StatsAggregator
 
-import "time"
+import (
+	"time"
+)
 
-func generateYearTimeFrames(start time.Time) map[string]timeFrame {
+func generateYearTimeFrames(start time.Time) map[string]TimeFrame {
 	// get to the start of the month by striping the day, hour, minute and second information.
 	start = start.AddDate(0, 0, -start.Day()+1)
 	start = start.Add(-time.Hour * time.Duration(start.Hour()))
 	start = start.Add(-time.Minute * time.Duration(start.Minute()))
 	start = start.Add(-time.Second * time.Duration(start.Second()))
 
-	ytf := make(map[string]timeFrame)
+	ytf := make(map[string]TimeFrame)
 	var firstRunFlag = true
 	start = start.AddDate(-1, 0, 0)
 	for {
@@ -39,7 +41,7 @@ func generateYearTimeFrames(start time.Time) map[string]timeFrame {
 		if start.After(time.Now()) {
 			break
 		}
-		ytf[start.Month().String()[:3]] = timeFrame{start: start, end: start.AddDate(0, 1, 0)}
+		ytf[start.Month().String()[:3]] = TimeFrame{start: start, end: start.AddDate(0, 1, 0)}
 		start = start.AddDate(0, 1, 0)
 	}
 

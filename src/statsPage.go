@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"math/rand/v2"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -50,11 +50,21 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "Oct", Other: "Oct"},
 		{ID: "Nov", Other: "Nov"},
 		{ID: "Dec", Other: "Dec"},
+		{ID: "CW", Other: "CW"}, //Calendar week
 		{ID: "StatsPageStatisticsOverviewHeader", Other: "Statistics overview"},
 		{ID: "StatsPageStatisticsHeader", Other: "Statistics"},
 		{ID: "StatsPageConferenceCountHeader", Other: "Conference count"},
 		{ID: "StatsPageConferencesTableHeader", Other: "Conferences"},
 		{ID: "StatsPageConferencesInToolTip", Other: "Conferences in"},
+		{ID: "StatsPageConferenceAttendeeCountHeader", Other: "Conference attendees"},
+		{ID: "StatsPageConferenceTotalMeetingHoursHeader", Other: "Conference total meeting hours"},
+		{ID: "StatsPageAttendeeCountTableHeader", Other: "Attendees"},
+		{ID: "StatsPageAttendeesInToolTip", Other: "Attendees "},
+		{ID: "StatsPageTotalMeetingHoursTableHeader", Other: "Total meeting hours"},
+		{ID: "StatsPageConferenceUsageHoursToolTip", Other: "Total meeting hours in"},
+		{ID: "StatsPageConferenceUserHoursHeader", Other: "Total user hours"},
+		{ID: "StatsPageConferencesUserHoursTableHeader", Other: "Total user hours"},
+		{ID: "StatsPageConferenceUserHoursToolTip", Other: "Total user hours in"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -82,134 +92,49 @@ type templateStruct struct {
 	StatsOrder   []string
 }
 
+type timeFrame struct {
+	start, end time.Time
+}
+
+// findMaxInMap loops through a map[string]int object, ignores all indexes, and returns the highest value.
+func findMaxInMap(in map[string]int) (max int) {
+	for _, value := range in {
+		if value > max {
+			max = value
+		}
+	}
+	return max
+}
+
 func statsPage(c echo.Context) error {
 	scope := c.QueryParam("scope")
 
 	templateData := templateStruct{}
-
-	yearStats := statistics{
-		ConferenceCount:           make(map[string]int),
-		MaxUserCount:              make(map[string]int),
-		ConferenceUsageHours:      make(map[string]int),
-		ConferenceUsersUsageHours: make(map[string]int),
+	dbStats, err := generateStatsByScope(c.Request().Context(), scope)
+	if err != nil {
+		fmt.Println("A error occured while generating stats page", err)
+		return c.Render(http.StatusInternalServerError, "errorPage", frontendError{ErrorTitle: "Internal Server Error", ErrorParagraph: "Error generating stats page"})
 	}
-	monthStats := statistics{
-		ConferenceCount:           make(map[string]int),
-		MaxUserCount:              make(map[string]int),
-		ConferenceUsageHours:      make(map[string]int),
-		ConferenceUsersUsageHours: make(map[string]int),
-	}
-	weekStats := statistics{
-		ConferenceCount:           make(map[string]int),
-		MaxUserCount:              make(map[string]int),
-		ConferenceUsageHours:      make(map[string]int),
-		ConferenceUsersUsageHours: make(map[string]int),
-	}
-	yearSampleData := map[string][4]int{ // sample data representing a year of bbb meetings.
-		"Jan": {4, 150, 40, 500},
-		"Feb": {3, 130, 35, 450},
-		"Mar": {5, 180, 50, 600},
-		"Apr": {6, 170, 60, 700},
-		"May": {4, 160, 45, 550},
-		"Jun": {7, 190, 70, 750},
-		"Jul": {3, 140, 30, 400},
-		"Aug": {5, 160, 55, 650},
-		"Oct": {4, 150, 45, 500},
-		"Sep": {6, 180, 60, 720},
-		"Nov": {2, 120, 25, 300},
-		"Dec": {8, 200, 75, 800},
-	}
-
-	monthSampleData := make(map[string][4]int)
-	for _, name := range getDaysBetween(time.Now().Add(-time.Hour*24*30), time.Now()) {
-		monthSampleData[name] = [4]int{rand.IntN(20), rand.IntN(20), rand.IntN(20), rand.IntN(20)}
-	}
-
-	weekSampleData := map[string][4]int{
-		"Mon": {150, 4, 500, 40},
-		"Tue": {450, 3, 130, 35},
-		"Wed": {600, 5, 180, 50},
-		"Thu": {500, 6, 160, 45},
-		"Fri": {500, 4, 160, 45},
-		"Sat": {750, 7, 190, 70},
-		"Sun": {30, 3, 140, 400},
-	}
-
-	applyStats(yearSampleData, &yearStats)
-	applyStats(monthSampleData, &monthStats)
-	applyStats(weekSampleData, &weekStats)
 
 	if scope != "" {
 		switch scope {
 		case "week":
 			templateData.WeekActive = true
-			templateData.Statistics = weekStats
-			templateData.StatsOrder = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}
+			templateData.Statistics = dbStats
+			templateData.StatsOrder = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}[:len(dbStats.ConferenceCount)]
 		case "month":
 			templateData.MonthActive = true
-			templateData.Statistics = monthStats
-			templateData.StatsOrder = getDaysBetween(time.Now().Add(-time.Hour*24*30), time.Now())
+			templateData.Statistics = dbStats
+			_, currentWeek := time.Now().ISOWeek()
+			templateData.StatsOrder = []string{"CW" + strconv.Itoa(currentWeek-4), "CW" + strconv.Itoa(currentWeek-3), "CW" + strconv.Itoa(currentWeek-2), "CW" + strconv.Itoa(currentWeek-1)}[:len(dbStats.ConferenceCount)]
 		case "year":
 			templateData.YearActive = true
-			templateData.Statistics = yearStats
-			templateData.StatsOrder = []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Oct", "Sep", "Nov", "Dec"}
+			templateData.Statistics = dbStats
+			templateData.StatsOrder = []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Oct", "Sep", "Nov", "Dec"}[:len(dbStats.ConferenceCount)]
 
 		}
 		templateData.CurrentScope = scope
 	}
 
 	return c.Render(http.StatusOK, "statistics", templateData)
-}
-
-func applyStats(yearSampleData map[string][4]int, yearStats *statistics) {
-	// Variables to track the highest values
-	highestConferenceCount := 0
-	highestMaxUserCount := 0
-	highestConferenceUsageHours := 0
-	highestConferenceUsersUsageHours := 0
-
-	for unit, values := range yearSampleData {
-		yearStats.ConferenceCount[unit] = values[0]
-		yearStats.MaxUserCount[unit] = values[1]
-		yearStats.ConferenceUsageHours[unit] = values[2]
-		yearStats.ConferenceUsersUsageHours[unit] = values[3]
-
-		// Update the highest values
-		if values[0] > highestConferenceCount {
-			highestConferenceCount = values[0]
-		}
-		if values[1] > highestMaxUserCount {
-			highestMaxUserCount = values[1]
-		}
-		if values[2] > highestConferenceUsageHours {
-			highestConferenceUsageHours = values[2]
-		}
-		if values[3] > highestConferenceUsersUsageHours {
-			highestConferenceUsersUsageHours = values[3]
-		}
-	}
-
-	// Assign the highest values to the struct
-	yearStats.HighestConferenceCount = highestConferenceCount
-	yearStats.HighestMaxUserCount = highestMaxUserCount
-	yearStats.HighestConferenceUsageHours = highestConferenceUsageHours
-	yearStats.HighestConferenceUsersUsageHours = highestConferenceUsersUsageHours
-}
-
-func getDaysBetween(startDate, endDate time.Time) []string {
-	var days []string
-
-	// Ensure startDate is before endDate
-	if startDate.After(endDate) {
-		return days
-	}
-
-	// Iterate from startDate to endDate
-	for d := startDate; d.Before(endDate) || d.Equal(endDate); d = d.AddDate(0, 0, 1) {
-		// Format the day and month
-		formattedDay := fmt.Sprintf("%d %s", d.Day(), d.Month().String()[:3])
-		days = append(days, formattedDay)
-	}
-
-	return days
 }

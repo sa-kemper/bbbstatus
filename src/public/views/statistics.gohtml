@@ -68,11 +68,74 @@
                         </td>
                     </tr>
                 {{ end }}
-
                 </tbody>
             </table>
-            <div class="chart" id="chart2"></div>
-            <!-- Add more charts as needed -->
+
+            <table id="attendee-count-table"
+                   class="charts-css bar show-heading show-labels data-outside sorted data-spacing-5">
+                <caption> {{t "StatsPageConferenceAttendeeCountHeader"}} </caption>
+                <thead>
+                <tr>
+                    <th>{{.CurrentScope}}</th>
+                    <th>{{t "StatsPageAttendeeCountTableHeader"}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ range .StatsOrder }}
+                    <tr>
+                        <th scope="row">{{t . }}</th>
+                        <td style="--size: calc({{ valFromIndex $.Statistics.MaxUserCount . }} / {{ $.Statistics.HighestMaxUserCount }})">
+                            {{ valFromIndex $.Statistics.MaxUserCount . }} <span
+                                    class="tooltip"> {{t "StatsPageAttendeesInToolTip"}} {{ . }}: {{ valFromIndex $.Statistics.MaxUserCount . }} </span>
+                        </td>
+                    </tr>
+                {{ end }}
+                </tbody>
+            </table>
+
+            <table id="conference-total-meeting-hours-count-table"
+                   class="charts-css bar show-heading show-labels data-outside sorted data-spacing-5">
+                <caption> {{t "StatsPageConferenceTotalMeetingHoursHeader"}} </caption>
+                <thead>
+                <tr>
+                    <th>{{.CurrentScope}}</th>
+                    <th>{{t "StatsPageTotalMeetingHoursTableHeader"}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ range .StatsOrder }}
+                    <tr>
+                        <th scope="row">{{t . }}</th>
+                        <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceUsageHours . }} / {{ $.Statistics.HighestConferenceUsageHours }})">
+                            {{ valFromIndex $.Statistics.ConferenceUsageHours . }} <span
+                                    class="tooltip"> {{t "StatsPageConferenceUsageHoursToolTip"}} {{ . }}: {{ valFromIndex $.Statistics.ConferenceUsageHours . }} </span>
+                        </td>
+                    </tr>
+                {{ end }}
+                </tbody>
+            </table>
+
+            <table id="conference-user-hours-table"
+                   class="charts-css bar show-heading show-labels data-outside sorted data-spacing-5">
+                <caption> {{t "StatsPageConferenceUserHoursHeader"}} </caption>
+                <thead>
+                <tr>
+                    <th>{{.CurrentScope}}</th>
+                    <th>{{t "StatsPageConferencesUserHoursTableHeader"}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ range .StatsOrder }}
+                    <tr>
+                        <th scope="row">{{t . }}</th>
+                        <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceCount . }} / {{ $.Statistics.HighestConferenceCount }})">
+                            {{ valFromIndex $.Statistics.ConferenceCount . }} <span
+                                    class="tooltip"> {{t "StatsPageConferenceUserHoursToolTip"}} {{ . }}: {{ valFromIndex $.Statistics.ConferenceCount . }} </span>
+                        </td>
+                    </tr>
+                {{ end }}
+                </tbody>
+            </table>
         </div>
     </div>
     </body>

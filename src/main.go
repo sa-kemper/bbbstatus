@@ -45,13 +45,12 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func Translate(text string) string {
-	re := regexp.MustCompile("(?i)[0-9]{1,2} ")
+	re := regexp.MustCompile("CW(?i)[0-9]{1,2}")
 	matched := re.MatchString(text)
-	capture := re.FindAllString(text, -1) // capture must have at least one if matched is true
 	if matched {
-		splitText := strings.Split(text, " ")
+		splitText := strings.Split(text, "CW")
 		if len(splitText) > 1 {
-			return capture[0] + localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: splitText[1]})
+			return localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: "CW"}) + splitText[1]
 		}
 	}
 	return localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: text})

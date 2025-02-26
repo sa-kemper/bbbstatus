@@ -86,6 +86,10 @@ other = "Zeit"
 hash = "sha1-9f8a2389a20ca0752aa9e95093515517e90e194c"
 other = "Benutzer"
 
+[CW]
+hash = "sha1-81d24cc01ffe84a8b639a3189c84d25955cc34ae"
+other = "KW"
+
 [Dec]
 hash = "sha1-997f59bc99b2a57280179c3ce09ba8ab57cbdf44"
 other = "Dez"
@@ -266,9 +270,37 @@ other = "Sam"
 hash = "sha1-fdd289e370bd5cc575f48a16947d05c144ec474b"
 other = "Sep"
 
+[StatsPageAttendeeCountTableHeader]
+hash = "sha1-a45a09624432a10add6932568409200bd3cc6fdd"
+other = "Teilnehmer"
+
+[StatsPageAttendeesInToolTip]
+hash = "sha1-b65477d35ae0f49f733183304dbf8ec997f859fa"
+other = "Teilnehmer am"
+
+[StatsPageConferenceAttendeeCountHeader]
+hash = "sha1-1206d91d2a711eb546b6e1279b2b33610c27f171"
+other = "Konferenz Teilnehmer"
+
 [StatsPageConferenceCountHeader]
 hash = "sha1-c5eedd0e192f7f298c4d0d010a5f013b566385cf"
 other = "Konferenz anzahl"
+
+[StatsPageConferenceTotalMeetingHoursHeader]
+hash = "sha1-b5f2a3ba41db819f0558f6a63de5f42ebb2b6ddc"
+other = "Gesamtdauer der konferenzen"
+
+[StatsPageConferenceUsageHoursToolTip]
+hash = "sha1-62d09f1039cbc33b6296b2fb9489ed2aa1c13890"
+other = "Gesamtdauer der konferenzen am (in stunden)"
+
+[StatsPageConferenceUserHoursHeader]
+hash = "sha1-14111d2848fc0f423269b124cc858ad376af23ea"
+other = "Gesammtdauer der konferenzteilnahmen (in stunden)"
+
+[StatsPageConferenceUserHoursToolTip]
+hash = "sha1-f5cc0236e434da93480ae23636d503c260689f15"
+other = "Gesammtdauer der konferenzteilnahmen am"
 
 [StatsPageConferencesInToolTip]
 hash = "sha1-b600a53a1940fffecfb8b08956a8fd1111cc7044"
@@ -278,6 +310,10 @@ other = "Konferenzen in"
 hash = "sha1-92ee4e6a83562ab2c6cdda0cc8936062a4959568"
 other = "Konferenzen"
 
+[StatsPageConferencesUserHoursTableHeader]
+hash = "sha1-14111d2848fc0f423269b124cc858ad376af23ea"
+other = "Gesammtdauer der konferenzteilnahmen"
+
 [StatsPageStatisticsHeader]
 hash = "sha1-2086b21f8f49274138c38d476bee317a84a8aecc"
 other = "Statistiken"
@@ -285,6 +321,10 @@ other = "Statistiken"
 [StatsPageStatisticsOverviewHeader]
 hash = "sha1-33a0579b2722e4f1b7fc70a41a1f2ff5f80bc6fd"
 other = "Statistik Überblick"
+
+[StatsPageTotalMeetingHoursTableHeader]
+hash = "sha1-ddd6f2fb1d80999b48f16b64bcc4dc892c236d6c"
+other = "Gesammtdauer der konferenzen"
 
 [Sun]
 hash = "sha1-48c98cab7866e606328c99289ed24e339393b5ab"

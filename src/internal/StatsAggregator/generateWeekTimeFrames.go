@@ -22,6 +22,10 @@ import (
 
 func generateWeekTimeFrames(startTime time.Time) map[string]TimeFrame {
 	wtf := make(map[string]TimeFrame)
+	targetTime := startTime.AddDate(0, 0, 7)
+	if targetTime.After(time.Now()) {
+		targetTime = time.Now()
+	}
 	start := startTime
 	start = start.Add(-time.Hour * time.Duration(start.Hour()))
 	start = start.Add(-time.Minute * time.Duration(start.Minute()))
@@ -34,7 +38,7 @@ func generateWeekTimeFrames(startTime time.Time) map[string]TimeFrame {
 			continue
 		}
 		firstRunFlag = false
-		if start.After(time.Now()) {
+		if start.After(targetTime) || len(wtf) == 7 {
 			break
 		}
 		wtf[start.Weekday().String()[:3]] = TimeFrame{

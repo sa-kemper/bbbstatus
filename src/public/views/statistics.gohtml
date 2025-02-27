@@ -48,6 +48,15 @@
 
         <div class="card">
             <h2>{{t "StatsPageStatisticsOverviewHeader"}}</h2>
+            <form action="{{reverse "statistics"}}">
+                <input type="hidden" name="scope" value="{{.CurrentScope}}">
+                <label for="startTime" class="label">{{t "StatsPageSelectScopeTime"}}</label>
+                <input type="{{ if eq .CurrentScope "week" }}week{{ else }}{{if eq .CurrentScope "month"}}month{{ else }}date{{ end }}{{ end }}"
+                       onblur="this.form.submit();" name="startTime"
+                       {{ if .StartTime }}value="{{ .StartTime }}"{{ end }} min="{{ .StartTimeMin }}"
+                       max="{{ .StartTimeMax }}" required>
+            </form>
+
             <!-- Placeholder for charts -->
             <table id="conference-count-table"
                    class="charts-css bar show-heading show-labels data-outside sorted data-spacing-5">

@@ -23,7 +23,7 @@ import (
 	"time"
 )
 
-func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString string) (stats Statistics, err error) {
+func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString string, targetTime time.Time) (stats Statistics, err error) {
 	stats.ConferenceCount = make(map[string]int)
 	stats.MaxUserCount = make(map[string]int)
 	stats.ConferenceUsageHours = make(map[string]int)
@@ -33,15 +33,17 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 	if err != nil {
 		return stats, fmt.Errorf("statsPage -> generateStatsByScope pgx.Connect: %w", err)
 	}
+	defer conn.Close(ctx)
+
 	timeFrames := map[string]TimeFrame{}
 	if scope == "week" {
-		timeFrames = generateWeekTimeFrames(time.Now())
+		timeFrames = generateWeekTimeFrames(targetTime)
 	}
 	if scope == "month" {
-		timeFrames = generateMonthTimeFrames(time.Now())
+		timeFrames = generateMonthTimeFrames(targetTime)
 	}
 	if scope == "year" {
-		timeFrames = generateYearTimeFrames(time.Now())
+		timeFrames = generateYearTimeFrames(targetTime)
 	}
 	for index, tf := range timeFrames {
 		var conferences int
@@ -84,6 +86,7 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 			}
 			userUsageHours += endTime.Sub(startTime)
 		}
+		rows.Close()
 
 		stats.ConferenceCount[index] = conferences
 		stats.MaxUserCount[index] = userCount

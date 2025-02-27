@@ -21,6 +21,11 @@ import (
 )
 
 func generateYearTimeFrames(start time.Time) map[string]TimeFrame {
+	targetTime := start.AddDate(1, 0, 0)
+	if targetTime.After(time.Now()) {
+		targetTime = time.Now()
+	}
+
 	// get to the start of the month by striping the day, hour, minute and second information.
 	start = start.AddDate(0, 0, -start.Day()+1)
 	start = start.Add(-time.Hour * time.Duration(start.Hour()))
@@ -38,7 +43,7 @@ func generateYearTimeFrames(start time.Time) map[string]TimeFrame {
 		if start.Month() == time.January {
 			firstRunFlag = false
 		}
-		if start.After(time.Now()) {
+		if start.After(targetTime) || len(ytf) == 12 {
 			break
 		}
 		ytf[start.Month().String()[:3]] = TimeFrame{start: start, end: start.AddDate(0, 1, 0)}

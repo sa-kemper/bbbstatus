@@ -24,6 +24,7 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -66,6 +67,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "StatsPageConferenceUserHoursHeader", Other: "Total user hours"},
 		{ID: "StatsPageConferencesUserHoursTableHeader", Other: "Total user hours"},
 		{ID: "StatsPageConferenceUserHoursToolTip", Other: "Total user hours in"},
+		{ID: "StatsPageSelectScopeTime", Other: "Select start time"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -75,42 +77,112 @@ func init() { // Add all messages that are related to this file into the localiz
 
 type templateStruct struct {
 	CurrentScope string
-	WeekActive   bool
-	MonthActive  bool
-	YearActive   bool
-	Statistics   StatsAggregator.Statistics
-	StatsOrder   []string
+	StartTime    string
+
+	StartTimeMin string
+	StartTimeMax string
+
+	WeekActive  bool
+	MonthActive bool
+	YearActive  bool
+	Statistics  StatsAggregator.Statistics
+	StatsOrder  []string
 }
 
-func statsPage(c echo.Context) error {
+func statsPage(c echo.Context) (err error) {
 	scope := c.QueryParam("scope")
+	startTime := c.QueryParam("startTime")
+	if scope == "" {
+		scope = "week"
+	}
+
+	var targetTime time.Time
+	if startTime != "" {
+		if scope == "week" {
+			var yearStr, weekStr string
+			if strings.Contains(startTime, "-") {
+				yearStr = strings.Split(startTime, "-")[0]
+				weekStr = strings.Split(startTime, "-")[1]
+				weekStr = strings.TrimLeft(weekStr, "W")
+				weekStr = strings.TrimLeft(weekStr, "0")
+			}
+			year, err := strconv.Atoi(yearStr)
+			if err != nil {
+				return err
+			}
+
+			targetTime = time.Date(year, 1, 1, 1, 0, 0, 0, time.UTC)
+			for {
+				targetTime = targetTime.AddDate(0, 0, 1)
+				_, week := targetTime.ISOWeek()
+				if strconv.Itoa(week) == weekStr {
+					break
+				}
+			}
+		}
+		if scope == "month" {
+			targetTime, err = time.Parse("2006-01", startTime)
+			if err != nil {
+				return err
+			}
+			targetTime = targetTime.AddDate(0, 0, 1)
+		}
+		if scope == "year" {
+			startTime = strings.Split(startTime, "-")[0]
+			targetTime, err = time.Parse("2006", startTime)
+			if err != nil {
+				return err
+			}
+			targetTime = targetTime.AddDate(0, 1, 1)
+		}
+	} else {
+		targetTime = time.Now()
+	}
 
 	templateData := templateStruct{}
-	dbStats, err := StatsAggregator.GenerateStatsByScope(c.Request().Context(), scope, confGet("DB_CONNECTION_STRING"))
+	dbStats, err := StatsAggregator.GenerateStatsByScope(c.Request().Context(), scope, confGet("DB_CONNECTION_STRING"), targetTime)
 	if err != nil {
 		fmt.Println("A error occured while generating stats page", err)
 		return c.Render(http.StatusInternalServerError, "errorPage", frontendError{ErrorTitle: "Internal Server Error", ErrorParagraph: "Error generating stats page"})
 	}
 
-	if scope != "" {
-		switch scope {
-		case "week":
-			templateData.WeekActive = true
-			templateData.Statistics = dbStats
-			templateData.StatsOrder = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}[:len(dbStats.ConferenceCount)]
-		case "month":
-			templateData.MonthActive = true
-			templateData.Statistics = dbStats
-			_, currentWeek := time.Now().ISOWeek()
-			templateData.StatsOrder = []string{"CW" + strconv.Itoa(currentWeek-4), "CW" + strconv.Itoa(currentWeek-3), "CW" + strconv.Itoa(currentWeek-2), "CW" + strconv.Itoa(currentWeek-1)}[:len(dbStats.ConferenceCount)]
-		case "year":
-			templateData.YearActive = true
-			templateData.Statistics = dbStats
-			templateData.StatsOrder = []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Oct", "Sep", "Nov", "Dec"}[:len(dbStats.ConferenceCount)]
-
-		}
-		templateData.CurrentScope = scope
+	earliestDataTimestamp, err := StatsAggregator.GetEarliestStatDate(c.Request().Context(), confGet("DB_CONNECTION_STRING"))
+	if err != nil {
+		fmt.Println("A error occured while generating stats page (get earliest data point)", err)
+		return c.Render(http.StatusInternalServerError, "errorPage", frontendError{ErrorTitle: "Internal Server Error", ErrorParagraph: "Error generating stats page"})
 	}
+
+	if startTime != "" {
+		templateData.StartTime = startTime
+	}
+
+	switch scope {
+	case "week":
+		minYear, minWeek := earliestDataTimestamp.ISOWeek()
+		maxYear, maxWeek := time.Now().ISOWeek()
+
+		templateData.WeekActive = true
+		templateData.Statistics = dbStats
+		templateData.StatsOrder = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}[:len(dbStats.ConferenceCount)]
+		templateData.StartTimeMin = fmt.Sprintf("%v-W%v", minYear, minWeek)
+		templateData.StartTimeMax = fmt.Sprintf("%v-W%v", maxYear, maxWeek)
+	case "month":
+		templateData.MonthActive = true
+		templateData.Statistics = dbStats
+		_, currentWeek := time.Now().ISOWeek()
+		templateData.StatsOrder = []string{"CW" + strconv.Itoa(currentWeek-4), "CW" + strconv.Itoa(currentWeek-3), "CW" + strconv.Itoa(currentWeek-2), "CW" + strconv.Itoa(currentWeek-1)}[:len(dbStats.ConferenceCount)]
+		templateData.StartTimeMin = fmt.Sprintf("%v-%d", earliestDataTimestamp.Year(), earliestDataTimestamp.Month())
+		templateData.StartTimeMax = fmt.Sprintf("%v-%d", time.Now().Year(), time.Now().Month())
+
+	case "year":
+		templateData.YearActive = true
+		templateData.Statistics = dbStats
+		templateData.StatsOrder = []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Oct", "Sep", "Nov", "Dec"}[:len(dbStats.ConferenceCount)]
+		templateData.StartTimeMin = fmt.Sprintf("%v-%v-%v", earliestDataTimestamp.Year(), earliestDataTimestamp.Month(), earliestDataTimestamp.Day())
+		templateData.StartTimeMax = fmt.Sprintf("%v-%v-%v", time.Now().Year(), time.Now().Month(), time.Now().Day())
+
+	}
+	templateData.CurrentScope = scope
 
 	return c.Render(http.StatusOK, "statistics", templateData)
 }

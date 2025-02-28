@@ -19,13 +19,18 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 )
 
 func downloadMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
+	var meetingName string
+	var meetingDate time.Time
 	var report, err = GenerateCSVReport(c.Request().Context(), internalMeetingId)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) { // this function may execute for a considerable amount of time. It's not completely unreasonable to assume that it may exceed time limits.
@@ -33,5 +38,16 @@ func downloadMeetingReport(c echo.Context) error {
 		}
 		return c.Render(http.StatusInternalServerError, "error", frontendError{ErrorTitle: Translate("ErrorTitleApplicationTimeout"), ErrorParagraph: Translate("ErrorParagraphApplicationTimeout")})
 	}
+
+	conn, err := pgx.Connect(c.Request().Context(), confGet("DB_CONNECTION_STRING"))
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = conn.QueryRow(c.Request().Context(), "SELECT create_time, name FROM meetings WHERE internal_meeting_id = $1", internalMeetingId).Scan(&meetingDate, &meetingName)
+	if err != nil {
+		fmt.Println(err)
+	}
+	meetingName = strings.ReplaceAll(strings.ReplaceAll(meetingName, " ", "-"), "'", "")
+	c.Response().Header().Set("Content-Disposition", "attachment; filename="+fmt.Sprintf("bbbstatus-meeting-report-%s-%s.csv", meetingName, meetingDate.Format("2006-02-01")))
 	return c.Blob(http.StatusOK, "text/csv", report)
 }

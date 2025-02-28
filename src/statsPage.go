@@ -69,6 +69,10 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "StatsPageConferenceUserHoursToolTip", Other: "Total user hours in"},
 		{ID: "StatsPageSelectScopeTime", Other: "Select start time"},
 		{ID: "StatsPageSelectScopeTimePrintLabel", Other: "Date\t"},
+		{ID: "StatsPageCSVTime", Other: "Time"},
+		{ID: "InternalServerError", Other: "Internal Server Error"},
+		{ID: "NoFutureTimeAllowed", Other: "Selected time point lays in the future"},
+		{ID: "StatsPageGenError", Other: "Error generating statistics"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -112,6 +116,9 @@ func statsPage(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
+	if targetTime.After(time.Now()) {
+		return renderError(c, "NoFutureTimeAllowed")
+	}
 
 	// Initialize template data
 	templateData := templateStruct{
@@ -127,7 +134,7 @@ func statsPage(c echo.Context) (err error) {
 	)
 	if err != nil {
 		fmt.Printf("Error generating stats page: %v\n", err)
-		return renderError(c, "Error generating stats page")
+		return renderError(c, "StatsPageGenError")
 	}
 
 	// Get the earliest statistics date
@@ -137,7 +144,7 @@ func statsPage(c echo.Context) (err error) {
 	)
 	if err != nil {
 		fmt.Printf("Error getting earliest stat date: %v\n", err)
-		return renderError(c, "Error generating stats page")
+		return renderError(c, "StatsPageGenError")
 	}
 
 	// Set start time if provided
@@ -148,25 +155,32 @@ func statsPage(c echo.Context) (err error) {
 	switch scope {
 	case "week":
 		minYear, minWeek := earliestDataTimestamp.ISOWeek()
-		maxYear, maxWeek := time.Now().ISOWeek()
+		maxYear, maxWeek := targetTime.ISOWeek()
+		currYear, currWeek := time.Now().ISOWeek()
 		templateData.WeekActive = true
 		templateData.Statistics = dbStats
 		templateData.StatsOrder = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}[:len(dbStats.ConferenceCount)]
 		templateData.StartTimeMin = fmt.Sprintf("%d-W%d", minYear, minWeek)
 		templateData.StartTimeMax = fmt.Sprintf("%d-W%d", maxYear, maxWeek)
+		if templateData.StartTime == "" {
+			templateData.StartTime = fmt.Sprintf("%d-W%02d", currYear, currWeek)
+		}
 
 	case "month":
 		templateData.MonthActive = true
 		templateData.Statistics = dbStats
-		_, currentWeek := time.Now().ISOWeek()
+		_, currentWeek := targetTime.AddDate(0, 0, -targetTime.Day()).ISOWeek()
 		templateData.StatsOrder = []string{
-			fmt.Sprintf("CW%d", currentWeek-4),
-			fmt.Sprintf("CW%d", currentWeek-3),
-			fmt.Sprintf("CW%d", currentWeek-2),
-			fmt.Sprintf("CW%d", currentWeek-1),
+			fmt.Sprintf("CW%d", currentWeek+0),
+			fmt.Sprintf("CW%d", currentWeek+1),
+			fmt.Sprintf("CW%d", currentWeek+2),
+			fmt.Sprintf("CW%d", currentWeek+3),
 		}[:len(dbStats.ConferenceCount)]
 		templateData.StartTimeMin = fmt.Sprintf("%d-%d", earliestDataTimestamp.Year(), earliestDataTimestamp.Month())
 		templateData.StartTimeMax = fmt.Sprintf("%d-%d", time.Now().Year(), time.Now().Month())
+		if templateData.StartTime == "" {
+			templateData.StartTime = fmt.Sprintf("%d-%02d", time.Now().Year(), time.Now().Month())
+		}
 
 	case "year":
 		templateData.YearActive = true
@@ -174,6 +188,9 @@ func statsPage(c echo.Context) (err error) {
 		templateData.StatsOrder = []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Oct", "Sep", "Nov", "Dec"}[:len(dbStats.ConferenceCount)]
 		templateData.StartTimeMin = earliestDataTimestamp.Format("2006-01-02")
 		templateData.StartTimeMax = time.Now().Format("2006-01-02")
+		if templateData.StartTime == "" {
+			templateData.StartTime = time.Now().Format("2006-01-02")
+		}
 	}
 
 	return c.Render(http.StatusOK, "statistics", templateData)
@@ -237,7 +254,7 @@ func parseWeekTime(startTime string) (time.Time, error) {
 	for {
 		_, currentWeek := targetTime.ISOWeek()
 		if currentWeek == week {
-			return targetTime.AddDate(0, 0, 7), nil
+			return targetTime, nil
 		}
 		targetTime = targetTime.AddDate(0, 0, 1)
 	}
@@ -246,7 +263,7 @@ func parseWeekTime(startTime string) (time.Time, error) {
 // renderError renders an error page with a standard message
 func renderError(c echo.Context, message string) error {
 	return c.Render(http.StatusInternalServerError, "errorPage", frontendError{
-		ErrorTitle:     "Internal Server Error",
+		ErrorTitle:     "InternalServerError",
 		ErrorParagraph: message,
 	})
 }

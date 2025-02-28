@@ -45,6 +45,7 @@ var routes = []route{
 	{Name: "reportCsv", Method: "GET", Path: "/report/:id/csv", HandlerFunc: downloadMeetingReport},
 	{Name: "webhookEvent", Method: "POST", Path: "/event", HandlerFunc: bbbWebHookEvent},
 	{Name: "statistics", Method: "GET", Path: "/statistics", HandlerFunc: statsPage},
+	{Name: "statisticsCsv", Method: "GET", Path: "/statistics/csv", HandlerFunc: statsPageCSV},
 	{Name: "index", Method: "GET", Path: "/", HandlerFunc: func(context echo.Context) error {
 		return context.Redirect(http.StatusMovedPermanently, context.Echo().Reverse("meetings"))
 	}},

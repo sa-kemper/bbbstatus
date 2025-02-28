@@ -23,7 +23,7 @@ import (
 
 func generateMonthTimeFrames(start time.Time) map[string]TimeFrame {
 	//start = start.AddDate(0, -1, 0)
-	targetTime := start.AddDate(0, 1, 0)
+	targetTime := start.AddDate(0, 1, -2)
 	if targetTime.After(time.Now()) {
 		targetTime = time.Now()
 	}
@@ -34,7 +34,8 @@ func generateMonthTimeFrames(start time.Time) map[string]TimeFrame {
 
 	mtf := make(map[string]TimeFrame)
 	for {
-		if start.After(targetTime) || len(mtf) == 4 {
+
+		if start.Month() > targetTime.Month() || len(mtf) == 4 || start.After(targetTime) || start.After(time.Now()) {
 			break
 		}
 		_, week := start.ISOWeek()

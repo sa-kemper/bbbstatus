@@ -23,6 +23,7 @@ import (
 func generateWeekTimeFrames(startTime time.Time) map[string]TimeFrame {
 	wtf := make(map[string]TimeFrame)
 	targetTime := startTime.AddDate(0, 0, 7)
+	_, targetWeek := startTime.ISOWeek()
 	if targetTime.After(time.Now()) {
 		targetTime = time.Now()
 	}
@@ -30,15 +31,15 @@ func generateWeekTimeFrames(startTime time.Time) map[string]TimeFrame {
 	start = start.Add(-time.Hour * time.Duration(start.Hour()))
 	start = start.Add(-time.Minute * time.Duration(start.Minute()))
 	start = start.Add(-time.Second * time.Duration(start.Second()))
-	start = start.AddDate(0, 0, -7)
 	var firstRunFlag = true
 	for {
 		if firstRunFlag && start.Weekday() != time.Monday {
-			start = start.AddDate(0, 0, 1)
+			start = start.AddDate(0, 0, -1)
 			continue
 		}
 		firstRunFlag = false
-		if start.After(targetTime) || len(wtf) == 7 {
+		_, currentWeek := start.ISOWeek()
+		if currentWeek > targetWeek || len(wtf) == 7 || start.After(time.Now()) || start.After(targetTime) {
 			break
 		}
 		wtf[start.Weekday().String()[:3]] = TimeFrame{

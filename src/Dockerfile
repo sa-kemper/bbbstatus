@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # syntax=docker/dockerfile:1
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23-alpine AS builder
 LABEL authors="user"
 
 RUN apk update

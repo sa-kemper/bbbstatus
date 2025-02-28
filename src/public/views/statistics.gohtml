@@ -8,6 +8,21 @@
         <link rel="stylesheet" href="/static/css/style.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <link rel="stylesheet" href="https://unpkg.com/charts.css/dist/charts.min.css">
+        <style>
+            #StatsPageSelectScopeTimePrintLabel {
+                visibility: hidden;
+            }
+
+            @media print {
+                #StatsPageSelectScopeTimePrintLabel {
+                    visibility: visible;
+                }
+
+                #StatsPageTimeSelectorLabel {
+                    visibility: hidden;
+                }
+            }
+        </style>
     </head>
     <body>
     <div class="container">
@@ -50,11 +65,13 @@
             <h2>{{t "StatsPageStatisticsOverviewHeader"}}</h2>
             <form action="{{reverse "statistics"}}">
                 <input type="hidden" name="scope" value="{{.CurrentScope}}">
-                <label for="startTime" class="label">{{t "StatsPageSelectScopeTime"}}</label>
+                <label for="StatsPageTimeSelector" class="label"><span
+                            id="StatsPageTimeSelectorLabel">{{t "StatsPageSelectScopeTime"}}</span><span
+                            id="StatsPageSelectScopeTimePrintLabel">{{t "StatsPageSelectScopeTimePrintLabel"}}</span></label>
                 <input type="{{ if eq .CurrentScope "week" }}week{{ else }}{{if eq .CurrentScope "month"}}month{{ else }}date{{ end }}{{ end }}"
                        onblur="this.form.submit();" name="startTime"
                        {{ if .StartTime }}value="{{ .StartTime }}"{{ end }} min="{{ .StartTimeMin }}"
-                       max="{{ .StartTimeMax }}" required>
+                       max="{{ .StartTimeMax }}" required id="StatsPageTimeSelector">
             </form>
 
             <!-- Placeholder for charts -->

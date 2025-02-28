@@ -68,6 +68,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "StatsPageConferencesUserHoursTableHeader", Other: "Total user hours"},
 		{ID: "StatsPageConferenceUserHoursToolTip", Other: "Total user hours in"},
 		{ID: "StatsPageSelectScopeTime", Other: "Select start time"},
+		{ID: "StatsPageSelectScopeTimePrintLabel", Other: "Date\t"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -89,69 +90,57 @@ type templateStruct struct {
 	StatsOrder  []string
 }
 
+// statsPage handles the rendering of the statistics page based on scope and time parameters
+//
+// Parameters:
+//
+//	c (echo.Context): The Echo context containing request information
+//
+// Returns:
+//
+//	error: Returns an error if stats generation or rendering fails, nil otherwise
 func statsPage(c echo.Context) (err error) {
+	// Get and set default scope
 	scope := c.QueryParam("scope")
-	startTime := c.QueryParam("startTime")
 	if scope == "" {
 		scope = "week"
 	}
 
-	var targetTime time.Time
-	if startTime != "" {
-		if scope == "week" {
-			var yearStr, weekStr string
-			if strings.Contains(startTime, "-") {
-				yearStr = strings.Split(startTime, "-")[0]
-				weekStr = strings.Split(startTime, "-")[1]
-				weekStr = strings.TrimLeft(weekStr, "W")
-				weekStr = strings.TrimLeft(weekStr, "0")
-			}
-			year, err := strconv.Atoi(yearStr)
-			if err != nil {
-				return err
-			}
-
-			targetTime = time.Date(year, 1, 1, 1, 0, 0, 0, time.UTC)
-			for {
-				targetTime = targetTime.AddDate(0, 0, 1)
-				_, week := targetTime.ISOWeek()
-				if strconv.Itoa(week) == weekStr {
-					break
-				}
-			}
-		}
-		if scope == "month" {
-			targetTime, err = time.Parse("2006-01", startTime)
-			if err != nil {
-				return err
-			}
-			targetTime = targetTime.AddDate(0, 0, 1)
-		}
-		if scope == "year" {
-			startTime = strings.Split(startTime, "-")[0]
-			targetTime, err = time.Parse("2006", startTime)
-			if err != nil {
-				return err
-			}
-			targetTime = targetTime.AddDate(0, 1, 1)
-		}
-	} else {
-		targetTime = time.Now()
-	}
-
-	templateData := templateStruct{}
-	dbStats, err := StatsAggregator.GenerateStatsByScope(c.Request().Context(), scope, confGet("DB_CONNECTION_STRING"), targetTime)
+	// Parse start time parameter
+	startTime := c.QueryParam("startTime")
+	targetTime, err := parseTargetTime(scope, startTime)
 	if err != nil {
-		fmt.Println("A error occured while generating stats page", err)
-		return c.Render(http.StatusInternalServerError, "errorPage", frontendError{ErrorTitle: "Internal Server Error", ErrorParagraph: "Error generating stats page"})
+		return err
 	}
 
-	earliestDataTimestamp, err := StatsAggregator.GetEarliestStatDate(c.Request().Context(), confGet("DB_CONNECTION_STRING"))
+	// Initialize template data
+	templateData := templateStruct{
+		CurrentScope: scope,
+	}
+
+	// Generate statistics from database
+	dbStats, err := StatsAggregator.GenerateStatsByScope(
+		c.Request().Context(),
+		scope,
+		confGet("DB_CONNECTION_STRING"),
+		targetTime,
+	)
 	if err != nil {
-		fmt.Println("A error occured while generating stats page (get earliest data point)", err)
-		return c.Render(http.StatusInternalServerError, "errorPage", frontendError{ErrorTitle: "Internal Server Error", ErrorParagraph: "Error generating stats page"})
+		fmt.Printf("Error generating stats page: %v\n", err)
+		return renderError(c, "Error generating stats page")
 	}
 
+	// Get the earliest statistics date
+	earliestDataTimestamp, err := StatsAggregator.GetEarliestStatDate(
+		c.Request().Context(),
+		confGet("DB_CONNECTION_STRING"),
+	)
+	if err != nil {
+		fmt.Printf("Error getting earliest stat date: %v\n", err)
+		return renderError(c, "Error generating stats page")
+	}
+
+	// Set start time if provided
 	if startTime != "" {
 		templateData.StartTime = startTime
 	}
@@ -160,29 +149,104 @@ func statsPage(c echo.Context) (err error) {
 	case "week":
 		minYear, minWeek := earliestDataTimestamp.ISOWeek()
 		maxYear, maxWeek := time.Now().ISOWeek()
-
 		templateData.WeekActive = true
 		templateData.Statistics = dbStats
 		templateData.StatsOrder = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}[:len(dbStats.ConferenceCount)]
-		templateData.StartTimeMin = fmt.Sprintf("%v-W%v", minYear, minWeek)
-		templateData.StartTimeMax = fmt.Sprintf("%v-W%v", maxYear, maxWeek)
+		templateData.StartTimeMin = fmt.Sprintf("%d-W%d", minYear, minWeek)
+		templateData.StartTimeMax = fmt.Sprintf("%d-W%d", maxYear, maxWeek)
+
 	case "month":
 		templateData.MonthActive = true
 		templateData.Statistics = dbStats
 		_, currentWeek := time.Now().ISOWeek()
-		templateData.StatsOrder = []string{"CW" + strconv.Itoa(currentWeek-4), "CW" + strconv.Itoa(currentWeek-3), "CW" + strconv.Itoa(currentWeek-2), "CW" + strconv.Itoa(currentWeek-1)}[:len(dbStats.ConferenceCount)]
-		templateData.StartTimeMin = fmt.Sprintf("%v-%d", earliestDataTimestamp.Year(), earliestDataTimestamp.Month())
-		templateData.StartTimeMax = fmt.Sprintf("%v-%d", time.Now().Year(), time.Now().Month())
+		templateData.StatsOrder = []string{
+			fmt.Sprintf("CW%d", currentWeek-4),
+			fmt.Sprintf("CW%d", currentWeek-3),
+			fmt.Sprintf("CW%d", currentWeek-2),
+			fmt.Sprintf("CW%d", currentWeek-1),
+		}[:len(dbStats.ConferenceCount)]
+		templateData.StartTimeMin = fmt.Sprintf("%d-%d", earliestDataTimestamp.Year(), earliestDataTimestamp.Month())
+		templateData.StartTimeMax = fmt.Sprintf("%d-%d", time.Now().Year(), time.Now().Month())
 
 	case "year":
 		templateData.YearActive = true
 		templateData.Statistics = dbStats
 		templateData.StatsOrder = []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Oct", "Sep", "Nov", "Dec"}[:len(dbStats.ConferenceCount)]
-		templateData.StartTimeMin = fmt.Sprintf("%v-%v-%v", earliestDataTimestamp.Year(), earliestDataTimestamp.Month(), earliestDataTimestamp.Day())
-		templateData.StartTimeMax = fmt.Sprintf("%v-%v-%v", time.Now().Year(), time.Now().Month(), time.Now().Day())
-
+		templateData.StartTimeMin = earliestDataTimestamp.Format("2006-01-02")
+		templateData.StartTimeMax = time.Now().Format("2006-01-02")
 	}
-	templateData.CurrentScope = scope
 
 	return c.Render(http.StatusOK, "statistics", templateData)
+}
+
+// parseTargetTime parses the target time based on scope and startTime string
+//
+// Parameters:
+//
+//	scope (string): The time scope (week, month, or year)
+//	startTime (string): The starting time string
+//
+// Returns:
+//
+//	time.Time: The parsed target time
+//	error: Error if parsing fails
+func parseTargetTime(scope, startTime string) (time.Time, error) {
+	if startTime == "" {
+		return time.Now(), nil
+	}
+
+	switch scope {
+	case "week":
+		return parseWeekTime(startTime)
+	case "month":
+		t, err := time.Parse("2006-01", startTime)
+		if err != nil {
+			return time.Time{}, err
+		}
+		return t.AddDate(0, 0, 1), nil
+	case "year":
+		t, err := time.Parse("2006", strings.Split(startTime, "-")[0])
+		if err != nil {
+			return time.Time{}, err
+		}
+		return t.AddDate(0, 1, 1), nil
+	default:
+		return time.Now(), nil
+	}
+}
+
+// parseWeekTime parses a week-based time string in format "YYYY-WWW"
+func parseWeekTime(startTime string) (time.Time, error) {
+	if !strings.Contains(startTime, "-") {
+		return time.Time{}, fmt.Errorf("invalid week format")
+	}
+
+	parts := strings.Split(startTime, "-")
+	year, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	weekStr := strings.TrimLeft(strings.TrimPrefix(parts[1], "W"), "0")
+	week, err := strconv.Atoi(weekStr)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	targetTime := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
+	for {
+		_, currentWeek := targetTime.ISOWeek()
+		if currentWeek == week {
+			return targetTime.AddDate(0, 0, 7), nil
+		}
+		targetTime = targetTime.AddDate(0, 0, 1)
+	}
+}
+
+// renderError renders an error page with a standard message
+func renderError(c echo.Context, message string) error {
+	return c.Render(http.StatusInternalServerError, "errorPage", frontendError{
+		ErrorTitle:     "Internal Server Error",
+		ErrorParagraph: message,
+	})
 }

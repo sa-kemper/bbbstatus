@@ -561,6 +561,14 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     .meeting-button.report-back-meeting-button {
         display: none;
     }
+
+    #StatsPageTimeSelector {
+        border: transparent;
+    }
+
+    table {
+        page-break-inside: avoid;
+    }
 }
 
 @media (max-width: 768px) {

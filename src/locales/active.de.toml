@@ -287,16 +287,16 @@ hash = "sha1-c5eedd0e192f7f298c4d0d010a5f013b566385cf"
 other = "Konferenz anzahl"
 
 [StatsPageConferenceTotalMeetingHoursHeader]
-hash = "sha1-b5f2a3ba41db819f0558f6a63de5f42ebb2b6ddc"
+hash = "sha1-8a6530ecbb69b21a92e5a19cb0f7430913032b47"
 other = "Gesamtdauer der konferenzen"
 
 [StatsPageConferenceUsageHoursToolTip]
 hash = "sha1-62d09f1039cbc33b6296b2fb9489ed2aa1c13890"
-other = "Gesamtdauer der konferenzen am (in stunden)"
+other = "Gesamtzahl der konferenzen am"
 
 [StatsPageConferenceUserHoursHeader]
 hash = "sha1-14111d2848fc0f423269b124cc858ad376af23ea"
-other = "Gesammtdauer der konferenzteilnahmen (in stunden)"
+other = "Gesammtdauer der konferenzteilnahmen"
 
 [StatsPageConferenceUserHoursToolTip]
 hash = "sha1-f5cc0236e434da93480ae23636d503c260689f15"
@@ -313,6 +313,14 @@ other = "Konferenzen"
 [StatsPageConferencesUserHoursTableHeader]
 hash = "sha1-14111d2848fc0f423269b124cc858ad376af23ea"
 other = "Gesammtdauer der konferenzteilnahmen"
+
+[StatsPageSelectScopeTime]
+hash = "sha1-9285ecba420a18464a93f38aa63fec311cea342b"
+other = "Startzeit wählen"
+
+[StatsPageSelectScopeTimePrintLabel]
+hash = "sha1-0386ebcfc074ce69f1c7b84e2436472376f2f6fa"
+other = "Datum\t"
 
 [StatsPageStatisticsHeader]
 hash = "sha1-2086b21f8f49274138c38d476bee317a84a8aecc"

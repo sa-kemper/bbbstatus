@@ -17,7 +17,7 @@
 package StatsAggregator
 
 import (
-	"strconv"
+	"fmt"
 	"time"
 )
 
@@ -31,16 +31,45 @@ func generateMonthTimeFrames(start time.Time) map[string]TimeFrame {
 	start = start.Add(-time.Hour * time.Duration(start.Hour()))
 	start = start.Add(-time.Minute * time.Duration(start.Minute()))
 	start = start.Add(-time.Second * time.Duration(start.Second()))
+	mtw := make(map[string]TimeFrame)
+	for _, cw := range collectCalendarWeeksForMonth(start.Year(), start.Month()) {
+		_, week := cw.Start.ISOWeek()
+		mtw[fmt.Sprintf("CW%d", week)] = cw
+	}
+	return mtw
+}
 
-	mtf := make(map[string]TimeFrame)
+func generateCalendarWeeks(year int) (result map[int]TimeFrame) {
+	start := time.Date(year, 1, -7, 0, 0, 0, 0, time.Local)
+	result = make(map[int]TimeFrame)
 	for {
-
-		if start.Month() > targetTime.Month() || len(mtf) == 4 || start.After(targetTime) || start.After(time.Now()) {
+		if start.Year() > year {
 			break
 		}
-		_, week := start.ISOWeek()
-		mtf["CW"+strconv.Itoa(week)] = TimeFrame{start: start, end: start.AddDate(0, 0, 7)}
-		start = start.AddDate(0, 0, 7)
+		if start.Weekday() == time.Monday {
+			_, week := start.ISOWeek()
+			if _, ok := result[week]; ok {
+				return
+			}
+			result[week] = TimeFrame{start, start.AddDate(0, 0, 6)}
+		}
+		start = start.AddDate(0, 0, 1)
 	}
-	return mtf
+	return
+}
+
+func collectCalendarWeeksForMonth(year int, month time.Month) (result []TimeFrame) {
+	_, start := time.Date(year, month, 1, 0, 0, 1, 0, time.UTC).ISOWeek()
+	_, end := time.Date(year, month, 1, 0, 0, 1, 0, time.UTC).AddDate(0, 1, 0).ISOWeek()
+	if month == time.December {
+		end = 52
+	}
+	if month == time.January {
+		start = 1
+	}
+	calendarWeeks := generateCalendarWeeks(year)
+	for i := start; i <= end; i++ {
+		result = append(result, calendarWeeks[i])
+	}
+	return
 }

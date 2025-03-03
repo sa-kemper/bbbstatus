@@ -169,13 +169,7 @@ func statsPage(c echo.Context) (err error) {
 	case "month":
 		templateData.MonthActive = true
 		templateData.Statistics = dbStats
-		_, currentWeek := targetTime.AddDate(0, 0, -targetTime.Day()).ISOWeek()
-		templateData.StatsOrder = []string{
-			fmt.Sprintf("CW%d", currentWeek+0),
-			fmt.Sprintf("CW%d", currentWeek+1),
-			fmt.Sprintf("CW%d", currentWeek+2),
-			fmt.Sprintf("CW%d", currentWeek+3),
-		}[:len(dbStats.ConferenceCount)]
+		templateData.StatsOrder = generateMonthStatIndexes(dbStats.TimeFrames)[:len(dbStats.ConferenceCount)]
 		templateData.StartTimeMin = fmt.Sprintf("%d-%d", earliestDataTimestamp.Year(), earliestDataTimestamp.Month())
 		templateData.StartTimeMax = fmt.Sprintf("%d-%d", time.Now().Year(), time.Now().Month())
 		if templateData.StartTime == "" {

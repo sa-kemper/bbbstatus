@@ -19,5 +19,5 @@ package StatsAggregator
 import "time"
 
 type TimeFrame struct {
-	start, end time.Time
+	Start, End time.Time
 }

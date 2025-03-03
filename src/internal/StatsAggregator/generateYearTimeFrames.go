@@ -46,7 +46,7 @@ func generateYearTimeFrames(start time.Time) map[string]TimeFrame {
 		if start.After(targetTime) || len(ytf) == 12 {
 			break
 		}
-		ytf[start.Month().String()[:3]] = TimeFrame{start: start, end: start.AddDate(0, 1, 0)}
+		ytf[start.Month().String()[:3]] = TimeFrame{Start: start, End: start.AddDate(0, 1, 0)}
 		start = start.AddDate(0, 1, 0)
 	}
 

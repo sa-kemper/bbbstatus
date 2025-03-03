@@ -21,7 +21,10 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"slices"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 func statsPageCSV(c echo.Context) (err error) {
@@ -57,13 +60,7 @@ func statsPageCSV(c echo.Context) (err error) {
 		_, week := startTime.ISOWeek()
 		fileDate = fmt.Sprintf("%d-callendar-week-%d", startTime.Year(), week)
 	case "month":
-		_, currentWeek := startTime.ISOWeek()
-		StatsOrder = []string{
-			fmt.Sprintf("CW%d", currentWeek-4),
-			fmt.Sprintf("CW%d", currentWeek-3),
-			fmt.Sprintf("CW%d", currentWeek-2),
-			fmt.Sprintf("CW%d", currentWeek-1),
-		}[:len(stats.ConferenceCount)]
+		StatsOrder = generateMonthStatIndexes(stats.TimeFrames)[:len(stats.ConferenceCount)]
 		fileDate = strconv.Itoa(startTime.Year()) + "-" + startTime.Month().String()
 	case "year":
 		StatsOrder = []string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Oct", "Sep", "Nov", "Dec"}[:len(stats.ConferenceCount)]
@@ -80,4 +77,28 @@ func statsPageCSV(c echo.Context) (err error) {
 
 	c.Response().Header().Set("Content-Disposition", "attachment; filename="+fmt.Sprintf("bbbstatus-%s-statistics-%s.csv", scope, fileDate))
 	return c.Blob(http.StatusOK, "text/csv", []byte(result))
+}
+
+func generateMonthStatIndexes(timeFrames []StatsAggregator.TimeFrame) (mtfIndex []string) {
+	for _, tf := range timeFrames {
+		_, week := tf.Start.ISOWeek()
+		if !slices.Contains(mtfIndex, fmt.Sprintf("CW%d", week)) {
+			mtfIndex = append(mtfIndex, fmt.Sprintf("CW%d", week))
+		}
+
+		_, week = tf.End.ISOWeek()
+		if !slices.Contains(mtfIndex, fmt.Sprintf("CW%d", week)) {
+			mtfIndex = append(mtfIndex, fmt.Sprintf("CW%d", week))
+		}
+	}
+	sort.Slice(mtfIndex, func(i, j int) bool {
+		digitI, err := strconv.Atoi(strings.TrimLeft(mtfIndex[i], "CW"))
+		if err != nil {
+			fmt.Println("err", err)
+		}
+		digitJ, err := strconv.Atoi(strings.TrimLeft(mtfIndex[j], "CW"))
+
+		return digitI < digitJ
+	})
+	return
 }

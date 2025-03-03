@@ -50,15 +50,15 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 		var userCount int
 		var conferenceUsageHours time.Duration
 		var userUsageHours time.Duration
-		err = conn.QueryRow(ctx, "SELECT COUNT(*) FROM meetings WHERE create_time BETWEEN $1 AND $2", tf.start, tf.end).Scan(&conferences)
+		err = conn.QueryRow(ctx, "SELECT COUNT(*) FROM meetings WHERE create_time BETWEEN $1 AND $2", tf.Start, tf.End).Scan(&conferences)
 		if err != nil {
 			return stats, fmt.Errorf("statsPage -> generateStatsByScope queryRow (meetings count): %w", err)
 		}
-		err = conn.QueryRow(ctx, "SELECT COUNT(*) FROM meetings WHERE create_time BETWEEN $1 AND $2", tf.start, tf.end).Scan(&userCount)
+		err = conn.QueryRow(ctx, "SELECT COUNT(*) FROM meetings WHERE create_time BETWEEN $1 AND $2", tf.Start, tf.End).Scan(&userCount)
 		if err != nil {
 			return stats, fmt.Errorf("statsPage -> generateStatsByScope queryRow (user count): %w", err)
 		}
-		rows, err := conn.Query(ctx, "SELECT create_time, meeting_ended FROM meetings WHERE meeting_ended IS NOT NULL AND create_time BETWEEN $1 AND $2", tf.start, tf.end)
+		rows, err := conn.Query(ctx, "SELECT create_time, meeting_ended FROM meetings WHERE meeting_ended IS NOT NULL AND create_time BETWEEN $1 AND $2", tf.Start, tf.End)
 		if err != nil {
 			return stats, fmt.Errorf("statsPage -> generateStatsByScope queryRow (meeting time): %w", err)
 		}
@@ -73,7 +73,7 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 		}
 		rows.Close()
 
-		rows, err = conn.Query(ctx, "SELECT join_timestamp, leave_timestamp FROM users WHERE users.leave_timestamp IS NOT NULL AND join_timestamp BETWEEN $1 AND $2", tf.start, tf.end)
+		rows, err = conn.Query(ctx, "SELECT join_timestamp, leave_timestamp FROM users WHERE users.leave_timestamp IS NOT NULL AND join_timestamp BETWEEN $1 AND $2", tf.Start, tf.End)
 		if err != nil {
 			return stats, fmt.Errorf("statsPage -> generateStatsByScope queryRow (users usage hours time): %w", err)
 		}
@@ -96,7 +96,9 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 		stats.HighestConferenceCount = findMaxInMap(stats.ConferenceCount)
 		stats.HighestMaxUserCount = findMaxInMap(stats.MaxUserCount)
 		stats.HighestConferenceUsageHours = findMaxInMap(stats.ConferenceUsageHours)
-
+		for _, tf := range timeFrames {
+			stats.TimeFrames = append(stats.TimeFrames, tf)
+		}
 	}
 
 	return stats, err

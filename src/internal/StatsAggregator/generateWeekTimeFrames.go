@@ -43,8 +43,8 @@ func generateWeekTimeFrames(startTime time.Time) map[string]TimeFrame {
 			break
 		}
 		wtf[start.Weekday().String()[:3]] = TimeFrame{
-			start: start,
-			end:   start.AddDate(0, 0, 1),
+			Start: start,
+			End:   start.AddDate(0, 0, 1),
 		}
 		start = start.AddDate(0, 0, 1)
 

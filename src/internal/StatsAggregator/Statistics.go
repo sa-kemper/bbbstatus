@@ -25,4 +25,5 @@ type Statistics struct {
 	HighestMaxUserCount              int
 	HighestConferenceUsageHours      int
 	HighestConferenceUsersUsageHours int
+	TimeFrames                       []TimeFrame
 }

@@ -73,14 +73,17 @@ BBB_SERVERS="bbb.example.com:443,bbb2.example.com"
 
 The comma is only required when configuring multiple bbb servers.
 
-NOTE: When configuring bbb servers this way, bbbstatus tries to automatically obtain the `SHARED_SECRET` as it's
-provided with each bbb-webhook request. One limitation is that this is not persistent, meaning that you have to wait for
-bbb-webhooks after each restart in order to use API features (like get recordings).
 
 ## Notes
 
-You may serve static files separately in your environment, therefore there is an option to disable it.
-bbbstatus will use the path /static in any case.
+- When configuring bbb servers this way, bbbstatus tries to automatically obtain the `SHARED_SECRET` as it's
+  provided with each bbb-webhook request. One limitation is that this is not persistent, meaning that you have to wait
+  for
+  bbb-webhooks after each restart in order to use API features (like get recordings).
+
+
+- You may serve static files separately in your environment, therefore there is an option to disable it.
+  bbbstatus will use the path /static in any case.
 
 # Customization
 
@@ -164,33 +167,37 @@ Restart=on-failure
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=bbbstatus
-Environment=DB_CONNECTION_STRING=postgres://bbbstatus:bbbstatus@localhost/bbbstatus
-Environment=HOST=0.0.0.0
-Environment=PORT=8080
 
 [Install]
 WantedBy=multi-user.target
 ```
 
 Please adapt the given sample configuration to your needs and values, see [configuration](README.MD#configuration).
-You will most definitely need to update the Environment=DB_CONNECTION_STRING line to the database credentials you have setup [here](README.MD#set-up-a-database-and-a-user-with-write-permissions).
+You will most definitely need to update the DB_CONNECTION_STRING line to the database credentials you have
+setup [here](README.MD#set-up-a-database-and-a-user-with-write-permissions).
 
 Save the changed content (on a fresh installation use `ctrl + O`)
 
 Exit the editor (on a fresh installation use `ctrl + C`)
 
 Now you can start, enable, stop, view logs, restart bbbstatus using the common systemd commands.
+After the first start of the service, bbbstatus will write a config.toml file in it's WorkingDirectory, please use it as
+your main way of configuring, using environment variables as a way of overwriting the config values.
 
-# Deployment Docker (minimal)
+# Deployment Docker
 
 Make a directory to hold the docker compose file, the .env file, the Caddyfile and the data folder from bbbstatus and
 Caddy (the default webserver).
 
-Create a file named `docker-compose.yml` using your favorite text editor, and insert the contents of [the example docker compose file](docker-compose.yml).
+- Create a file named `docker-compose.yml` using your favorite text editor, and insert the contents
+  of [the example docker compose file](docker-compose.yml).
 Or just simply download the given example of this repository.
-Save the changes, and create a new file called `.env`
-Insert the contents of the [example file](dotenv) and change the configuration parameters to your needs.
-You should change at least the database username, and the database password.
+- create a new file called `.env`
+- Insert the contents of the [example file](dotenv) and change the configuration parameters to your needs.
+  You should change at least the database username, and the database password.
+- Copy the provided Caddyfile.example to Caddyfile and change at least the authentication hash (It's just a example.).
+  You can generate a caddy hash using the caddy binary
+  as [documented here](https://caddyserver.com/docs/command-line#caddy-hash-password)
 
 bbbstatus requires either full ipv6 support or fully disabled ipv6 support.
 If your bbb server sends webhooks using ipv6, bbbstatus **MUST** receive it as ipv6 as well.

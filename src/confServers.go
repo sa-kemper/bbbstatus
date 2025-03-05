@@ -31,7 +31,7 @@ func confGetServers(query string) (matches []bbbServer) {
 			matches = append(matches, server)
 		}
 	}
-	fmt.Println("DEBUG confGetServers -> len=", len(matches), "matches=", matches)
+	//fmt.Println("DEBUG confGetServers -> len=", len(matches), "matches=", matches)
 	return
 }
 

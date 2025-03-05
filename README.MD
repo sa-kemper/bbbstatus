@@ -214,3 +214,19 @@ If your bbb server sends webhooks using ipv6, bbbstatus **MUST** receive it as i
    and paste this configuration:
    `net.ipv6.conf.all.disable_ipv6 = 1`
 
+## Dependencies
+
+Frontend:
+
+- [font-awesome 6.0.0](https://fontawesome.com/)
+- [charts.css 1.1.0](https://chartscss.org/)
+
+Backend:
+
+- github.com/BurntSushi/toml
+- github.com/jackc/pgx/v5
+- github.com/labstack/echo/v4
+- github.com/labstack/gommon
+- github.com/nicksnyder/go-i18n/v2
+- github.com/pressly/goose/v3
+- golang.org/x/text

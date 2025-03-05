@@ -26,7 +26,7 @@ func loadAdditionalUserData(user *User, tx pgx.Tx) error {
 	if user != nil && user.Name == "" && user.InternalUserID != "" {
 		err := tx.QueryRow(context.Background(), "SELECT name FROM users WHERE internal_user_id=$1", user.InternalUserID).Scan(&user.Name)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("error occurred during loadAdditionalUserData: ", err)
 			return err
 		}
 	}

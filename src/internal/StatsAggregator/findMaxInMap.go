@@ -23,5 +23,5 @@ func findMaxInMap(in map[string]int) (max int) {
 			max = value
 		}
 	}
-	return max
+	return
 }

@@ -24,17 +24,18 @@ type Recordings struct {
 	Recording []Recording `xml:"recording"`
 }
 type Recording struct {
-	RecordID     string            `xml:"recordID"`
-	MeetingID    string            `xml:"meetingID"`
-	Name         string            `xml:"name"`
-	IsBreakout   bool              `xml:"isBreakout"`
-	Published    bool              `xml:"published"`
-	State        string            `xml:"state"`
-	StartTime    string            `xml:"startTime"`
-	EndTime      string            `xml:"endTime"`
-	Participants int               `xml:"participants"`
-	MetaData     RecordingMetadata `xml:"metadata"`
-	Playback     struct {
+	RecordID          string            `xml:"recordID"`
+	MeetingID         string            `xml:"meetingID"`
+	InternalMeetingID string            `xml:"internalMeetingID"`
+	Name              string            `xml:"name"`
+	IsBreakout        bool              `xml:"isBreakout"`
+	Published         bool              `xml:"published"`
+	State             string            `xml:"state"`
+	StartTime         string            `xml:"startTime"`
+	EndTime           string            `xml:"endTime"`
+	Participants      int               `xml:"participants"`
+	MetaData          RecordingMetadata `xml:"metadata"`
+	Playback          struct {
 		Format []struct {
 			Type   string   `xml:"type"`
 			Url    string   `xml:"url"`

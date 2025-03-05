@@ -23,7 +23,7 @@ Configuration sources:
 | `DB_CONNECTION_STRING` | `postgres://bbbstatus:bbbstatus@localhost/bbbstatus` | Database connection string (PostgreSQL).                                                                                                                                   | DatabaseConfig |
 | `CSV_STRUCTURE`        | `time,user,action,text representation`               | Defines the structure of the CSV format for exports.                                                                                                                       | ReportConfig   |
 | `SERVE_STATIC_CONTENT` | `true`                                               | Serving static content (`true` or `false`).                                                                                                                                | BaseConfig     |
-| `BBBServers`           | *None*                                               | A list of Big Blue Button servers used for webhook validation, API functions and Report configuration                                                                      | BBBServers     |
+| `BBB_SERVERS`          | *None*                                               | A list of Big Blue Button servers used for webhook validation, API functions and Report configuration                                                                      | BBBServers     |
 | `TRUSTED_PROXIES`      | `127.0.0.1/8,172.17.0.1/16,::1/128`                  | A comma seperated list of CIDR notated network ranges, used to identify the *real ip* of the client, configure this value to be the list of proxies in your infrastructure | BaseConfig     | 
 
 ## Configuration behavior
@@ -46,9 +46,36 @@ If `config.toml` is missing or a parameter is not defined, the program falls bac
 
 ### 4. BBBServers
 
-At the time of writing, the BBBServer configuration has no lookup or usage, it is reserved for later use, the design
-philosiphy is to use the information available, now matter how little there may be, to deliver the best experience
-possible, whilst being verbose of missing information.
+BBB_SERVERS are used for authenticating bbb servers to bbbstatus. This has to be configured differently depending on the
+configuration methode:
+
+Through `config.toml`
+
+If you configure bbbstatus using the config.toml, configure BBB_SERVERS like this:
+
+```yaml
+[ [ BBBServers ] ]
+   HOSTNAME = "bbb.example.com"
+   SHARED_SECRET = "BBB Shared Secret"
+   FRIENDLY_NAME = "Example Big Blue Button Server"
+```
+
+To add another BBBServer, repeat this block for each server in your list of servers.
+
+Through Environment variables / `.env`
+
+If you configure bbbstatus using the .env file or using environment variables, configure BBB_SERVERS like this:
+`<Hostname>[:apiPort]`
+
+```
+BBB_SERVERS="bbb.example.com:443,bbb2.example.com"
+```
+
+The comma is only required when configuring multiple bbb servers.
+
+NOTE: When configuring bbb servers this way, bbbstatus tries to automatically obtain the `SHARED_SECRET` as it's
+provided with each bbb-webhook request. One limitation is that this is not persistent, meaning that you have to wait for
+bbb-webhooks after each restart in order to use API features (like get recordings).
 
 ## Notes
 

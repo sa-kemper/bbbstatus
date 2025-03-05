@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"github.com/jackc/pgx/v5"
 	"os"
 	"slices"
 	"strings"
@@ -57,6 +58,13 @@ type bbbServer struct {
 	FriendlyName string `toml:"FRIENDLY_NAME"` // not required
 }
 
+func (s bbbServer) isEqual(other bbbServer) bool {
+	return s.Hostname == other.Hostname &&
+		s.ApiPort == other.ApiPort &&
+		s.SharedSecret == other.SharedSecret &&
+		s.FriendlyName == other.FriendlyName
+}
+
 var defaultConfiguration = config{
 	BaseConfig:     baseConfig{Host: "0.0.0.0", Port: "8080", ServeStaticContent: true},
 	ReportConfig:   reportConfig{CsvStructure: "time,user,action,text representation"},
@@ -67,7 +75,8 @@ var defaultConfiguration = config{
 	},
 }
 
-var conf config
+var adminConf config
+var runtimeBbbServers []bbbServer // runtimeBbbServers is used to change configured bbbServer's at runtime (api key change, user settings, etc.) without mutating the original adminConf.
 
 func init() {
 	var configFileConf config
@@ -75,33 +84,86 @@ func init() {
 
 	if err != nil { // error reading the config
 		// TODO: handle the error differently depending on why the file couldn't be read.
-		fmt.Println("config.toml does not exist") // the config file may be unreadable. further error handling is required.
+		fmt.Println("Error reading config.toml:", err) // the config file may be unreadable. further error handling is required.
 		defaultConfig, err := toml.Marshal(defaultConfiguration)
 		if err != nil {
-			fmt.Println("Error occurred marshaling the default config file to the current work directory:", err)
+			fmt.Println("Error occurred marshaling the default config file to the current work directory:", err) // unlikely during production, this is mainly for development.
 			return
 		}
 		fmt.Println("Attempting to write default config file to the current work directory")
 		err = os.WriteFile("config.toml", defaultConfig, 0600)
 		if err != nil {
 			fmt.Println("Error occurred writing the default config file to the current work directory:", err)
-			return
 		}
+	}
+
+	if content != nil {
+		err = toml.Unmarshal(content, &configFileConf)
+		if err != nil {
+			fmt.Println("Error occurred unmarshalling the default config file to the current work directory:", err)
+		}
+		adminConf = configFileConf
+	}
+
+	parseBBBServersFromEnv()
+
+	if len(adminConf.BBBServers) < 1 && len(runtimeBbbServers) < 1 {
+		panic("No bbb servers configured.")
+	} else {
+		ValidateConfiguredBBBServers()
+	}
+}
+
+func parseBBBServersFromEnv() {
+	bbbServersEnv, ok := os.LookupEnv("BBB_SERVERS")
+	if !ok && len(adminConf.BBBServers) < 1 { // no bbbServers were configured.
+		panic("BBB_SERVERS environment must be set in order for bbbstatus to work.")
+	}
+	if !ok { // config file was used
+		fmt.Println("BBB_SERVERS environment variable not set", bbbServersEnv, ok)
 		return
 	}
 
-	err = toml.Unmarshal(content, &configFileConf)
+	// remove potential artifacts from the adminConf.
+	bbbServersEnv = strings.ReplaceAll(bbbServersEnv, "\"", "")
+	bbbServersEnv = strings.ReplaceAll(bbbServersEnv, "'", "")
+	bbbServersEnv = strings.TrimSpace(bbbServersEnv)
+	bbbServersEnv = strings.ToLower(bbbServersEnv)
+	conn, err := pgx.Connect(context.TODO(), confGet("DB_CONNECTION_STRING"))
 	if err != nil {
-		fmt.Println("Error occurred unmarshalling the default config file to the current work directory:", err)
+		fmt.Println("error parseBBBServersFromEnv -> connecting to database:", err)
+		return
 	}
+	defer conn.Close(context.TODO())
 
-	conf = configFileConf
-
-	if len(conf.BBBServers) < 1 {
-		fmt.Println("No servers configured. Expect API config to not work at all, The webhook validator will consider any package as valid.")
+	for _, serverUrl := range strings.Split(bbbServersEnv, ",") { // serverUrl is expected to be hostname:port, omitting the protocol as it's https in most cases. port and colon are optional
+		var serverHostname, serverPort string
+		if strings.Contains(serverUrl, ":") {
+			urlParts := strings.Split(serverUrl, ":")
+			if len(urlParts) > 2 {
+				panic("Malformed BBB_SERVERS URL")
+			}
+			serverHostname = urlParts[0]
+			serverPort = urlParts[1]
+		} else {
+			serverHostname = serverUrl
+			serverPort = "443"
+		}
+		//fmt.Println("DEBUG: parseBBBServersFromEnv->serverUrl:'" + serverUrl + "', ServerHostname:'" + serverHostname + "', ServerPort:'" + serverPort + "'")
+		err = addBBBServerToDb(conn, bbbServer{Hostname: serverHostname, ApiPort: serverPort})
+		if err != nil {
+			fmt.Println("Error occurred adding BBB server to database:", err)
+		}
 	}
+	return
+}
+
+func ValidateConfiguredBBBServers() {
 	// Validate the read BBBServers config by checking for API access
-	for _, server := range conf.BBBServers {
+	for _, server := range adminConf.BBBServers {
+		if server.SharedSecret == "nil" { // database default for nil value.
+			continue
+		}
 		APITimeout := time.Duration(server.APITimeout) * time.Second
 		var api BBBAPI.API
 		if APITimeout != 0 {
@@ -125,8 +187,8 @@ func confGet(key string) string {
 		if val, exists := os.LookupEnv(key); exists {
 			return val
 		}
-		if conf.BaseConfig.Host != "" {
-			return conf.BaseConfig.Host
+		if adminConf.BaseConfig.Host != "" {
+			return adminConf.BaseConfig.Host
 		}
 		if host, _ = os.Hostname(); host != "" {
 			return host
@@ -137,8 +199,8 @@ func confGet(key string) string {
 		if val, exists := os.LookupEnv(key); exists {
 			return val
 		}
-		if conf.BaseConfig.Port != "" {
-			return conf.BaseConfig.Port
+		if adminConf.BaseConfig.Port != "" {
+			return adminConf.BaseConfig.Port
 		}
 		return "8080"
 
@@ -147,7 +209,7 @@ func confGet(key string) string {
 			return val
 		}
 
-		connStr := conf.DatabaseConfig.DatabaseConnectionString
+		connStr := adminConf.DatabaseConfig.DatabaseConnectionString
 		if connStr != "" {
 			return connStr
 		}
@@ -161,7 +223,7 @@ func confGet(key string) string {
 			return val
 		}
 
-		if csvStructure := conf.ReportConfig.CsvStructure; csvStructure != "" {
+		if csvStructure := adminConf.ReportConfig.CsvStructure; csvStructure != "" {
 			valid := ValidateCSVStructureConfig(csvStructure)
 			if valid != nil {
 				panic("The provided CSV_STRUCTURE config.toml variable is not valid.")
@@ -175,7 +237,7 @@ func confGet(key string) string {
 			return strings.ToLower(val)
 		}
 
-		if conf.BaseConfig.ServeStaticContent {
+		if adminConf.BaseConfig.ServeStaticContent {
 			return "true"
 		}
 		return "false"
@@ -183,7 +245,7 @@ func confGet(key string) string {
 		if val, exists := os.LookupEnv(key); exists {
 			return val
 		}
-		if trustedProxies := conf.BaseConfig.TrustedProxies; trustedProxies != "" {
+		if trustedProxies := adminConf.BaseConfig.TrustedProxies; trustedProxies != "" {
 			return trustedProxies
 		}
 		return "127.0.0.1/8,172.17.0.1/16,::1/128" // In my opinion, a sane default.
@@ -193,7 +255,7 @@ func confGet(key string) string {
 	return os.Getenv(key)
 }
 
-// todo: run go routine that reloads the conf content on a OS signal
+// todo: run go routine that reloads the adminConf content on a OS signal
 
 func ValidateCSVStructureConfig(csvStructure string) error {
 	// Validate CSV Struct config

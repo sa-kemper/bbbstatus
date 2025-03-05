@@ -36,6 +36,10 @@ func generateURL(config URLConfig) string {
 		var empty string
 		config.ApiPort = &empty
 	}
+	if strings.HasSuffix(*config.ApiPort, "443") {
+		var empty string // remove port param if it's the default https port.
+		config.ApiPort = &empty
+	}
 
 	result := fmt.Sprintf("https://%s%s/bigbluebutton/api/%s?", config.Hostname, *config.ApiPort, config.Methode)
 

@@ -18,7 +18,6 @@ package main
 
 import (
 	"BbbStatus/internal/BBBEvents"
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -55,55 +54,64 @@ func bbbWebHookEvent(c echo.Context) error {
 	postEvent := c.FormValue("event")
 	postEvent = strings.TrimLeft(postEvent, "[")
 	postEvent = strings.TrimRight(postEvent, "]")
-	fmt.Println(postEvent)
+	apiKey := c.Request().Header.Get("Authorization")
+	apiKey = strings.TrimSpace(strings.Replace(apiKey, "Bearer ", "", -1))
+	// fmt.Println("API key: '" + apiKey + "'")
+	// fmt.Println("DEBUG bbbWebHookEvent -> postEvent: ", postEvent)
 
 	err = json.Unmarshal(
 		[]byte(postEvent),
 		&event,
 	)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		fmt.Println("Error occurred during unmarshalling of the event: ", err)
+		return c.String(http.StatusBadRequest, "Error occurred during unmarshalling of the event")
 	}
 
 	addr, err := net.LookupAddr(getIpFromContext(c).String())
 	if err != nil || len(addr) == 0 {
 		fmt.Println("Failed to obtain BBBServer hostname of host:", getIpFromContext(c))
-		fmt.Println(err)
-		event.Data.Attributes.Meeting.BbbHostname = getIpFromContext(c).String()
+		return c.String(http.StatusBadRequest, "Failed to obtain BBBServer hostname of host")
 	}
 	if len(addr) > 1 {
 		fmt.Println("LookupAddr returned more then one addr:", addr)
 	}
 	if len(addr) != 0 {
-		event.Data.Attributes.Meeting.BbbHostname = strings.TrimRight(addr[0], ".")
+		event.Data.Attributes.Meeting.BbbHostname = strings.TrimSpace(strings.TrimRight(addr[0], "."))
+		//fmt.Println("DEBUG bbbWebHookEvent -> BBBServer: '" + event.Data.Attributes.Meeting.BbbHostname + "'")
 	}
-	// Simple host based webhook safety, not really great but better than nothing at all.
-	if len(conf.BBBServers) > 0 && getIpFromContext(c).String() != event.Data.Attributes.Meeting.BbbHostname {
-		validHost := false
-		for _, server := range conf.BBBServers {
-			if server.Hostname == event.Data.Attributes.Meeting.BbbHostname {
-				validHost = true
-				break
-			}
-		}
-		if !validHost {
-			return c.String(http.StatusUnauthorized, "Unauthorized")
-		}
-	}
-
-	conn, err := pgx.Connect(context.Background(), confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(c.Request().Context(), confGet("DB_CONNECTION_STRING"))
 	if err != nil {
-		fmt.Println(err)
-		return err
+		fmt.Println("error occurred during pgx connect (bbbWebHookEvent): ", err)
+		return c.String(http.StatusInternalServerError, "Error occurred database connect (bbbWebHookEvent)")
 	}
 	//goland:noinspection ALL
-	defer conn.Close(context.Background())
+	defer conn.Close(c.Request().Context())
 
-	err = event.Save(context.Background(), conn)
-	if err != nil {
-		fmt.Println(err)
-		//return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
+	// Simple host based webhook safety, not really great but better than nothing at all.
+	bbbServers := confGetServers(event.Data.Attributes.Meeting.BbbHostname)
+	if len(bbbServers) < 1 {
+		//fmt.Println("List of valid hosts: ", confGetServers(""))
+		//fmt.Println("Failed to authenticate host: '" + event.Data.Attributes.Meeting.BbbHostname + "'")
+		return c.String(http.StatusUnauthorized, "Unauthorized")
+	} else {
+		server := bbbServers[0]
+		if server.SharedSecret != apiKey {
+			//fmt.Println("DEBUG: updating bbb API key")
+			//fmt.Println("DEBUG server.SharedSecret='" + server.SharedSecret + "' api_key='" + apiKey + "'")
+			server.SharedSecret = apiKey
+			err = confSetServer(c.Request().Context(), server)
+			if err != nil {
+				fmt.Println("error occurred during confSetServer: ", err)
+			}
+		}
 	}
+
+	err = event.Save(c.Request().Context(), conn)
+	if err != nil {
+		fmt.Println("error occurred during save event: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
+	}
+
 	return c.String(http.StatusOK, "")
 }

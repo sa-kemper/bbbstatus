@@ -150,6 +150,27 @@ const (
 	EventSharedNotesChanged        = "pad-content"
 )
 
+var handledBBBEvents = []string{EventMeetingCreated,
+	EventUserJoined,
+	EventUserLeft,
+	EventUserPresenterAssigned,
+	EventUserPresenterUnassigned,
+	EventUserAudioVoiceEnabled,
+	EventUserAudioVoiceDisabled,
+	EventUserAudioMuted,
+	EventUserAudioUnmuted,
+	EventUserCamBroadcastStart,
+	EventUserCamBroadcastEnd,
+	EventMeetingScreenshareStarted,
+	EventMeetingScreenshareStopped,
+	EventChatGroupMessageSent,
+	EventUserEmojiChanged,
+	EventUserRaiseHandChanged,
+	EventPollStarted,
+	EventPollResponded,
+	EventMeetingEnded,
+}
+
 /*
  TODO: Add rap-archive-started, rap-archive-ended, pad-content
 samples:

@@ -30,10 +30,11 @@ var postgresInitialUp embed.FS
 
 func initDatabase() error {
 	db, err := sql.Open("pgx", confGet("DB_CONNECTION_STRING"))
-	defer db.Close()
 	if err != nil {
 		panic(fmt.Errorf("Unable to connect to database: %v\n", err))
 	}
+	defer db.Close()
+
 	err = db.Ping()
 	if err != nil {
 		panic(fmt.Errorf("Unable to connect to database: %v\n", err))

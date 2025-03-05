@@ -20,13 +20,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5"
+	"slices"
 	"strings"
 )
 
 func userExists(ctx context.Context, conn *pgx.Conn, InternalUserID string) (exists bool, err error) {
 	err = conn.QueryRow(ctx, "SELECT COUNT(*) > 0 AS user_exists FROM users WHERE internal_user_id = $1", InternalUserID).Scan(&exists)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("error occurred during user exists check: ", err)
 		return false, err
 	}
 	return exists, nil
@@ -41,29 +42,44 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 		user = b.Data.Attributes.User
 	}
 
+	if !slices.Contains(handledBBBEvents, b.Data.ID) {
+		fmt.Println("WARNING:", b.Data.ID, "is not being handled by bbbstatus yet.")
+		return nil
+	}
+
 	tx, err := conn.Begin(ctx) // We use database transactions to handle runtime errors gracefully.
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("error occurred during save event -> begin transaction: ", err)
 		return err
 	}
 	//goland:noinspection ALL
 	defer tx.Rollback(ctx)
 
-	err2 := loadAdditionalUserData(user, tx)
-	if err2 != nil {
-		return err2
+	if isUserEvent := strings.Contains(b.Data.ID, "user"); isUserEvent {
+		err = loadAdditionalUserData(user, tx)
+		if err != nil {
+			fmt.Println("error occurred during save event -> loadAdditionalUserData: ", err)
+			return err
+		}
 	}
 
-	err3 := loadAdditionalMeetingData(meeting, tx)
-	if err3 != nil {
-		return err3
+	err = loadAdditionalMeetingData(meeting, tx)
+	if err != nil {
+		fmt.Println("error occurred during save event -> loadAdditionalMeetingData: ", err)
+		return err
 	}
 
 	if isUserEvent := strings.Contains(b.Data.ID, "user"); isUserEvent {
-		return handleUserEvent(ctx, conn, user, tx, meeting, b)
+		err = handleUserEvent(ctx, conn, user, tx, meeting, b)
+		if err != nil {
+			fmt.Println("error occurred during save event -> handleUserEvent: ", err)
+		}
 	}
 	if b.Data.ID == EventMeetingScreenshareStarted || b.Data.ID == EventMeetingScreenshareStopped {
-		return handleUserEvent(ctx, conn, user, tx, meeting, b)
+		err = handleUserEvent(ctx, conn, user, tx, meeting, b)
+		if err != nil {
+			fmt.Println("error occurred during save event -> handleUserEvent: ", err)
+		}
 	}
 
 	switch b.Data.ID {

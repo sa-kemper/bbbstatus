@@ -17,6 +17,7 @@
 package BBBAPI
 
 import (
+	"BbbStatus/internal/BBBEvents"
 	"context"
 	"encoding/xml"
 	"io"
@@ -46,7 +47,7 @@ type GetRecordingsParameters struct {
 	Limit *int
 }
 
-func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters) (result Recordings, err error) {
+func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters, meeting BBBEvents.Meeting) (result Recordings, err error) {
 	var client = a.getHTTPClient()
 	var requestParameters = make(map[string]string)
 	var apiResponse GetRecordingsResponse
@@ -69,19 +70,27 @@ func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters)
 	if err != nil {
 		return Recordings{}, err
 	}
-
+	//fmt.Println("DEBUG: URL", request.URL.String())
+	//fmt.Println("DEBUG: responseBytes:", string(responseBytes))
 	err = xml.Unmarshal(responseBytes, &apiResponse)
 	if err != nil {
 		return Recordings{}, err
 	}
-	for recordIndex, recording := range apiResponse.Recordings.Recording {
-		for formatIndex, format := range recording.Playback.Format {
-			apiResponse.Recordings.Recording[recordIndex].Playback.Format[formatIndex].Url = strings.ReplaceAll(format.Url, "\n", "")
-			apiResponse.Recordings.Recording[recordIndex].Playback.Format[formatIndex].Url = strings.TrimSpace(format.Url)
+	var cleanedRecordings []Recording
+	for _, recording := range apiResponse.Recordings.Recording {
+		if recording.InternalMeetingID == meeting.InternalMeetingID {
+			cleanedRecordings = append(cleanedRecordings, recording)
 		}
 	}
 
-	return apiResponse.Recordings, nil
+	for recordIndex, recording := range cleanedRecordings {
+		for formatIndex, format := range recording.Playback.Format {
+			cleanedRecordings[recordIndex].Playback.Format[formatIndex].Url = strings.ReplaceAll(format.Url, "\n", "")
+			cleanedRecordings[recordIndex].Playback.Format[formatIndex].Url = strings.TrimSpace(format.Url)
+		}
+	}
+
+	return Recordings{cleanedRecordings}, nil
 }
 
 func populateRequestParameters(paramMap map[string]string, params GetRecordingsParameters) {

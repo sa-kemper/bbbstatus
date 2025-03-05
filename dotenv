@@ -23,3 +23,6 @@ DB_CONNECTION_STRING=postgresql://bbbstatus:bbbstatus@db:5432/bbbstatus
 DATABASE_DIRECTORY=.
 
 TRUSTED_PROXIES=127.0.0.1/8,172.17.0.1/16,::1/128
+
+# A comma seperated list of BBB Servers
+BBB_SERVERS="bbb.example.com"

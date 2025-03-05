@@ -91,24 +91,48 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	defer conn.Close(ctx)
 
 	// Query and parse meeting using the row.next and row.scan methode of pgx
-	err = conn.QueryRow(ctx, "SELECT * FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingID).Scan(&meeting.InternalMeetingID, &meeting.ExternalMeetingID, &meeting.Name, &meeting.IsBreakout, &meeting.ParentID, &meeting.CreateTime, &meeting.ModeratorPass, &meeting.ViewerPass, &meeting.Record, &meeting.VoiceConf, &meeting.DialNumber, &meeting.MaxUsers, &meeting.Metadata, &meeting.BbbHostname, &meeting.ParticipantCount, &meeting.MeetingEnded)
+	err = conn.QueryRow(ctx, "SELECT * FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingID).Scan(
+		&meeting.InternalMeetingID,
+		&meeting.ExternalMeetingID,
+		&meeting.Name,
+		&meeting.IsBreakout,
+		&meeting.ParentID,
+		&meeting.CreateTime,
+		&meeting.ModeratorPass,
+		&meeting.ViewerPass,
+		&meeting.Record,
+		&meeting.VoiceConf,
+		&meeting.DialNumber,
+		&meeting.MaxUsers,
+		&meeting.Metadata,
+		&meeting.BbbHostname,
+		&meeting.ParticipantCount,
+		&meeting.MeetingEnded,
+	)
 	if err != nil {
 		return Report{}, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
 
-	if meeting.BbbHostname != "" {
-		for _, server := range conf.BBBServers {
-			if server.Hostname == meeting.BbbHostname {
-				if server.APITimeout != 0 {
-					apitimeout := time.Duration(server.APITimeout) * time.Second
-					meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apitimeout}
-				} else {
-					meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret}
-				}
+	servers := confGetServers(meeting.BbbHostname)
+	var server bbbServer
+
+	if len(servers) < 1 {
+		panic("Unable to find BBBServer for meeting " + internalMeetingID)
+	} else {
+		server = servers[0]
+		fmt.Println("server found: ", server)
+		if server.Hostname == meeting.BbbHostname {
+			if server.APITimeout != 0 {
+				apitimeout := time.Duration(server.APITimeout) * time.Second
+				meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apitimeout}
+			} else {
+				meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret}
 			}
+		} else {
+			//fmt.Println("DEBUG API SERVER FINDING: '" + server.Hostname + "' != '" + meeting.BbbHostname + "'")
 		}
 	}
-
+	//fmt.Println("DEBUG: meetingAPI: ", meetingServerAPI)
 	details = FillMeetingDetails(details, meeting)
 
 	err, participants = FillMeetingParticipants(ctx, internalMeetingID, conn)
@@ -117,14 +141,17 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	}
 
 	if meetingServerAPI.Hostname != "" && meetingServerAPI.SharedSecret != "" {
-		getRecordingsResponse, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID})
+		//fmt.Println("DEBUG: meetingServerAPI is valid enough ^^ ", meetingServerAPI)
+		getRecordingsResponse, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID}, meeting)
 		if err != nil {
-			if errors.Is(err, os.ErrNotExist) {
+			if errors.Is(err, os.ErrDeadlineExceeded) {
 				fmt.Println("FATAL: BBB API Timeout for host:", meetingServerAPI.Hostname)
 			}
+			//fmt.Println("DEBUG: Error occurred whilst geting recordings. ", err)
 			return Report{}, err
 		}
 		recordings = getRecordingsResponse.Recording
+		//fmt.Println("DEBUG: recordings: ", recordings)
 	}
 
 	err, userEvents := FillMeetingUserEvents(ctx, internalMeetingID, conn)

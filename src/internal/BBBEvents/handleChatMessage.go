@@ -22,7 +22,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handleChatMessage(ctx context.Context, conn *pgx.Conn, b *BaseEvent, err error, tx pgx.Tx, meeting Meeting) error {
+func handleChatMessage(ctx context.Context, conn *pgx.Conn, b *BaseEvent, tx pgx.Tx, meeting Meeting) (err error) {
 	message := b.Data.Attributes.Message
 	var userInRequestExists bool
 	userInRequestExists, err = userExists(ctx, conn, b.Data.Attributes.Message.Sender.InternalUserID)

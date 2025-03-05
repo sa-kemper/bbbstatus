@@ -89,8 +89,22 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 	}
 
 	messageTimeline, err := fillCSVMessageEvents(ctx, internalMeetingID, conn)
+	if err != nil {
+		fmt.Println("error occurred while filling message timeline (GenerateCSVReport)", err.Error())
+		return nil, err
+	}
+
 	userEventTimeline, err := FillCSVUserEvents(ctx, internalMeetingID, conn)
+	if err != nil {
+		fmt.Println("error occurred while filling user event timeline (GenerateCSVReport)", err.Error())
+		return nil, err
+	}
+
 	pollTimeline, err := FillCsvPollEvents(ctx, internalMeetingID, conn, polls)
+	if err != nil {
+		fmt.Println("error occurred while filling poll timeline (GenerateCSVReport)", err.Error())
+		return nil, err
+	}
 
 	timeline = append(timeline, messageTimeline...)
 	timeline = append(timeline, userEventTimeline...)
@@ -301,6 +315,11 @@ func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *
 			}
 
 			err = json.Unmarshal([]byte(answersJSON), &poll.Answers)
+			if err != nil {
+				fmt.Printf("error decoding answers of poll %s with json '%s'\n", poll.ID, answerJSON)
+				return err, timeline
+			}
+
 			if poll.Question == "" { // use a shortened version of the poll id if the question is empty.
 				poll.Question = string([]byte(pollID)[0:5])
 			}

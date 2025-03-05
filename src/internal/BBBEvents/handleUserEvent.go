@@ -44,6 +44,10 @@ func handleUserEvent(ctx context.Context, conn *pgx.Conn, user *User, tx pgx.Tx,
 				fmt.Println("Failed obtaining the presenters userID ->", err)
 			} else { // obtain the username of the current presenter, if possible.
 				err = conn.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", user.InternalUserID).Scan(&user.Name)
+				if err != nil {
+					fmt.Println("Failed obtaining the username ->", err)
+					return err
+				}
 			}
 
 		} else {

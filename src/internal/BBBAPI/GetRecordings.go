@@ -20,6 +20,7 @@ import (
 	"BbbStatus/internal/BBBEvents"
 	"context"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -60,6 +61,10 @@ func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters,
 		Parameters:   requestParameters,
 		SharedSecret: a.SharedSecret,
 	}), nil)
+	if err != nil {
+		fmt.Println("error creating request:", err)
+		return Recordings{}, err
+	}
 	response, err := client.Do(request)
 	if err != nil {
 		return Recordings{}, err

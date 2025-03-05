@@ -22,7 +22,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handlePollCreation(b *BaseEvent, user *User, err error, tx pgx.Tx, meeting Meeting) error {
+func handlePollCreation(b *BaseEvent, user *User, tx pgx.Tx, meeting Meeting) (err error) {
 	poll := b.Data.Attributes.Poll
 	if user == nil {
 		return fmt.Errorf("user is unexpectedly nil")

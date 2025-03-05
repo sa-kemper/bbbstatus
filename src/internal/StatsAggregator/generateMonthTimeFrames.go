@@ -22,11 +22,6 @@ import (
 )
 
 func generateMonthTimeFrames(start time.Time) map[string]TimeFrame {
-	//start = start.AddDate(0, -1, 0)
-	targetTime := start.AddDate(0, 1, -2)
-	if targetTime.After(time.Now()) {
-		targetTime = time.Now()
-	}
 	start = start.AddDate(0, 0, -start.Day()+1)
 	start = start.Add(-time.Hour * time.Duration(start.Hour()))
 	start = start.Add(-time.Minute * time.Duration(start.Minute()))

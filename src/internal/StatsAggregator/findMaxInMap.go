@@ -17,10 +17,10 @@
 package StatsAggregator
 
 // findMaxInMap loops through a map[string]int object, ignores all indexes, and returns the highest value.
-func findMaxInMap(in map[string]int) (max int) {
+func findMaxInMap(in map[string]int) (currentMax int) {
 	for _, value := range in {
-		if value > max {
-			max = value
+		if value > currentMax {
+			currentMax = value
 		}
 	}
 	return

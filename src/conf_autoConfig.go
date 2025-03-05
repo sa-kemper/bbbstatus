@@ -155,7 +155,6 @@ func parseBBBServersFromEnv() {
 			fmt.Println("Error occurred adding BBB server to database:", err)
 		}
 	}
-	return
 }
 
 func ValidateConfiguredBBBServers() {

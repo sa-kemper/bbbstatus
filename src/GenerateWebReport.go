@@ -234,6 +234,10 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 			}
 
 			err = json.Unmarshal([]byte(answersJSON), &poll.Answers)
+			if err != nil {
+				fmt.Printf("error decoding answers of poll %s with json '%s'\n", poll.ID, answerJSON)
+
+			}
 			if poll.Question == "" { // use a shortened version of the poll id if the question is empty.
 				poll.Question = string([]byte(pollID)[0:5])
 			}

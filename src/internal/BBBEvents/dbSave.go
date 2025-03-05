@@ -86,13 +86,13 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 	case EventMeetingCreated:
 		return handleMeetingCreated(tx, meeting, b)
 	case EventChatGroupMessageSent:
-		return handleChatMessage(ctx, conn, b, err, tx, meeting)
+		return handleChatMessage(ctx, conn, b, tx, meeting)
 	case EventPollStarted: //
-		return handlePollCreation(b, user, err, tx, meeting)
+		return handlePollCreation(b, user, tx, meeting)
 	case EventPollResponded:
 		return handlePollResponse(b, user, tx)
 	case EventMeetingEnded:
-		return handleMeetingEnded(err, tx, meeting, b)
+		return handleMeetingEnded(tx, meeting, b)
 	}
 	return nil
 

@@ -97,6 +97,9 @@ func generateMonthStatIndexes(timeFrames []StatsAggregator.TimeFrame) (mtfIndex 
 			fmt.Println("err", err)
 		}
 		digitJ, err := strconv.Atoi(strings.TrimLeft(mtfIndex[j], "CW"))
+		if err != nil {
+			fmt.Println("err", err)
+		}
 
 		return digitI < digitJ
 	})

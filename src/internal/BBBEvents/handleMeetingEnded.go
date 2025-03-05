@@ -22,7 +22,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handleMeetingEnded(err error, tx pgx.Tx, meeting Meeting, b *BaseEvent) error {
+func handleMeetingEnded(tx pgx.Tx, meeting Meeting, b *BaseEvent) (err error) {
 	_, err = tx.Exec(context.Background(), "INSERT INTO meeting_events (internal_meeting_id, event_type, event_timestamp) VALUES ($1, $2, $3)", meeting.InternalMeetingID, EventMeetingEnded, b.GetTimestamp())
 	if err != nil {
 		fmt.Println(err)

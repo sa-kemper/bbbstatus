@@ -354,6 +354,14 @@ other = "Gesammtdauer der konferenzen"
 hash = "sha1-48c98cab7866e606328c99289ed24e339393b5ab"
 other = "Son"
 
+[SystemMessage]
+hash = "sha1-80ef4ac783caef7ac8a830239d74e77ac72ec089"
+other = "System Nachricht"
+
+[SystemSentMessage]
+hash = "sha1-ce1687380bb7cccd6380fecbbd9e2b64f2b89d82"
+other = "Das System sendete die Nachricht: '{{.Message}}'"
+
 [Thu]
 hash = "sha1-3593ccd96f6c0fad4e362d18ac37226707f2ea46"
 other = "Don"

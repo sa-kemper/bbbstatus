@@ -57,7 +57,7 @@ func bbbWebHookEvent(c echo.Context) error {
 	apiKey := c.Request().Header.Get("Authorization")
 	apiKey = strings.TrimSpace(strings.Replace(apiKey, "Bearer ", "", -1))
 	// fmt.Println("API key: '" + apiKey + "'")
-	// fmt.Println("DEBUG bbbWebHookEvent -> postEvent: ", postEvent)
+	fmt.Println("DEBUG bbbWebHookEvent -> postEvent: ", postEvent)
 
 	err = json.Unmarshal(
 		[]byte(postEvent),

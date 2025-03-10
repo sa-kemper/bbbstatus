@@ -66,6 +66,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "meetingListHeader", Other: "Meeting List"},
 		{ID: "BackToMeetingsButton", Other: "Back to Meetings"},
 		{ID: "RecordingsHeader", Other: "Recordings"},
+		{ID: "SystemSentMessage", Other: "System Sent the message: '{{.Message}}'"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -120,7 +121,6 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 		panic("Unable to find BBBServer for meeting " + internalMeetingID)
 	} else {
 		server = servers[0]
-		fmt.Println("server found: ", server)
 		if server.Hostname == meeting.BbbHostname {
 			if server.APITimeout != 0 {
 				apitimeout := time.Duration(server.APITimeout) * time.Second
@@ -319,6 +319,13 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, con
 		err = row.Scan(&chatMessageUserID, &chatMessageContent, &event.Time)
 		if err != nil {
 			fmt.Println(err)
+		}
+
+		// Handle system message.
+		if chatMessageUserID == "SYSTEM" {
+			event.TextRepresentation = TranslateAdvanced("SystemSentMessage", map[string]string{"Message": chatMessageContent})
+			timeline = append(timeline, event)
+			continue
 		}
 
 		// we cannot use the same connection while the row is not closed.

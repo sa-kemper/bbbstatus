@@ -25,10 +25,15 @@ import (
 func handleChatMessage(ctx context.Context, conn *pgx.Conn, b *BaseEvent, tx pgx.Tx, meeting Meeting) (err error) {
 	message := b.Data.Attributes.Message
 	var userInRequestExists bool
-	userInRequestExists, err = userExists(ctx, conn, b.Data.Attributes.Message.Sender.InternalUserID)
-	if err != nil {
-		fmt.Println(err)
-		return err
+	if b.Data.Attributes.Message.Sender.InternalUserID == "SYSTEM" {
+		userInRequestExists = true
+
+	} else {
+		userInRequestExists, err = userExists(ctx, conn, b.Data.Attributes.Message.Sender.InternalUserID)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
 	}
 
 	if !userInRequestExists {

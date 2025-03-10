@@ -58,6 +58,7 @@ func init() {
 		{ID: "CSVReportAction-meeting-screenshare-started", Other: "Started a screenshare"},
 		{ID: "CSVReportAction-meeting-screenshare-stopped", Other: "Stopped a screenshare"},
 		{ID: "CSVReportAction-user-emoji-changed", Other: "Raised his hand"},
+		{ID: "SystemMessage", Other: "System message"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, messages...)
 }
@@ -158,6 +159,16 @@ func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, conn *p
 		err = row.Scan(&chatMessageUserID, &chatMessageContent, &event.Time)
 		if err != nil {
 			fmt.Println(err)
+		}
+
+		// Handle system messages
+		if chatMessageUserID == "SYSTEM" {
+			event.TextRepresentation = TranslateAdvanced("SystemSentMessage", map[string]string{"Message": chatMessageContent})
+			event.Action = Translate("SystemMessage")
+			event.FormattedTime = event.Time.Format(time.TimeOnly)
+			event.User = chatMessageUserID
+			timeline = append(timeline, event)
+			continue
 		}
 
 		// we cannot use the same connection while the row is not closed.

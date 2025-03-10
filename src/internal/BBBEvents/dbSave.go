@@ -18,6 +18,7 @@ package BBBEvents
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"slices"
@@ -56,17 +57,28 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 	defer tx.Rollback(ctx)
 
 	if isUserEvent := strings.Contains(b.Data.ID, "user"); isUserEvent {
-		err = loadAdditionalUserData(user, tx)
-		if err != nil {
-			fmt.Println("error occurred during save event -> loadAdditionalUserData: ", err)
-			return err
+		if joinEvent := strings.Contains(b.Data.ID, "joined"); !joinEvent {
+			err = loadAdditionalUserData(user, tx)
+
+			if b.Data.ID == EventUserPresenterAssigned { // This is a special case because bbb-webhooks does not maintain the event queue order, if one event is not delivered. (Throw away presenter assigned events if the user is unknown)
+				if errors.Is(err, pgx.ErrNoRows) {
+					return nil
+				}
+			}
+
+			if err != nil {
+				fmt.Println("error occurred during save event -> loadAdditionalUserData: ", err)
+				return err
+			}
 		}
 	}
 
-	err = loadAdditionalMeetingData(meeting, tx)
-	if err != nil {
-		fmt.Println("error occurred during save event -> loadAdditionalMeetingData: ", err)
-		return err
+	if b.Data.ID != EventMeetingCreated {
+		err = loadAdditionalMeetingData(meeting, tx)
+		if err != nil {
+			fmt.Println("error occurred during save event -> loadAdditionalMeetingData: ", err)
+			return err
+		}
 	}
 
 	if isUserEvent := strings.Contains(b.Data.ID, "user"); isUserEvent {
@@ -75,6 +87,7 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 			fmt.Println("error occurred during save event -> handleUserEvent: ", err)
 		}
 	}
+
 	if b.Data.ID == EventMeetingScreenshareStarted || b.Data.ID == EventMeetingScreenshareStopped {
 		err = handleUserEvent(ctx, conn, user, tx, meeting, b)
 		if err != nil {

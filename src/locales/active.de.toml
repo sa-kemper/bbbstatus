@@ -12,19 +12,19 @@ other = "Aug"
 
 [BackToMeetingsButton]
 hash = "sha1-a00619a52130bf71a69db12a9b4cda996d3d91cc"
-other = "Zurück zu den meetings"
+other = "zurück zur Übersicht"
 
 [CSVReportAction-meeting-screenshare-started]
 hash = "sha1-d0d8670190908582bda8e7dd4a015f217ef85324"
-other = "Startete eine Bildschirmaufnahme"
+other = "Startete Screensharing"
 
 [CSVReportAction-meeting-screenshare-stopped]
 hash = "sha1-4205ea68674df33cc2072e18f17463c50618db88"
-other = "Stopte eine Bildschirmaufnahme"
+other = "Stoppte Screensharing"
 
 [CSVReportAction-user-audio-muted]
 hash = "sha1-b9e78ced88a4641f8289a36049516182b46cf836"
-other = "Stummgestellt"
+other = "stummgestellt"
 
 [CSVReportAction-user-audio-unmuted]
 hash = "sha1-200c77d6ca2c90a47464e551fe5a8afbce011bf9"
@@ -32,23 +32,23 @@ other = "Stummschaltung aufgehoben"
 
 [CSVReportAction-user-audio-voice-disabled]
 hash = "sha1-4d43c6d085dfe285d5d6fd41d753a663e015e2ad"
-other = "Sprachanruf verlassen"
+other = "Audio verlassen"
 
 [CSVReportAction-user-audio-voice-enabled]
 hash = "sha1-55f34686d117b51a2183329e08648d28e1a72927"
-other = "Sprachanruf beigetreten"
+other = "Audio beigetreten"
 
 [CSVReportAction-user-cam-broadcast-end]
 hash = "sha1-7de996c6aaa1251bd7b1461046266beb9037aa40"
-other = "Stoppte webcam übertragung"
+other = "Webcam deaktiviert"
 
 [CSVReportAction-user-cam-broadcast-start]
 hash = "sha1-b98ce5b0481c0362c77d049daf659b9f5167db39"
-other = "Startete webcam übertragung"
+other = "Webcam aktiviert"
 
 [CSVReportAction-user-emoji-changed]
 hash = "sha1-917930c36e749d8b57146cf70e53507521b52a3a"
-other = "Hebte die hand"
+other = "Emoji gewechselt"
 
 [CSVReportAction-user-joined]
 hash = "sha1-ce89dcae47faf59faf7ebbb406e464d83d0fd11b"
@@ -60,15 +60,15 @@ other = "Meeting verlassen"
 
 [CSVReportAction-user-presenter-assigned]
 hash = "sha1-0509ddf4668f2cec839f8698f772dc5958bafa83"
-other = "Als Präsentator zugewiesen"
+other = "Präsentator geworden"
 
 [CSVReportAction-user-presenter-unassigned]
 hash = "sha1-0a237c9d42bab331e835fddc0fe9816d6fdc2d90"
-other = "Präsentator entzogen"
+other = "kein Präsentator mehr"
 
 [CSVReportActionChatted]
 hash = "sha1-abd97d51fdfa66d4b3247cb1d70ceda6d53fc641"
-other = "Sendete nachricht"
+other = "Sendete Nachricht"
 
 [CSVReportConfig-action]
 hash = "sha1-97c89a4d6630adeb18fa12ba9976a31413fe293e"
@@ -76,7 +76,7 @@ other = "Aktion"
 
 [CSVReportConfig-textrepresentation]
 hash = "sha1-726109d45a569803c8d0cd0bb99c70bc4bbb5c50"
-other = "Text Darstellung"
+other = "Text-Darstellung"
 
 [CSVReportConfig-time]
 hash = "sha1-6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b"
@@ -96,7 +96,7 @@ other = "Dez"
 
 [ErrorParagraphApplicationTimeout]
 hash = "sha1-e09bfd4ae4b3758578549646e86cb8478ca2b569"
-other = "Beim bearbeiten der anfrage ist eine zeitüberschreitung aufgetreten, bitte versuchen sie es erneut."
+other = "Zeitüberschreitung beim Bearbeiten der Anfrage, bitte versuchen Sie es erneut."
 
 [ErrorTitleApplicationTimeout]
 hash = "sha1-d4c45de0fe64ac43c72a798c67faaadadfaa1b90"
@@ -104,7 +104,7 @@ other = "Zeitüberschreitung"
 
 [EventTimelineHeader]
 hash = "sha1-45d97e8b0133f6ad1bc5c0ef26f67fb2e25a9895"
-other = "Event zeitlinie"
+other = "Event Timeline"
 
 [Feb]
 hash = "sha1-dc8415ccfe52505f1d0a74025c76b3c26c88c59d"
@@ -112,11 +112,11 @@ other = "Feb"
 
 [Fri]
 hash = "sha1-bbd6e32ee1326237814b697269b4368033d50d2f"
-other = "Fre"
+other = "Fr"
 
 [InternalServerError]
 hash = "sha1-ffa5578af85cd8c29d2df2242dc504e3b2ba687d"
-other = "Interner Server Fehler"
+other = "Interner Serverfehler"
 
 [Jan]
 hash = "sha1-efed3690ea2243f5f1ac77cbb0987e5335440258"
@@ -132,11 +132,11 @@ other = "Jun"
 
 [Mar]
 hash = "sha1-c4ba0822462e0c373aadd5360a69f205c2a7d036"
-other = "Mer"
+other = "Mrz"
 
 [May]
 hash = "sha1-c94f479833c5d401cffdfa7afe6c9c2d56448019"
-other = "May"
+other = "Mai"
 
 [MeetingActive]
 hash = "sha1-a733b809d2f1233496ab516eed0f3ef75cf3791a"
@@ -144,7 +144,7 @@ other = "Aktiv"
 
 [MeetingCreateTime]
 hash = "sha1-da27e4b5e998c43c50b1672e50886be19f8730ac"
-other = "Erstellungs zeitpunkt"
+other = "Erstellungs-Zeitpunkt"
 
 [MeetingCreated]
 hash = "sha1-accf40c89baa4fa88e6a7ff11e1f805beecafd3f"
@@ -192,7 +192,7 @@ other = "Zur Zusammenfassung"
 
 [Mon]
 hash = "sha1-24b2a0993d0cfa93c44282d6bba72bcf58b300d6"
-other = "Mon"
+other = "Mo"
 
 [Month]
 hash = "sha1-082bc378cd60e17a38d99898b21955299c5b60c8"
@@ -220,7 +220,7 @@ other = "Aufzeichnungen"
 
 [ReportHeader]
 hash = "sha1-9f5e0854a7e28ebf19364bb154d82f4122c6eddc"
-other = "Meeting protokoll"
+other = "Meeting-Protokoll"
 
 [ReportMeetingDetailBBBHostname]
 hash = "sha1-0b35e13daab63a0ae172592f7b8a20dbe2298b4b"
@@ -228,7 +228,7 @@ other = "BBB Hostname"
 
 [ReportMeetingDetailCreationDate]
 hash = "sha1-a9d459cebdee4eefdd15be1b89bd130c7498a4bf"
-other = "Erstell Datum"
+other = "Erstell-Datum"
 
 [ReportMeetingDetailInternalMeetingID]
 hash = "sha1-d21523173a90654fd1e4b40c4d6e20559d00126f"
@@ -236,7 +236,7 @@ other = "Interne Meeting ID"
 
 [ReportMeetingDetailMeetingName]
 hash = "sha1-9ee349ddc5c5ffb61d276ce5a3568e5d66305427"
-other = "Meeting name"
+other = "Meeting Name"
 
 [ReportMeetingDetailsHeader]
 hash = "sha1-14e998e82ac4c8446e5698f47ccc5502beb6cd4c"
@@ -244,11 +244,11 @@ other = "Meeting Details"
 
 [ReportMessageEventRepresentation]
 hash = "sha1-bf3a1a74bdad9232d5f7de6c8c3b6f538c3f52e7"
-other = "Der benutzer '{{.Username}}' sendete eine nachricht: {{.Message}}"
+other = "Benutzer '{{.Username}}' sendete eine nachricht: {{.Message}}"
 
 [ReportOpenInExcelButton]
 hash = "sha1-ad069dee8ef02d00e414f5ce890ba63cdf53baa7"
-other = "In excel öffnen"
+other = "In Excel öffnen"
 
 [ReportParticipantsHeader]
 hash = "sha1-cd56e0839d06af74923cd6ad99d6fc9e7dab8e3a"
@@ -256,11 +256,11 @@ other = "Teilnehmer"
 
 [ReportPollResponseEventRepresentation]
 hash = "sha1-2dc51991622edb14df2388c00ed2f6b2dff4f171"
-other = "Der Benutzer '{{.Username}}' stimmte in der umfrage {{.PollQuestion}} mit {{.PollAnswer}}"
+other = "Benutzer '{{.Username}}' stimmte in der umfrage {{.PollQuestion}} mit {{.PollAnswer}}"
 
 [ReportPollStartedEventRepresentation]
 hash = "sha1-4f4279a08c7a2eaf9e6210b1f3c4d56c3dd2a37a"
-other = "Der Benutzer '{{.Username}}' Startete eine abstimmung '{{.PollQuestion}}', mit den optionen: {{.PollOptions}}"
+other = "Benutzer '{{.Username}}' Startete eine abstimmung '{{.PollQuestion}}', mit den optionen: {{.PollOptions}}"
 
 [ReportPrintReportButton]
 hash = "sha1-20dad9f57e19663cc2dde35a2d1ab894a273897d"
@@ -268,11 +268,11 @@ other = "Auswertung drucken"
 
 [ReturnToIndexLinkText]
 hash = "sha1-cc93f34f921a9b60c004893a42230ba323335950"
-other = "Zur startseite"
+other = "Zur Übersicht"
 
 [Sat]
 hash = "sha1-6b782d41b0c29e2f39f93a8352c43300b042c6cd"
-other = "Sam"
+other = "Sa"
 
 [Sep]
 hash = "sha1-fdd289e370bd5cc575f48a16947d05c144ec474b"
@@ -292,27 +292,27 @@ other = "Zeitpunkt"
 
 [StatsPageConferenceAttendeeCountHeader]
 hash = "sha1-1206d91d2a711eb546b6e1279b2b33610c27f171"
-other = "Konferenz Teilnehmer"
+other = "Konferenz-Teilnehmer"
 
 [StatsPageConferenceCountHeader]
 hash = "sha1-c5eedd0e192f7f298c4d0d010a5f013b566385cf"
-other = "Konferenz anzahl"
+other = "Konferenz-Anzahl"
 
 [StatsPageConferenceTotalMeetingHoursHeader]
 hash = "sha1-8a6530ecbb69b21a92e5a19cb0f7430913032b47"
-other = "Gesamtdauer der konferenzen"
+other = "Gesamtdauer der Konferenzen"
 
 [StatsPageConferenceUsageHoursToolTip]
 hash = "sha1-62d09f1039cbc33b6296b2fb9489ed2aa1c13890"
-other = "Gesamtzahl der konferenzen am"
+other = "Gesamtzahl der Konferenzen am"
 
 [StatsPageConferenceUserHoursHeader]
 hash = "sha1-14111d2848fc0f423269b124cc858ad376af23ea"
-other = "Gesammtdauer der konferenzteilnahmen"
+other = "Gesammtdauer der Konferenzteilnahmen"
 
 [StatsPageConferenceUserHoursToolTip]
 hash = "sha1-f5cc0236e434da93480ae23636d503c260689f15"
-other = "Gesammtdauer der konferenzteilnahmen am"
+other = "Gesammtdauer der Konferenzteilnahmen am"
 
 [StatsPageConferencesInToolTip]
 hash = "sha1-b600a53a1940fffecfb8b08956a8fd1111cc7044"
@@ -324,7 +324,7 @@ other = "Konferenzen"
 
 [StatsPageConferencesUserHoursTableHeader]
 hash = "sha1-14111d2848fc0f423269b124cc858ad376af23ea"
-other = "Gesammtdauer der konferenzteilnahmen"
+other = "Gesammtdauer der Konferenzteilnahmen"
 
 [StatsPageGenError]
 hash = "sha1-288c15948054bad5e446387a1aa2eec59798ca1e"
@@ -348,11 +348,11 @@ other = "Statistik Überblick"
 
 [StatsPageTotalMeetingHoursTableHeader]
 hash = "sha1-ddd6f2fb1d80999b48f16b64bcc4dc892c236d6c"
-other = "Gesammtdauer der konferenzen"
+other = "Gesamtdauer der konferenzen"
 
 [Sun]
 hash = "sha1-48c98cab7866e606328c99289ed24e339393b5ab"
-other = "Son"
+other = "So"
 
 [SystemMessage]
 hash = "sha1-80ef4ac783caef7ac8a830239d74e77ac72ec089"
@@ -364,15 +364,15 @@ other = "Das System sendete die Nachricht: '{{.Message}}'"
 
 [Thu]
 hash = "sha1-3593ccd96f6c0fad4e362d18ac37226707f2ea46"
-other = "Don"
+other = "Do"
 
 [Tue]
 hash = "sha1-529541bb390c76152e313351d89de3cd30a1c4bd"
-other = "Die"
+other = "Di"
 
 [Wed]
 hash = "sha1-23408b19b29e8e8495bb4b68733ada5f85fc2fd6"
-other = "Mit"
+other = "Mi"
 
 [Week]
 hash = "sha1-f82be68a7fb4e7dec88f27463de94ad355242ee5"
@@ -384,7 +384,7 @@ other = "Jahr"
 
 [chat-group-message-sent]
 hash = "sha1-6629df86e55a247723deb970bafd438e4831b7eb"
-other = "Der Benutzer '{{.Username}}' Wechselte seinen emoji"
+other = "Benutzer '{{.Username}}' Wechselte seinen emoji"
 
 [meeting-screenshare-started]
 hash = "sha1-a41b064635f2fc0486378442828b41ff9a73fc0a"
@@ -392,7 +392,7 @@ other = "Der Benutzer '{{.Username}}' Startete seine bildschirm übertragung"
 
 [meeting-screenshare-stopped]
 hash = "sha1-f5b0000263add05996d897844c0faaf2adf718c8"
-other = "Der Benutzer '{{.Username}}' Stopte seine bildschirm übertragung"
+other = "Benutzer '{{.Username}}' Stopte seine bildschirm übertragung"
 
 [meetingListFilterEndDate]
 hash = "sha1-84b1478125890bad1cc4b36d6d3781773b3fde5a"
@@ -416,44 +416,44 @@ other = "Siehe Statistiken"
 
 [user-audio-muted]
 hash = "sha1-e1ce0a16ae7cef80eb65def56c1f0555380b3bdf"
-other = "Der Benutzer '{{.Username}}' Stellte sich selbst stumm und kann nicht von anderen benutzern gehört werden"
+other = "Benutzer '{{.Username}}' hat sein Mikrofon deaktiviert"
 
 [user-audio-unmuted]
 hash = "sha1-e1ce0a16ae7cef80eb65def56c1f0555380b3bdf"
-other = "Der Benutzer '{{.Username}}' hat sein mikrofon aktiviert"
+other = "Benutzer '{{.Username}}' hat sein Mikrofon aktiviert"
 
 [user-audio-voice-disabled]
 hash = "sha1-8efa036024823658e7dc88c62477544a850c8b18"
-other = "Der Benutzer '{{.Username}} hat den audio kanal verlassen und kann niemanden mehr hören"
+other = "Benutzer '{{.Username}} hat Audio deaktiviert"
 
 [user-audio-voice-enabled]
 hash = "sha1-6eaf753df840a56b2cdfff41d0f7801a8c8ce62b"
-other = "Der Benutzer '{{.Username}}' ist dem audio kanal beigetreten und kann nun alle teilnehmer hören"
+other = "Benutzer '{{.Username}}' hat Audio aktiviert"
 
 [user-cam-broadcast-end]
 hash = "sha1-f12e5b29d2d529cf1eb242b56bd149bd1ebc01f5"
-other = "Der Benutzer '{{.Username}}' hat seine kamera übertragung beendet"
+other = "Benutzer '{{.Username}}' hat seine Webcam deaktiviert"
 
 [user-cam-broadcast-start]
 hash = "sha1-c468d213eeddbed7e97959768284a22bd0c83894"
-other = "Der Benutzer '{{.Username}}' hat eine kamera übertragung gestartet"
+other = "Benutzer '{{.Username}}' hat seine Webcam aktiviert"
 
 [user-emoji-changed]
 hash = "sha1-ba0e0729d6200670d8fcc7380f766452a9ce0e21"
-other = "Der Benutzer '{{.Username}}' hat seine hand gehoben"
+other = "Benutzer '{{.Username}}' hat seine Hand gehoben"
 
 [user-joined]
 hash = "sha1-78d0333eddedd60b524446e042c688cd3a42f9db"
-other = "Der Benutzer '{{.Username}}' ist dem meeting beigetreten"
+other = "Benutzer '{{.Username}}' ist dem Meeting beigetreten"
 
 [user-left]
 hash = "sha1-2ef0edd939c6dee3641935035a4c7b26a1bc7f3d"
-other = "Der Benutzer '{{.Username}}' hat das meeting verlassen"
+other = "Benutzer '{{.Username}}' hat das Meeting verlassen"
 
 [user-presenter-assigned]
 hash = "sha1-6c7fdf21d5de374aa6796d468905f85fcc7a7d0e"
-other = "Der Benutzer '{{.Username}}' wurde zum Präsentator ernannt"
+other = "Benutzer '{{.Username}}' wurde zum Präsentator ernannt"
 
 [user-presenter-unassigned]
 hash = "sha1-fef691d3f84a775f23ccb8a76383af69986f3ba6"
-other = "Dem Benutzer '{{.Username}}' wurde der Präsentator status entzogen"
+other = "Benutzer '{{.Username}}' ist kein Präsentator mehr"

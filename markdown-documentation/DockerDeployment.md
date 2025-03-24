@@ -2,24 +2,44 @@
 
 ## See also: [Docker Compile  Guide](DockerCompile.md)
 
-Make a directory to hold the docker compose file, the .env file, the Caddyfile and the data folder from bbbstatus and
-Caddy (the default webserver).
-
+Make a directory to hold the docker compose file, the .env file, data folder from bbbstatus, the Caddyfile (the default
+webserver), and optionally the config.toml for bbbstatus.
 
 ---
 
 # Deployment Instructions
 - Create a file named `docker-compose.yml` using your favorite text editor, and insert the contents
-  of [the example docker compose file](docker-compose.yml).
-  Or just simply download the given example of this repository.
-- create a new file called `.env`
-- Insert the contents of the [example file](dotenv) and change the configuration parameters to your needs.
-  You should change at least the database password.
-- Copy the provided Caddyfile.example to Caddyfile and change at least the authentication hash (It's just a example.).
+  of [the example docker compose file](../docker-compose.yml).
+
+```shell
+nano docker-compose.yml
+```
+
+- create a new file called `.env` and insert the contents of the [.env example file](../dotenv), then change the
+  configuration parameters to your needs.
+  _Note: You should change at least the database password._
+
+```shell
+nano .env
+```
+
+- Copy the provided [Caddyfile.example](../Caddyfile.example) to Caddyfile and change at least the authentication hash (
+  It's just a example.).
   You can generate a caddy hash using the caddy binary
-  as [documented here](https://caddyserver.com/docs/command-line#caddy-hash-password)
+  as [documented here](CaddyAuthenticationHash.md)
+
+```shell
+nano Caddyfile
+```
 
 ## Notes:
+
+- If the configuration is not working, make sure to delete directories with conflicting names from your deployment
+  folder:
+
+```shell
+rm -r Caddyfile config.toml 
+```
 
 - For some installations (ARM), formatting issues and verbose configuration of the Caddyfile result in strange bugs such
   as ip resolution being broken. (Fix: use

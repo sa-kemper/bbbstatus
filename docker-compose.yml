@@ -1,16 +1,13 @@
-name: bbbstatus
+version: '3.8'
+
 services:
   bbbstatus:
     image: bbbstatus:latest
     container_name: bbbstatus
-    ports:
-      - "${APP_PORT:-8080}:8080"
     environment:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-postgresql://bbbstatus:bbbstatus@db:5432/bbbstatus}
       - HOST=${HOST:-0.0.0.0}
       - PORT=${APP_PORT:-8080}
-      - TRUSTED_PROXIES=${TRUSTED_PROXIES:-127.0.0.1/8,172.17.0.1/16,::1/128}
-      - BBB_SERVERS=${BBB_SERVERS:-bbb.example.com}
     depends_on:
       - db
     restart: unless-stopped
@@ -24,8 +21,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-bbbstatus}
       POSTGRES_USER: ${POSTGRES_USER:-bbbstatus}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bbbstatus}
-    ports:
-      - "${DB_PORT:-5432}:5432"
     volumes:
       - ${DATABASE_DIRECTORY:-.}/data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -44,7 +39,7 @@ services:
         published: 443
         mode: host
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
     logging:

@@ -38,6 +38,13 @@ nano Caddyfile
 docker compose up -d
 ```
 
+- Check the created docker network ip range and adjust the `trusted_proxies` option in your `Caddyfile` as well as in
+  your `config.toml` and your `.env` file.
+
+```shell
+ip a
+```
+
 ## Notes:
 
 - If the configuration is not working, make sure to delete directories with conflicting names from your deployment

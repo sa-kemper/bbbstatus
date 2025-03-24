@@ -96,6 +96,10 @@ files) /
 official versions (files) are tested.
 You may even override multiple files at once. To do that you need to override every file individually, just as described [here](markdown-documentation/Customisation.md).
 
+# Deployment preparation:
+
+Prepare your bbb server as described in [BBBServerPreperation.md](markdown-documentation/BBBServerPreperation.md)
+
 # [Native Deployment ](markdown-documentation/NativeDeployment.md) installation guide
 
 # [Docker Deployment](markdown-documentation/DockerDeployment.md) installation guide

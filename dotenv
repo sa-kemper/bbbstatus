@@ -10,19 +10,13 @@ POSTGRES_PASSWORD=bbbstatus
 # The port the postgresql database should bind to
 DB_PORT=5432
 
-# The IP the application should bind to
-HOST=0.0.0.0
-
-# The port the application should bind to
-APP_PORT=8080
-
 # the database connection string according to https://www.postgresql.org/docs/12/libpq-connect.html#id-1.7.3.8.3.6 change username, password and database name accordingly.
 DB_CONNECTION_STRING=postgresql://bbbstatus:bbbstatus@db:5432/bbbstatus
 
 # Where the data should be stored defaults to current folder (careful, if you use the default only run the docker compose file within the same folder)
 DATABASE_DIRECTORY=.
 
-TRUSTED_PROXIES=127.0.0.1/8,172.17.0.1/16,::1/128
+TRUSTED_PROXIES=127.0.0.1/8,172.17.0.1/16,172.18.0.1/16,::1/128
 
 # A comma seperated list of BBB Servers
 BBB_SERVERS="bbb.example.com"

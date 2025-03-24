@@ -6,8 +6,8 @@ services:
     container_name: bbbstatus
     environment:
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING:-postgresql://bbbstatus:bbbstatus@db:5432/bbbstatus}
-      - HOST=${HOST:-0.0.0.0}
-      - PORT=${APP_PORT:-8080}
+      - HOST=0.0.0.0
+      - PORT=8080
     depends_on:
       - db
     restart: unless-stopped

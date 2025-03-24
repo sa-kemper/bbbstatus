@@ -59,6 +59,8 @@ func bbbWebHookEvent(c echo.Context) error {
 	// fmt.Println("API key: '" + apiKey + "'")
 	fmt.Println("DEBUG bbbWebHookEvent -> postEvent: ", postEvent)
 
+	var requesterIpAddress string
+
 	err = json.Unmarshal(
 		[]byte(postEvent),
 		&event,
@@ -67,12 +69,31 @@ func bbbWebHookEvent(c echo.Context) error {
 		fmt.Println("Error occurred during unmarshalling of the event: ", err)
 		return c.String(http.StatusBadRequest, "Error occurred during unmarshalling of the event")
 	}
+	frameworkExtractedIP := c.RealIP()
+	customIpExtractor := getIpFromContext(c).String()
 
-	addr, err := net.LookupAddr(getIpFromContext(c).String())
-	if err != nil || len(addr) == 0 {
-		fmt.Println("Failed to obtain BBBServer hostname of host:", getIpFromContext(c))
+	// this is required due to differences with X86_64 and ARM implementations of the echo frameworks ip extractor.
+	if ip := net.ParseIP(frameworkExtractedIP); ip != nil {
+		requesterIpAddress = ip.String()
+	}
+
+	// this is required due to differences with X86_64 and ARM implementations of the echo frameworks ip extractor.
+	if ip := net.ParseIP(customIpExtractor); ip != nil {
+		requesterIpAddress = ip.String()
+	}
+
+	addr, err := net.LookupAddr(requesterIpAddress)
+	if err != nil {
+		fmt.Println("Failed to obtain BBBServer hostname of host:", requesterIpAddress)
+		fmt.Println("Error:", err)
+		return c.String(http.StatusBadRequest, "Failed to obtain BBBServer hostname of host")
+
+	}
+	if len(addr) == 0 {
+		fmt.Println("Failed to obtain BBBServer hostname of host (Zero addresses returned.):", requesterIpAddress)
 		return c.String(http.StatusBadRequest, "Failed to obtain BBBServer hostname of host")
 	}
+
 	if len(addr) > 1 {
 		fmt.Println("LookupAddr returned more then one addr:", addr)
 	}

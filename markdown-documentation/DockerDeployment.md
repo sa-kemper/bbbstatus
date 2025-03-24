@@ -32,6 +32,12 @@ nano .env
 nano Caddyfile
 ```
 
+- Deploy the container:
+
+```shell
+docker compose up -d
+```
+
 ## Notes:
 
 - If the configuration is not working, make sure to delete directories with conflicting names from your deployment

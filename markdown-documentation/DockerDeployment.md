@@ -1,8 +1,14 @@
 # Docker Deployment
 
+## See also: [Docker Compile  Guide](DockerCompile.md)
+
 Make a directory to hold the docker compose file, the .env file, the Caddyfile and the data folder from bbbstatus and
 Caddy (the default webserver).
 
+
+---
+
+# Deployment Instructions
 - Create a file named `docker-compose.yml` using your favorite text editor, and insert the contents
   of [the example docker compose file](docker-compose.yml).
   Or just simply download the given example of this repository.

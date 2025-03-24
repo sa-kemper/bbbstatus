@@ -1,20 +1,20 @@
 {
-    acme_ca https://acme-v02.api.letsencrypt.org/directory
-    email   root@example.com
-    default_bind 0.0.0.0
+	acme_ca https://acme-v02.api.letsencrypt.org/directory
+	email root@example.com
+	default_bind 0.0.0.0
 }
 
 bbbstatus.example.com {
-    @protected {
-        not path /event
-    }
+	@protected {
+		not path /event
+	}
 
-    basic_auth @protected {
-        root PASSWORD_HASH # generated using https://caddyserver.com/docs/command-line#caddy-hash-password
-    }
+	basic_auth @protected {
+		root PASSWORD_HASH # generated using https://caddyserver.com/docs/command-line#caddy-hash-password
+	}
 
-    reverse_proxy bbbstatus:8080 {
-        trusted_proxies 172.17.0.0/16
-        header_up X-Forwarded-For {http.request.remote}
-    }
+	reverse_proxy bbbstatus:8080 {
+		trusted_proxies 172.17.0.0/16
+		header_up X-Forwarded-For {http.request.remote}
+	}
 }

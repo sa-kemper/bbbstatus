@@ -81,6 +81,9 @@ The comma is only required when configuring multiple bbb servers.
   for
   bbb-webhooks after each restart in order to use API features (like get recordings).
 
+  To make this absolutely clear, you restart bbbstatus => you cannot access recordings until the bbb server
+  corresponding has sent a new event.
+
 
 - You may serve static files separately in your environment, therefore there is an option to disable it.
   bbbstatus will use the path /static in any case.
@@ -88,8 +91,9 @@ The comma is only required when configuring multiple bbb servers.
 # Customization
 
 You may override locales, templates, static content (like CSS) and even database migrations at runtime without
-recompiling bbbstatus. But be aware that even though this is possible, it may lead to problems, as only the embedded /
-official versions are tested.
+recompiling bbbstatus. But be aware that even though this is possible, it may lead to problems, as only the embedded (
+files) /
+official versions (files) are tested.
 You may even override multiple files at once. To do that you need to override every file individually, just as described [here](markdown-documentation/Customisation.md).
 
 # [Native Deployment ](markdown-documentation/NativeDeployment.md) installation guide

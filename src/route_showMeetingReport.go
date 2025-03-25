@@ -17,7 +17,7 @@
 package main
 
 import (
-	"BbbStatus/internal/BBBEvents"
+	"bbbstatus/internal/BBBEvents"
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"

@@ -1,4 +1,4 @@
-module BbbStatus
+module bbbstatus
 
 go 1.23
 

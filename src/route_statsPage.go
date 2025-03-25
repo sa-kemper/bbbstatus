@@ -17,8 +17,8 @@
 package main
 
 import (
-	"BbbStatus/internal/BBBEvents"
-	"BbbStatus/internal/StatsAggregator"
+	"bbbstatus/internal/BBBEvents"
+	"bbbstatus/internal/StatsAggregator"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"

@@ -17,8 +17,8 @@
 package main
 
 import (
-	"BbbStatus/internal/BBBAPI"
-	"BbbStatus/internal/BBBEvents"
+	"bbbstatus/internal/BBBAPI"
+	"bbbstatus/internal/BBBEvents"
 	"context"
 	"encoding/json"
 	"errors"

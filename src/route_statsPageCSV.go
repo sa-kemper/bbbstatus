@@ -17,7 +17,7 @@
 package main
 
 import (
-	"BbbStatus/internal/StatsAggregator"
+	"bbbstatus/internal/StatsAggregator"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"

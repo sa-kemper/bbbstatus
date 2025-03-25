@@ -17,7 +17,7 @@
 package main
 
 import (
-	"BbbStatus/internal/BBBEvents"
+	"bbbstatus/internal/BBBEvents"
 	"encoding/json"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -111,7 +111,6 @@ func bbbWebHookEvent(c echo.Context) error {
 		fmt.Println("error occurred during pgx connect (bbbWebHookEvent): ", err)
 		return c.String(http.StatusInternalServerError, "Error occurred database connect (bbbWebHookEvent)")
 	}
-	//goland:noinspection ALL
 	defer conn.Close(c.Request().Context())
 
 	// Simple host based webhook safety, not really great but better than nothing at all.

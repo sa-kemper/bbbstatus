@@ -17,7 +17,7 @@
 package BBBAPI
 
 import (
-	"BbbStatus/internal/BBBEvents"
+	"bbbstatus/internal/BBBEvents"
 	"context"
 	"encoding/xml"
 	"fmt"

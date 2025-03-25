@@ -17,7 +17,7 @@
 package main
 
 import (
-	"BbbStatus/internal/BBBAPI"
+	"bbbstatus/internal/BBBAPI"
 	"context"
 	"fmt"
 	"github.com/BurntSushi/toml"

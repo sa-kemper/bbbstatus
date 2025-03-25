@@ -249,6 +249,12 @@ func confGet(key string) string {
 			return trustedProxies
 		}
 		return "127.0.0.1/8,172.17.0.1/16,::1/128" // In my opinion, a sane default.
+	case "CLEAR_QUEUE":
+		if val, exists := os.LookupEnv(key); exists {
+			return strings.TrimSpace(strings.ToLower(val))
+		}
+		return "false"
+
 	}
 
 	fmt.Printf("ISSUES REGARDING CONFIGURATION KEY: '%s'\r\n", key)

@@ -50,6 +50,11 @@ Note:
 - The function does not handle any errors that may occur during the database connection or the `Save` operation. It simply logs the errors and returns them.
 */
 func bbbWebHookEvent(c echo.Context) error {
+	// Debug deployments
+	if confGet("CLEAR_QUEUE") == "true" {
+		return c.String(http.StatusOK, "Event was dropped.")
+	}
+
 	var event BBBEvents.BaseEvent
 	postEvent := c.FormValue("event")
 	postEvent = strings.TrimLeft(postEvent, "[")

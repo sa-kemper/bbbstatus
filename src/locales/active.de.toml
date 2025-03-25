@@ -176,15 +176,15 @@ other = "Zeige Details"
 
 [MeetingRecordingDisabled]
 hash = "sha1-f4f4473df8cb59f0a369aebee3d1509adc0151c6"
-other = "Deaktiviert"
+other = "Aufzeichnungen sind deaktiviert"
 
 [MeetingRecordingEnabled]
 hash = "sha1-df174a3f2faa31814e06540acda7af8825403fac"
-other = "Aktiviert"
+other = "Aufzeichnungen sind möglich"
 
 [MeetingRecordingStatusHeader]
 hash = "sha1-9b98e1a0008e6dc21c64e9b98854c5b018cd0f46"
-other = "Zeichnet auf"
+other = "Aufzeichnungen"
 
 [MeetingToReport]
 hash = "sha1-114c4dd2498e790e45bdba42832d78da0edbe889"

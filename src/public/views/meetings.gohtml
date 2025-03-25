@@ -56,9 +56,15 @@ limitations under the License.
                     <div class="status-badge status-{{if .Active}}active{{else}}ended{{end}}">{{ if .Active}}{{t "MeetingActive"}}{{else}}{{t "MeetingEnded"}}{{end}}</div>
                     <h3>{{ .BBBEventsMeeting.Name}}</h3>
                     <div class="detail-item">
+                        <span class="detail-label">{{t "ReportMeetingDetailBBBHostname"}}</span>
+                        <span class="detail-value">{{ .BbbHostname }}</span>
+                    </div>
+                    <div class="detail-item">
                         <span class="detail-label">{{t "MeetingCreated"}}</span>
                         <span class="detail-value">{{ .BBBEventsMeeting.CreateDate }}</span>
                     </div>
+
+
                     <div class="detail-item">
                         <a class="meeting-button meeting-button-to-report"
                            href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}"
@@ -70,10 +76,6 @@ limitations under the License.
                         </a>
                     </div>
                     <div class="meeting-details">
-                        <div class="detail-item">
-                            <span class="detail-label">{{t "ReportMeetingDetailBBBHostname"}}</span>
-                            <span class="detail-value">{{ .BbbHostname }}</span>
-                        </div>
                         <div class="detail-item">
                             <span class="detail-label">{{t "MeetingCreateTime"}}</span>
                             <span class="detail-value">{{formatTime .BBBEventsMeeting.CreateTime }}</span>

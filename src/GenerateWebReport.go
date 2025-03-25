@@ -67,6 +67,10 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "BackToMeetingsButton", Other: "Back to Meetings"},
 		{ID: "RecordingsHeader", Other: "Recordings"},
 		{ID: "SystemSentMessage", Other: "System Sent the message: '{{.Message}}'"},
+		{ID: "MeetingEvent-meeting-created", Other: "Meeting created"},
+		{ID: "MeetingEvent-meeting-ended", Other: "Meeting ended"},
+		{ID: "MeetingEvent-meeting-recording-started", Other: "Meeting Recording Started"},
+		{ID: "MeetingEvent-meeting-recording-stopped", Other: "Meeting Recording Stopped"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -178,6 +182,12 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	}
 	timeline = append(timeline, pollResponseTimeline...)
 
+	err, meetingEventsTimeline := FillMeetingEvents(ctx, internalMeetingID, conn)
+	if err != nil {
+		return Report{}, err
+	}
+	timeline = append(timeline, meetingEventsTimeline...)
+
 	for i, event := range timeline {
 		timeline[i].FormattedTime = event.Time.Format(time.TimeOnly + " 02.01.2006")
 	}
@@ -188,6 +198,26 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	})
 
 	return Report{Details: details, Participants: participants, Recordings: recordings, Timeline: timeline}, nil
+}
+
+func FillMeetingEvents(ctx context.Context, id string, conn *pgx.Conn) (err error, timeline []Event) {
+	row, err := conn.Query(ctx, "SELECT event_type, event_timestamp FROM meeting_events WHERE internal_meeting_id = $1", id)
+	if err != nil {
+		return err, nil
+	}
+	defer row.Close()
+
+	for row.Next() {
+		var meetingEvent Event
+		var eventType string
+		err = row.Scan(&eventType, &meetingEvent.Time)
+		if err != nil {
+			return err, nil
+		}
+		meetingEvent.TextRepresentation = Translate("MeetingEvent-" + eventType)
+		timeline = append(timeline, meetingEvent)
+	}
+	return nil, timeline
 }
 
 func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, polls *[]string, conn *pgx.Conn) (err error, timeline []Event) {

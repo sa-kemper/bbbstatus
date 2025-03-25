@@ -22,13 +22,13 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handleMeetingEnded(conn *pgx.Conn, meeting Meeting, b *BaseEvent) (err error) {
-	_, err = conn.Exec(context.Background(), "INSERT INTO meeting_events (internal_meeting_id, event_type, event_timestamp) VALUES ($1, $2, $3)", meeting.InternalMeetingID, EventMeetingEnded, b.GetTimestamp())
+func handleMeetingEnded(ctx context.Context, conn *pgx.Conn, meeting Meeting, b *BaseEvent) (err error) {
+	_, err = conn.Exec(ctx, "INSERT INTO meeting_events (internal_meeting_id, event_type, event_timestamp) VALUES ($1, $2, $3)", meeting.InternalMeetingID, EventMeetingEnded, b.GetTimestamp())
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	_, err = conn.Exec(context.Background(), "UPDATE meetings SET meeting_ended = $1 WHERE internal_meeting_id = $2", b.GetTimestamp(), meeting.InternalMeetingID)
+	_, err = conn.Exec(ctx, "UPDATE meetings SET meeting_ended = $1 WHERE internal_meeting_id = $2", b.GetTimestamp(), meeting.InternalMeetingID)
 	if err != nil {
 		fmt.Println("Failed ending the meeting.")
 		fmt.Println(err)

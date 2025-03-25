@@ -89,16 +89,30 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 
 	switch b.Data.ID {
 	case EventMeetingCreated:
-		return handleMeetingCreated(conn, meeting, b)
+		return handleMeetingCreated(ctx, conn, meeting, b)
 	case EventChatGroupMessageSent:
 		return handleChatMessage(ctx, conn, b, meeting)
 	case EventPollStarted: //
-		return handlePollCreation(b, user, conn, meeting)
+		return handlePollCreation(ctx, conn, b, user, meeting)
 	case EventPollResponded:
 		return handlePollResponse(b, user, conn)
 	case EventMeetingEnded:
-		return handleMeetingEnded(conn, meeting, b)
+		return handleMeetingEnded(ctx, conn, meeting, b)
+	case MeetingRecordingStarted:
+		return handleMeetingRecordEvent(ctx, conn, meeting, b)
+	case MeetingRecordingStopped:
+		return handleMeetingRecordEvent(ctx, conn, meeting, b)
 	}
 	return nil
 
+}
+
+func handleMeetingRecordEvent(ctx context.Context, conn *pgx.Conn, meeting Meeting, b *BaseEvent) (err error) {
+	// {"data":{"type":"event","id":"meeting-recording-started","attributes":{"meeting":{"internal-meeting-id":"e6e630064669a3491c571e46c02091acc4ef99e9-1742912517852","external-meeting-id":"nogeseza921ixradoodrdpjvolltv6keqhv9r9eo"}},"event":{"ts":1742912530304}}}
+	_, err = conn.Exec(ctx, "INSERT INTO meeting_events (internal_meeting_id, event_type, event_timestamp) VALUES ($1, $2, $3)", meeting.InternalMeetingID, b.Data.ID, b.GetTimestamp())
+	if err != nil {
+		fmt.Println("error occurred during save event -> handleMeetingRecordEvent: ", err)
+		return err
+	}
+	return nil
 }

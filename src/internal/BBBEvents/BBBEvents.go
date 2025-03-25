@@ -145,9 +145,11 @@ const (
 	EventPollStarted               = "poll-started"
 	EventPollResponded             = "poll-responded"
 	EventMeetingEnded              = "meeting-ended"
-	EventMeetingRapArchiveEnded    = "meeting-rap-archive-ended"
+	EventMeetingRapArchiveEnded    = "meeting-rap-archive-ended" // TODO: use this as a counter for recordings of a meeting.
 	EventMeetingRapArchiveStarted  = "meeting-rap-archive-started"
 	EventSharedNotesChanged        = "pad-content"
+	MeetingRecordingStarted        = "meeting-recording-started"
+	MeetingRecordingStopped        = "meeting-recording-stopped"
 )
 
 var handledBBBEvents = []string{EventMeetingCreated,
@@ -169,6 +171,8 @@ var handledBBBEvents = []string{EventMeetingCreated,
 	EventPollStarted,
 	EventPollResponded,
 	EventMeetingEnded,
+	MeetingRecordingStarted,
+	MeetingRecordingStopped,
 }
 
 /*

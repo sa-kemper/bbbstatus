@@ -14,6 +14,30 @@ other = "Aug"
 hash = "sha1-a00619a52130bf71a69db12a9b4cda996d3d91cc"
 other = "zurück zur Übersicht"
 
+[CSVMeetingAction-meeting-recording-started]
+hash = "sha1-bde81afa928840be70c67638434105d89efb658e"
+other = "Aufzeichnungs start"
+
+[CSVMeetingAction-meeting-recording-stopped]
+hash = "sha1-460b7c299f9e8ffead1efb400e3169cdbb5d399a"
+other = "Aufzeichnungs stop"
+
+[CSVMeetingEvent-meeting-created]
+hash = "sha1-740fe1de219024332094840763a1fea397c1b8a4"
+other = "Meeting start"
+
+[CSVMeetingEvent-meeting-ended]
+hash = "sha1-86fd1d773fe75aa1c6a04682bae1556ef8a9b582"
+other = "Meeting ende"
+
+[CSVMeetingEvent-meeting-recording-started]
+hash = "sha1-3059a09fc54d90a32f8d68efaaa50b7f6782c911"
+other = "Die Aufzeichnung der Sitzung wurde gestartet"
+
+[CSVMeetingEvent-meeting-recording-stopped]
+hash = "sha1-683f3e6d204f8d12b2949fa0e544d5b723675916"
+other = "Die Aufzeichnung der Sitzung wurde gestoppt"
+
 [CSVReportAction-meeting-screenshare-started]
 hash = "sha1-d0d8670190908582bda8e7dd4a015f217ef85324"
 other = "Startete Screensharing"
@@ -157,6 +181,22 @@ other = "Dauer"
 [MeetingEnded]
 hash = "sha1-90303d8df23e3832c1582952684b4dbaa58e069c"
 other = "Beendet"
+
+[MeetingEvent-meeting-created]
+hash = "sha1-740fe1de219024332094840763a1fea397c1b8a4"
+other = "Meeting start"
+
+[MeetingEvent-meeting-ended]
+hash = "sha1-86fd1d773fe75aa1c6a04682bae1556ef8a9b582"
+other = "Meeting ende"
+
+[MeetingEvent-meeting-recording-started]
+hash = "sha1-41a106c82058a0cbeadab46541e23443b2d90afb"
+other = "Die Aufzeichnung der Sitzung wurde gestartet"
+
+[MeetingEvent-meeting-recording-stopped]
+hash = "sha1-f39520d5be0f2e5b5a9227206be078af14bb6ec0"
+other = "Die Aufzeichnung der Sitzung wurde gestoppt"
 
 [MeetingExternalID]
 hash = "sha1-40dc448a962e5fe46d99f57ab5bbb9ad1da10770"

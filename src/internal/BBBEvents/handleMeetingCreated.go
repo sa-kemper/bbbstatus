@@ -22,9 +22,9 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handleMeetingCreated(conn *pgx.Conn, meeting Meeting, b *BaseEvent) error {
+func handleMeetingCreated(ctx context.Context, conn *pgx.Conn, meeting Meeting, b *BaseEvent) error {
 	var err error
-	_, err = conn.Exec(context.Background(),
+	_, err = conn.Exec(ctx,
 		"INSERT INTO meetings (internal_meeting_id, external_meeting_id, name, is_breakout, parent_id,  create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 		meeting.InternalMeetingID,
 		meeting.ExternalMeetingID,
@@ -45,7 +45,7 @@ func handleMeetingCreated(conn *pgx.Conn, meeting Meeting, b *BaseEvent) error {
 		fmt.Println(err)
 		return err
 	}
-	_, err = conn.Exec(context.Background(), "INSERT INTO meeting_events (internal_meeting_id, event_type, event_timestamp) VALUES ($1, $2, $3)", meeting.InternalMeetingID, EventMeetingCreated, b.GetTimestamp())
+	_, err = conn.Exec(ctx, "INSERT INTO meeting_events (internal_meeting_id, event_type, event_timestamp) VALUES ($1, $2, $3)", meeting.InternalMeetingID, EventMeetingCreated, b.GetTimestamp())
 	if err != nil {
 		fmt.Println(err)
 		return err

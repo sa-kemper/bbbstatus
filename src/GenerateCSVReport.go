@@ -59,6 +59,14 @@ func init() {
 		{ID: "CSVReportAction-meeting-screenshare-stopped", Other: "Stopped a screenshare"},
 		{ID: "CSVReportAction-user-emoji-changed", Other: "Raised his hand"},
 		{ID: "SystemMessage", Other: "System message"},
+		{ID: "CSVMeetingEvent-meeting-created", Other: "Meeting created"},
+		{ID: "CSVMeetingEvent-meeting-ended", Other: "Meeting ended"},
+		{ID: "CSVMeetingEvent-meeting-recording-started", Other: "The meeting recording started"},
+		{ID: "CSVMeetingEvent-meeting-recording-stopped", Other: "The meeting recording stopped"},
+		{ID: "CSVMeetingAction-meeting-recording-started", Other: "Recording start"},
+		{ID: "CSVMeetingAction-meeting-recording-stopped", Other: "Recording stopped"},
+		{ID: "CSVMeetingAction-meeting-created", Other: "Meeting created"},
+		{ID: "CSVMeetingAction-meeting-ended", Other: "Meeting ended"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, messages...)
 }
@@ -107,9 +115,16 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 		return nil, err
 	}
 
+	meetingEventTimeline, err := FillCsvMeetingEvents(ctx, conn, internalMeetingID)
+	if err != nil {
+		fmt.Println("error occurred while filling meeting event timeline (GenerateCSVReport)", err.Error())
+		return nil, err
+	}
+
 	timeline = append(timeline, messageTimeline...)
 	timeline = append(timeline, userEventTimeline...)
 	timeline = append(timeline, pollTimeline...)
+	timeline = append(timeline, meetingEventTimeline...)
 
 	for i, event := range timeline {
 		timeline[i].FormattedTime = event.Time.Format(time.TimeOnly)
@@ -126,6 +141,24 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 	}
 
 	return []byte(result), nil
+}
+
+func FillCsvMeetingEvents(ctx context.Context, conn *pgx.Conn, internalMeetingId string) (timeline []CSVEvent, err error) {
+	row, err := conn.Query(ctx, "SELECT event_type, event_timestamp FROM meeting_events WHERE internal_meeting_id=$1", internalMeetingId)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+	for row.Next() {
+		var event = CSVEvent{User: "SYSTEM"}
+		var eventId string
+		err = row.Scan(&eventId, &event.Time)
+		event.TextRepresentation = Translate("CSVMeetingEvent-" + eventId)
+		event.Action = Translate("CSVMeetingAction-" + eventId)
+		timeline = append(timeline, event)
+	}
+
+	return timeline, nil
 }
 
 func (e CSVEvent) ReturnCSVRow(CsvStructureConfig []string) string {

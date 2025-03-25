@@ -23,7 +23,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handlePollResponse(b *BaseEvent, user *User, tx pgx.Tx) error {
+func handlePollResponse(b *BaseEvent, user *User, conn *pgx.Conn) error {
 	poll := b.Data.Attributes.Poll
 	if user == nil {
 		return fmt.Errorf("user is unexpectedly nil")
@@ -34,16 +34,11 @@ func handlePollResponse(b *BaseEvent, user *User, tx pgx.Tx) error {
 		return err
 	}
 
-	_, err = tx.Exec(context.Background(), "INSERT INTO poll_responses (poll_id, internal_user_id, answer_ids, response_time) VALUES ($1, $2, $3, $4)", poll.ID, user.InternalUserID, string(res), b.GetTimestamp())
+	_, err = conn.Exec(context.Background(), "INSERT INTO poll_responses (poll_id, internal_user_id, answer_ids, response_time) VALUES ($1, $2, $3, $4)", poll.ID, user.InternalUserID, string(res), b.GetTimestamp())
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
-	err = tx.Commit(context.Background()) // commit on success.
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
 	return nil
 }

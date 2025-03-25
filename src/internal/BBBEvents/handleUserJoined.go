@@ -24,19 +24,11 @@ import (
 
 func handleUserJoined(ctx context.Context, conn *pgx.Conn, user *User, meeting Meeting, b *BaseEvent) error {
 	var err error
-	var tx pgx.Tx
 	var userInRequestExists bool
 
 	if user == nil {
 		return fmt.Errorf("user is unexpectedly nil")
 	}
-
-	tx, err = conn.Begin(context.Background())
-	if err != nil {
-		return err
-	}
-	//goland:noinspection ALL
-	defer tx.Rollback(context.Background())
 
 	userInRequestExists, err = userExists(ctx, conn, user.InternalUserID)
 	if err != nil {
@@ -45,19 +37,14 @@ func handleUserJoined(ctx context.Context, conn *pgx.Conn, user *User, meeting M
 	}
 
 	if !userInRequestExists {
-		_, err := tx.Exec(context.Background(), "INSERT INTO users (internal_user_id, external_user_id, name, role, is_guest) VALUES ($1, $2, $3, $4, $5)", user.InternalUserID, user.ExternalUserID, user.Name, user.Role, user.Guest)
+		_, err := conn.Exec(context.Background(), "INSERT INTO users (internal_user_id, external_user_id, name, role, is_guest) VALUES ($1, $2, $3, $4, $5)", user.InternalUserID, user.ExternalUserID, user.Name, user.Role, user.Guest)
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
 	}
 
-	_, err = tx.Exec(context.Background(), "INSERT INTO user_events (internal_meeting_id, internal_user_id, event_type, event_timestamp) VALUES ($1, $2, $3, $4)", meeting.InternalMeetingID, user.InternalUserID, b.Data.ID, b.GetTimestamp())
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	err = tx.Commit(context.Background())
+	_, err = conn.Exec(context.Background(), "INSERT INTO user_events (internal_meeting_id, internal_user_id, event_type, event_timestamp) VALUES ($1, $2, $3, $4)", meeting.InternalMeetingID, user.InternalUserID, b.Data.ID, b.GetTimestamp())
 	if err != nil {
 		fmt.Println(err)
 		return err

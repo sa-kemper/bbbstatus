@@ -48,17 +48,9 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 		return nil
 	}
 
-	tx, err := conn.Begin(ctx) // We use database transactions to handle runtime errors gracefully.
-	if err != nil {
-		fmt.Println("error occurred during save event -> begin transaction: ", err)
-		return err
-	}
-	//goland:noinspection ALL
-	defer tx.Rollback(ctx)
-
 	if isUserEvent := strings.Contains(b.Data.ID, "user"); isUserEvent {
 		if joinEvent := strings.Contains(b.Data.ID, "joined"); !joinEvent {
-			err = loadAdditionalUserData(user, tx)
+			err = loadAdditionalUserData(user, conn)
 
 			if b.Data.ID == EventUserPresenterAssigned { // This is a special case because bbb-webhooks does not maintain the event queue order, if one event is not delivered. (Throw away presenter assigned events if the user is unknown)
 				if errors.Is(err, pgx.ErrNoRows) {
@@ -74,7 +66,7 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 	}
 
 	if b.Data.ID != EventMeetingCreated {
-		err = loadAdditionalMeetingData(meeting, tx)
+		err = loadAdditionalMeetingData(&meeting, conn)
 		if err != nil {
 			fmt.Println("error occurred during save event -> loadAdditionalMeetingData: ", err)
 			return err
@@ -82,14 +74,14 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 	}
 
 	if isUserEvent := strings.Contains(b.Data.ID, "user"); isUserEvent {
-		err = handleUserEvent(ctx, conn, user, tx, meeting, b)
+		err = handleUserEvent(ctx, conn, user, meeting, b)
 		if err != nil {
 			fmt.Println("error occurred during save event -> handleUserEvent: ", err)
 		}
 	}
 
 	if b.Data.ID == EventMeetingScreenshareStarted || b.Data.ID == EventMeetingScreenshareStopped {
-		err = handleUserEvent(ctx, conn, user, tx, meeting, b)
+		err = handleUserEvent(ctx, conn, user, meeting, b)
 		if err != nil {
 			fmt.Println("error occurred during save event -> handleUserEvent: ", err)
 		}
@@ -97,15 +89,15 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 
 	switch b.Data.ID {
 	case EventMeetingCreated:
-		return handleMeetingCreated(tx, meeting, b)
+		return handleMeetingCreated(conn, meeting, b)
 	case EventChatGroupMessageSent:
-		return handleChatMessage(ctx, conn, b, tx, meeting)
+		return handleChatMessage(ctx, conn, b, meeting)
 	case EventPollStarted: //
-		return handlePollCreation(b, user, tx, meeting)
+		return handlePollCreation(b, user, conn, meeting)
 	case EventPollResponded:
-		return handlePollResponse(b, user, tx)
+		return handlePollResponse(b, user, conn)
 	case EventMeetingEnded:
-		return handleMeetingEnded(tx, meeting, b)
+		return handleMeetingEnded(conn, meeting, b)
 	}
 	return nil
 

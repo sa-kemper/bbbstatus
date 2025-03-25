@@ -22,7 +22,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handleChatMessage(ctx context.Context, conn *pgx.Conn, b *BaseEvent, tx pgx.Tx, meeting Meeting) (err error) {
+func handleChatMessage(ctx context.Context, conn *pgx.Conn, b *BaseEvent, meeting Meeting) (err error) {
 	message := b.Data.Attributes.Message
 	var userInRequestExists bool
 	if b.Data.Attributes.Message.Sender.InternalUserID == "SYSTEM" {
@@ -39,12 +39,7 @@ func handleChatMessage(ctx context.Context, conn *pgx.Conn, b *BaseEvent, tx pgx
 	if !userInRequestExists {
 		return fmt.Errorf("user %s is not present. This is unexpected behaviour, check your DB integrity and the API authorisation", b.Data.Attributes.Message.Sender.InternalUserID)
 	}
-	_, err = tx.Exec(context.Background(), "INSERT INTO chat_messages (internal_meeting_id, internal_user_id, chat_id, message_content, send_time) VALUES ($1,$2,$3,$4,$5)", meeting.InternalMeetingID, message.Sender.InternalUserID, b.Data.Attributes.ChatID, message.Message, b.GetTimestamp())
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	err = tx.Commit(context.Background())
+	_, err = conn.Exec(context.Background(), "INSERT INTO chat_messages (internal_meeting_id, internal_user_id, chat_id, message_content, send_time) VALUES ($1,$2,$3,$4,$5)", meeting.InternalMeetingID, message.Sender.InternalUserID, b.Data.Attributes.ChatID, message.Message, b.GetTimestamp())
 	if err != nil {
 		fmt.Println(err)
 		return err

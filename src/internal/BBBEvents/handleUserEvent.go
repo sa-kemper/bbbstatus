@@ -22,7 +22,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handleUserEvent(ctx context.Context, conn *pgx.Conn, user *User, tx pgx.Tx, meeting Meeting, b *BaseEvent) error {
+func handleUserEvent(ctx context.Context, conn *pgx.Conn, user *User, meeting Meeting, b *BaseEvent) error {
 	var userInRequestExists bool
 	var err error
 	if b.Data.ID == "user-joined" {
@@ -62,12 +62,7 @@ func handleUserEvent(ctx context.Context, conn *pgx.Conn, user *User, tx pgx.Tx,
 	if !userInRequestExists {
 		return fmt.Errorf("user %s is not present. This is unexpected behaviour, check your DB integrity and the API authorisation", user.InternalUserID)
 	}
-	_, err = tx.Exec(context.Background(), "INSERT INTO user_events (internal_meeting_id, internal_user_id, event_type, event_timestamp) VALUES ($1, $2, $3, $4)", meeting.InternalMeetingID, user.InternalUserID, b.Data.ID, b.GetTimestamp())
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	err = tx.Commit(context.Background())
+	_, err = conn.Exec(context.Background(), "INSERT INTO user_events (internal_meeting_id, internal_user_id, event_type, event_timestamp) VALUES ($1, $2, $3, $4)", meeting.InternalMeetingID, user.InternalUserID, b.Data.ID, b.GetTimestamp())
 	if err != nil {
 		fmt.Println(err)
 		return err

@@ -22,17 +22,12 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func handlePollCreation(b *BaseEvent, user *User, tx pgx.Tx, meeting Meeting) (err error) {
+func handlePollCreation(b *BaseEvent, user *User, conn *pgx.Conn, meeting Meeting) (err error) {
 	poll := b.Data.Attributes.Poll
 	if user == nil {
 		return fmt.Errorf("user is unexpectedly nil")
 	}
-	_, err = tx.Exec(context.Background(), "INSERT INTO polls (poll_id, internal_meeting_id,  internal_user_id, question, answers, created_at) VALUES ($1, $2, $3, $4, $5, $6)", poll.ID, meeting.InternalMeetingID, user.InternalUserID, poll.Question, poll.Answers, b.GetTimestamp())
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	err = tx.Commit(context.Background())
+	_, err = conn.Exec(context.Background(), "INSERT INTO polls (poll_id, internal_meeting_id,  internal_user_id, question, answers, created_at) VALUES ($1, $2, $3, $4, $5, $6)", poll.ID, meeting.InternalMeetingID, user.InternalUserID, poll.Question, poll.Answers, b.GetTimestamp())
 	if err != nil {
 		fmt.Println(err)
 		return err

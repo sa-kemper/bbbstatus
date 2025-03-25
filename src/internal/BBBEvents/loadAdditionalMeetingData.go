@@ -22,9 +22,9 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func loadAdditionalMeetingData(meeting Meeting, tx pgx.Tx) error {
+func loadAdditionalMeetingData(meeting *Meeting, conn *pgx.Conn) error {
 	if meeting.Name == "" && meeting.InternalMeetingID != "" {
-		err := tx.QueryRow(context.Background(), "SELECT name FROM meetings WHERE internal_meeting_id=$1", meeting.InternalMeetingID).Scan(&meeting.Name)
+		err := conn.QueryRow(context.Background(), "SELECT name FROM meetings WHERE internal_meeting_id=$1", meeting.InternalMeetingID).Scan(&meeting.Name)
 		if err != nil {
 			fmt.Println("error occurred during save event -> loadAdditionalMeetingData: ", err)
 			return err

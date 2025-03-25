@@ -115,6 +115,12 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 		return nil, err
 	}
 
+	pollResponseTimeline, err := FillCsvPollResponses(ctx, conn, internalMeetingID, polls)
+	if err != nil {
+		fmt.Println("error occurred while filling poll responses (GenerateCSVReport)", err.Error())
+		return nil, err
+	}
+
 	meetingEventTimeline, err := FillCsvMeetingEvents(ctx, conn, internalMeetingID)
 	if err != nil {
 		fmt.Println("error occurred while filling meeting event timeline (GenerateCSVReport)", err.Error())
@@ -124,6 +130,7 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 	timeline = append(timeline, messageTimeline...)
 	timeline = append(timeline, userEventTimeline...)
 	timeline = append(timeline, pollTimeline...)
+	timeline = append(timeline, pollResponseTimeline...)
 	timeline = append(timeline, meetingEventTimeline...)
 
 	for i, event := range timeline {
@@ -315,12 +322,12 @@ func FillCsvPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.
 	return timeline, err
 }
 
-func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *[]string, conn *pgx.Conn) (err error, timeline []CSVEvent) {
+func FillCsvPollResponses(ctx context.Context, conn *pgx.Conn, internalMeetingID string, polls *[]string) (timeline []CSVEvent, err error) {
 	// insert the poll Answers into the timeline
 	for _, pollID := range *polls {
 		row, err := conn.Query(ctx, "SELECT internal_user_id, answer_ids, response_time FROM poll_responses WHERE poll_id = $1", pollID)
 		if err != nil {
-			return fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err), timeline
+			return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 		}
 		for row.Next() {
 			var event CSVEvent
@@ -337,14 +344,14 @@ func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *
 			err = json.Unmarshal([]byte(answerJSON), &poll.AnswerIds)
 			if err != nil {
 				fmt.Printf("error decoding answers of poll %s with json '%s'\n", poll.ID, answerJSON)
-				return err, timeline
+				return timeline, err
 			}
 
 			// we cannot use the same connection while the row is not closed.
 			conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 			if err != nil {
 				fmt.Println("error connecting to the database at least twice. ->", err)
-				return err, timeline
+				return timeline, err
 			}
 			err = conn2.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", user.InternalUserID).Scan(&user.Name)
 			if err != nil {
@@ -361,7 +368,7 @@ func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *
 			err = json.Unmarshal([]byte(answersJSON), &poll.Answers)
 			if err != nil {
 				fmt.Printf("error decoding answers of poll %s with json '%s'\n", poll.ID, answerJSON)
-				return err, timeline
+				return timeline, err
 			}
 
 			if poll.Question == "" { // use a shortened version of the poll id if the question is empty.
@@ -377,5 +384,5 @@ func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *
 		}
 		row.Close()
 	}
-	return err, timeline
+	return timeline, err
 }

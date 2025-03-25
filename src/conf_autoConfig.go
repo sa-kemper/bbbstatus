@@ -120,7 +120,6 @@ func parseBBBServersFromEnv() {
 		panic("BBB_SERVERS environment must be set in order for bbbstatus to work.")
 	}
 	if !ok { // config file was used
-		fmt.Println("BBB_SERVERS environment variable not set", bbbServersEnv, ok)
 		return
 	}
 

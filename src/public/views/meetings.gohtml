@@ -75,16 +75,8 @@ limitations under the License.
                             <span class="detail-value">{{ .BbbHostname }}</span>
                         </div>
                         <div class="detail-item">
-                            <span class="detail-label">{{t "MeetingMaxUsers"}}</span>
-                            <span class="detail-value">{{ .BBBEventsMeeting.MaxUsers }}</span>
-                        </div>
-                        <div class="detail-item">
                             <span class="detail-label">{{t "MeetingCreateTime"}}</span>
                             <span class="detail-value">{{formatTime .BBBEventsMeeting.CreateTime }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">{{t "MeetingRecordingStatusHeader"}}</span>
-                            <span class="detail-value">{{if .BBBEventsMeeting.Record }}{{t "MeetingRecordingEnabled"}}{{else}}{{t "MeetingRecordingDisabled"}}{{end}}</span>
                         </div>
                     </div>
                 </div>

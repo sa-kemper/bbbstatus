@@ -1,0 +1,15 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "queries"
+    schema: "Migrations/PostgreSQL"
+    gen:
+      go:
+        package: "bbbstatus"
+        out: "internal/database"
+        sql_package: "pgx/v5"
+      overrides:
+        - db_type: "uuid"
+          go_type:
+            import: "github.com/google/uuid"
+            type: "UUID"

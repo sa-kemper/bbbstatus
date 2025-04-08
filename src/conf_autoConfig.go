@@ -175,6 +175,7 @@ func ValidateConfiguredBBBServers() {
 			fmt.Println("Error occurred validating the API settings: ", err)
 		}
 		runtimeBbbServers = append(runtimeBbbServers, server)
+		fmt.Printf("the server %s is configured with the api key '%s'", server.Hostname, server.SharedSecret)
 	}
 }
 

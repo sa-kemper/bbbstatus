@@ -26,10 +26,12 @@ import (
 )
 
 const getUserNameById = `-- name: GetUserNameById :one
-SELECT name FROM users WHERE internal_user_id = $1
+SELECT name
+FROM users
+WHERE internal_user_id = $1
 `
 
-func (q *Queries) GetUserNameById(internalUserID string) (string, error) {
+func (q *Queries) GetUserNameById(ctx context.Context, internalUserID string) (string, error) {
 	row := q.db.QueryRow(ctx, getUserNameById, internalUserID)
 	var name string
 	err := row.Scan(&name)

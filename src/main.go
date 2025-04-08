@@ -80,7 +80,6 @@ func main() {
 	}
 	initI18n()
 	initEchoFramework()
-
 	initRoutes()
 
 	echof.Logger.Fatal(echof.Start(confGet("HOST") + ":" + confGet("PORT")))

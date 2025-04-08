@@ -19,6 +19,7 @@ package main
 import (
 	"bbbstatus/internal/BBBAPI"
 	"bbbstatus/internal/BBBEvents"
+	db "bbbstatus/internal/database"
 	"context"
 	"encoding/json"
 	"errors"
@@ -95,6 +96,8 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	//goland:noinspection ALL
 	defer conn.Close(ctx)
 
+	dbQueries := db.New(conn)
+
 	// Query and parse meeting using the row.next and row.scan methode of pgx
 	err = conn.QueryRow(ctx, "SELECT * FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingID).Scan(
 		&meeting.InternalMeetingID,
@@ -158,31 +161,31 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 		//fmt.Println("DEBUG: recordings: ", recordings)
 	}
 
-	err, userEvents := FillMeetingUserEvents(ctx, internalMeetingID, conn)
+	userEvents, err := FillMeetingUserEvents(ctx, internalMeetingID, conn)
 	if err != nil {
 		return Report{}, err
 	}
 	timeline = append(timeline, userEvents...)
 
-	err, messageTimeline := FillMeetingMessageEvents(ctx, internalMeetingID, conn)
+	messageTimeline, err := FillMeetingMessageEvents(ctx, internalMeetingID, conn)
 	if err != nil {
 		return Report{}, err
 	}
 	timeline = append(timeline, messageTimeline...)
 
-	err, pollTimeline := FillMeetingPollEvents(ctx, internalMeetingID, conn, &polls)
+	pollTimeline, err := FillMeetingPollEvents(ctx, internalMeetingID, conn, &polls)
 	if err != nil {
 		return Report{}, err
 	}
 	timeline = append(timeline, pollTimeline...)
 
-	err, pollResponseTimeline := FillMeetingPollResponses(ctx, internalMeetingID, &polls, conn)
+	pollResponseTimeline, err := FillMeetingPollResponses(ctx, internalMeetingID, &polls, conn)
 	if err != nil {
 		return Report{}, err
 	}
 	timeline = append(timeline, pollResponseTimeline...)
 
-	err, meetingEventsTimeline := FillMeetingEvents(ctx, internalMeetingID, conn)
+	meetingEventsTimeline, err := FillMeetingEvents(ctx, internalMeetingID, dbQueries)
 	if err != nil {
 		return Report{}, err
 	}
@@ -200,32 +203,32 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	return Report{Details: details, Participants: participants, Recordings: recordings, Timeline: timeline}, nil
 }
 
-func FillMeetingEvents(ctx context.Context, id string, conn *pgx.Conn) (err error, timeline []Event) {
-	row, err := conn.Query(ctx, "SELECT event_type, event_timestamp FROM meeting_events WHERE internal_meeting_id = $1", id)
+func FillMeetingEvents(ctx context.Context, id string, dbQueries *db.Queries) ([]Event, error) {
+	meetingEvents, err := dbQueries.GetMeetingEventsByInternalMeetingID(ctx, id)
 	if err != nil {
-		return err, nil
+		return nil, fmt.Errorf("failed to get meeting events for meeting id %s: %w", id, err)
 	}
-	defer row.Close()
 
-	for row.Next() {
-		var meetingEvent Event
-		var eventType string
-		err = row.Scan(&eventType, &meetingEvent.Time)
-		if err != nil {
-			return err, nil
+	timeline := make([]Event, 0, len(meetingEvents))
+	for _, event := range meetingEvents {
+		if !event.EventTimestamp.Valid {
+			fmt.Println("WARNING: Meeting event with id ", id, " has an invalid timestamp, event type:", event.EventType)
+			continue // Skip invalid timestamps; log if needed
 		}
-		meetingEvent.TextRepresentation = Translate("MeetingEvent-" + eventType)
-		timeline = append(timeline, meetingEvent)
+		timeline = append(timeline, Event{
+			Time:               event.EventTimestamp.Time,
+			TextRepresentation: Translate("MeetingEvent-" + event.EventType),
+		})
 	}
-	return nil, timeline
+	return timeline, nil
 }
 
-func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, polls *[]string, conn *pgx.Conn) (err error, timeline []Event) {
+func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, polls *[]string, conn *pgx.Conn) (timeline []Event, err error) {
 	// insert the poll Answers into the timeline
 	for _, pollID := range *polls {
 		row, err := conn.Query(ctx, "SELECT internal_user_id, answer_ids, response_time FROM poll_responses WHERE poll_id = $1", pollID)
 		if err != nil {
-			return fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err), timeline
+			return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 		}
 		for row.Next() {
 			var event Event
@@ -242,14 +245,14 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 			err = json.Unmarshal([]byte(answerJSON), &poll.AnswerIds)
 			if err != nil {
 				fmt.Printf("error decoding answers of poll %s with json '%s'\n", poll.ID, answerJSON)
-				return err, timeline
+				return timeline, err
 			}
 
 			// we cannot use the same connection while the row is not closed.
 			conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 			if err != nil {
 				fmt.Println("error connecting to the database at least twice. ->", err)
-				return err, timeline
+				return timeline, err
 			}
 			err = conn2.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", user.InternalUserID).Scan(&user.Name)
 			if err != nil {
@@ -279,14 +282,14 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 		}
 		row.Close()
 	}
-	return err, timeline
+	return timeline, err
 }
 
-func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn, polls *[]string) (err error, timeline []Event) {
+func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn, polls *[]string) (timeline []Event, err error) {
 	// insert the polls into the timeline
 	row, err := conn.Query(ctx, "SELECT poll_id, internal_user_id, question, answers, created_at FROM polls WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
-		return fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err), timeline
+		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
 	for row.Next() {
 		var event Event
@@ -313,7 +316,7 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 		conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
-			return err, timeline
+			return timeline, err
 		}
 		err = conn2.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", userID).Scan(&userName)
 		if err != nil {
@@ -332,14 +335,14 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 
 	}
 	row.Close()
-	return err, timeline
+	return timeline, err
 }
 
-func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (err error, timeline []Event) {
+func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (timeline []Event, err error) {
 	// insert user messages into the timeline
 	row, err := conn.Query(ctx, "SELECT internal_user_id, message_content, send_time FROM chat_messages WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
-		return fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err), timeline
+		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
 	for row.Next() {
 		var event Event
@@ -373,19 +376,19 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, con
 			err = conn2.Close(ctx)
 			if err != nil {
 				fmt.Println("error closing the database connection when getting additional user information")
-				return err, timeline
+				return timeline, err
 			}
 		}
 	}
 	row.Close()
-	return err, timeline
+	return timeline, err
 }
 
-func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (err error, timeline []Event) {
+func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (timeline []Event, err error) {
 	// insert user events into the timeline
 	row, err := conn.Query(ctx, "SELECT event_timestamp, internal_user_id, event_type FROM user_events WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
-		return fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err), timeline
+		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
 	for row.Next() {
 		var event Event
@@ -396,7 +399,7 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, conn *
 		con2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
-			return err, timeline
+			return timeline, err
 		}
 		err = row.Scan(&event.Time, &userID, &eventType)
 		if err != nil {
@@ -406,13 +409,13 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, conn *
 		err = con2.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", userID).Scan(&userName)
 		if err != nil {
 			fmt.Println("error obtaining user information of user event")
-			return err, timeline
+			return timeline, err
 		}
 		event.TextRepresentation = TranslateAdvanced(eventType, map[string]string{"Username": userName})
 		timeline = append(timeline, event)
 	}
 	row.Close()
-	return err, timeline
+	return timeline, err
 }
 
 func FillMeetingParticipants(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (error, []BBBEvents.User) {

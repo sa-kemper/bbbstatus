@@ -24,6 +24,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -129,7 +130,7 @@ type BbbServer struct {
 }
 
 type ChatMessage struct {
-	MessageID         pgtype.UUID
+	MessageID         uuid.UUID
 	InternalMeetingID string
 	InternalUserID    string
 	ChatID            string
@@ -157,7 +158,7 @@ type Meeting struct {
 }
 
 type MeetingEvent struct {
-	EventID           pgtype.UUID
+	EventID           uuid.UUID
 	InternalMeetingID string
 	EventType         string
 	EventTimestamp    pgtype.Timestamp
@@ -168,15 +169,15 @@ type Poll struct {
 	InternalMeetingID string
 	InternalUserID    string
 	Question          string
-	Answers           []byte
+	Answers           string
 	CreatedAt         pgtype.Timestamp
 }
 
 type PollResponse struct {
-	ResponseID     pgtype.UUID
+	ResponseID     uuid.UUID
 	PollID         string
 	InternalUserID string
-	AnswerIds      []byte
+	AnswerIds      string
 	ResponseTime   pgtype.Timestamp
 }
 
@@ -191,7 +192,7 @@ type User struct {
 }
 
 type UserEvent struct {
-	EventID           pgtype.UUID
+	EventID           uuid.UUID
 	InternalMeetingID string
 	InternalUserID    string
 	EventType         string

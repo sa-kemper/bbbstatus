@@ -398,33 +398,19 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 	return timeline, err
 }
 
-func FillMeetingParticipants(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (error, []BBBEvents.User) {
+func FillMeetingParticipants(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (err error, participants []BBBEvents.User) {
 	// Query participants and parse them
-	var err error
-	var participants []BBBEvents.User
-	row, err := conn.Query(ctx, "SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1", internalMeetingID)
+	meetingUsers, err := dbQueries.GetUserIDsFromMeetingByMeetingID(ctx, internalMeetingID) // conn.Query(ctx, "SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
 		return fmt.Errorf("Error occured when generating report for Id %s: %v\n", internalMeetingID, err), nil
 	}
-	var participantIds []string
-	for row.Next() {
-		var participantID string
-		err = row.Scan(&participantID)
-		if err != nil {
-			fmt.Println(err)
-		}
-		participantIds = append(participantIds, participantID)
-	}
-	row.Close()
-
-	for _, participantID := range participantIds {
-		var user BBBEvents.User
-		err = conn.QueryRow(ctx, "SELECT internal_user_id, external_user_id, name, role, is_guest FROM users WHERE internal_user_id = $1", participantID).Scan(&user.InternalUserID, &user.ExternalUserID, &user.Name, &user.Role, &user.Guest)
+	for _, participantID := range meetingUsers {
+		dbUser, err := dbQueries.GetUserById(ctx, participantID) // conn.QueryRow(ctx, "SELECT internal_user_id, external_user_id, name, role, is_guest FROM users WHERE internal_user_id = $1", participantID).Scan(&user.InternalUserID, &user.ExternalUserID, &user.Name, &user.Role, &user.Guest)
 		if err != nil {
 			fmt.Println("Error occurred adding user to participants list:", err)
 			continue
 		}
-		participants = append(participants, user)
+		participants = append(participants, BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.Name, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool})
 	}
 
 	return err, participants

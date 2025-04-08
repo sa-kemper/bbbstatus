@@ -17,7 +17,7 @@
 package BBBAPI
 
 import (
-	"bbbstatus/internal/BBBEvents"
+	db "bbbstatus/internal/database"
 	"context"
 	"encoding/xml"
 	"fmt"
@@ -48,7 +48,7 @@ type GetRecordingsParameters struct {
 	Limit *int
 }
 
-func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters, meeting BBBEvents.Meeting) (result Recordings, err error) {
+func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters, meeting db.Meeting) (result Recordings, err error) {
 	var client = a.getHTTPClient()
 	var requestParameters = make(map[string]string)
 	var apiResponse GetRecordingsResponse

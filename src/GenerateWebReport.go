@@ -80,7 +80,6 @@ func init() { // Add all messages that are related to this file into the localiz
 }
 
 func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, error) {
-	var meeting BBBEvents.Meeting
 	var details []Detail
 	var participants []BBBEvents.User
 	var timeline []Event
@@ -99,36 +98,19 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 	dbQueries := db.New(conn)
 
 	// Query and parse meeting using the row.next and row.scan methode of pgx
-	err = conn.QueryRow(ctx, "SELECT * FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingID).Scan(
-		&meeting.InternalMeetingID,
-		&meeting.ExternalMeetingID,
-		&meeting.Name,
-		&meeting.IsBreakout,
-		&meeting.ParentID,
-		&meeting.CreateTime,
-		&meeting.ModeratorPass,
-		&meeting.ViewerPass,
-		&meeting.Record,
-		&meeting.VoiceConf,
-		&meeting.DialNumber,
-		&meeting.MaxUsers,
-		&meeting.Metadata,
-		&meeting.BbbHostname,
-		&meeting.ParticipantCount,
-		&meeting.MeetingEnded,
-	)
+	meeting, err := dbQueries.GetMeetingById(ctx, internalMeetingID)
 	if err != nil {
 		return Report{}, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
 
-	servers := confGetServers(meeting.BbbHostname)
+	servers := confGetServers(meeting.Bbbhostname)
 	var server bbbServer
 
 	if len(servers) < 1 {
 		panic("Unable to find BBBServer for meeting " + internalMeetingID)
 	} else {
 		server = servers[0]
-		if server.Hostname == meeting.BbbHostname {
+		if server.Hostname == meeting.Bbbhostname {
 			if server.APITimeout != 0 {
 				apitimeout := time.Duration(server.APITimeout) * time.Second
 				meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apitimeout}
@@ -236,7 +218,7 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 			var user = BBBEvents.User{}
 			var answerJSON string
 			var answersJSON string
-
+			var dbQueries = db.New(conn)
 			var err = row.Scan(&user.InternalUserID, &answerJSON, &event.Time)
 			if err != nil {
 				fmt.Println(err)
@@ -254,7 +236,7 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 				fmt.Println("error connecting to the database at least twice. ->", err)
 				return timeline, err
 			}
-			err = conn2.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", user.InternalUserID).Scan(&user.Name)
+			user.Name, err = dbQueries.GetUserNameById(ctx, user.InternalUserID)
 			if err != nil {
 				fmt.Println("error obtaining user information of poll answer")
 				fmt.Println(err)
@@ -274,7 +256,7 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 			if poll.Question == "" { // use a shortened version of the poll id if the question is empty.
 				poll.Question = string([]byte(pollID)[0:5])
 			}
-			event.TextRepresentation = TranslateAdvanced("ReportPollResponseEventRepresentation", map[string]string{"username": user.Name, "pollQuestion": poll.Question, "pollAnswer": poll.Answers[poll.AnswerIds[0]].Key}) // fmt.Sprintf("%s responded to a poll '%s' with %s", user.Name, poll.Question, poll.Answers[poll.AnswerIds[0]].Key)
+			event.TextRepresentation = TranslateAdvanced("ReportPollResponseEventRepresentation", map[string]string{"username": user.Name, "pollQuestion": poll.Question, "pollAnswer": poll.Answers[poll.AnswerIds[0]].Key})
 			timeline = append(timeline, event)
 			//goland:noinspection ALL
 			conn2.Close(ctx)
@@ -328,7 +310,7 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 			question = string([]byte(pollId)[0:5])
 		}
 
-		event.TextRepresentation = TranslateAdvanced("ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation}) // fmt.Sprintf("%s started a poll '%s', with options: %s", userName, question, answersTextRepresentation)
+		event.TextRepresentation = TranslateAdvanced("ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
 		timeline = append(timeline, event)
 		//goland:noinspection ALL
 		conn2.Close(ctx)
@@ -340,7 +322,7 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 
 func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []Event, err error) {
 	// insert user messages into the timeline
-	meetingMessages, err := dbQueries.GetMeetingMessagesByID(ctx, internalMeetingID) // conn.Query(ctx, "SELECT internal_user_id, message_content, send_time FROM chat_messages WHERE internal_meeting_id = $1", internalMeetingID)
+	meetingMessages, err := dbQueries.GetMeetingMessagesByID(ctx, internalMeetingID)
 	if err != nil {
 		return timeline, fmt.Errorf("Unable to obtaib meeting messages with Id %s: %v\n", internalMeetingID, err)
 	}
@@ -375,7 +357,7 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 
 func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []Event, err error) {
 	// insert user events into the timeline
-	meetingEvents, err := dbQueries.GetUserEventsByMeetingID(ctx, internalMeetingID) // conn.Query(ctx, "SELECT event_timestamp, internal_user_id, event_type FROM user_events WHERE internal_meeting_id = $1", internalMeetingID)
+	meetingEvents, err := dbQueries.GetUserEventsByMeetingID(ctx, internalMeetingID)
 	if err != nil {
 		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
@@ -400,12 +382,12 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 
 func FillMeetingParticipants(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (participants []BBBEvents.User, err error) {
 	// Query participants and parse them
-	meetingUsers, err := dbQueries.GetUserIDsFromMeetingByMeetingID(ctx, internalMeetingID) // conn.Query(ctx, "SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1", internalMeetingID)
+	meetingUsers, err := dbQueries.GetUserIDsFromMeetingByMeetingID(ctx, internalMeetingID)
 	if err != nil {
 		return nil, fmt.Errorf("Error occured when generating report for Id %s: %v\n", internalMeetingID, err)
 	}
 	for _, participantID := range meetingUsers {
-		dbUser, err := dbQueries.GetUserById(ctx, participantID) // conn.QueryRow(ctx, "SELECT internal_user_id, external_user_id, name, role, is_guest FROM users WHERE internal_user_id = $1", participantID).Scan(&user.InternalUserID, &user.ExternalUserID, &user.Name, &user.Role, &user.Guest)
+		dbUser, err := dbQueries.GetUserById(ctx, participantID)
 		if err != nil {
 			fmt.Println("Error occurred adding user to participants list:", err)
 			continue
@@ -416,11 +398,11 @@ func FillMeetingParticipants(ctx context.Context, internalMeetingID string, dbQu
 	return participants, err
 }
 
-func FillMeetingDetails(details []Detail, meeting BBBEvents.Meeting) []Detail {
+func FillMeetingDetails(details []Detail, meeting db.Meeting) []Detail {
 	// Load Details
 	details = append(details, Detail{Translate("ReportMeetingDetailMeetingName"), meeting.Name})
 	details = append(details, Detail{Translate("ReportMeetingDetailInternalMeetingID"), meeting.InternalMeetingID})
-	details = append(details, Detail{Translate("ReportMeetingDetailBBBHostname"), meeting.BbbHostname})
-	details = append(details, Detail{Translate("ReportMeetingDetailCreationDate"), meeting.CreateTime.Format("02.01.2006")})
+	details = append(details, Detail{Translate("ReportMeetingDetailBBBHostname"), meeting.Bbbhostname})
+	details = append(details, Detail{Translate("ReportMeetingDetailCreationDate"), meeting.CreateTime.Time.Format("02.01.2006")})
 	return details
 }

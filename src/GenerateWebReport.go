@@ -338,49 +338,38 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 	return timeline, err
 }
 
-func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (timeline []Event, err error) {
+func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []Event, err error) {
 	// insert user messages into the timeline
-	row, err := conn.Query(ctx, "SELECT internal_user_id, message_content, send_time FROM chat_messages WHERE internal_meeting_id = $1", internalMeetingID)
+	meetingMessages, err := dbQueries.GetMeetingMessagesByID(ctx, internalMeetingID) // conn.Query(ctx, "SELECT internal_user_id, message_content, send_time FROM chat_messages WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
-		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
+		return timeline, fmt.Errorf("Unable to obtaib meeting messages with Id %s: %v\n", internalMeetingID, err)
 	}
-	for row.Next() {
-		var event Event
-		var chatMessageContent string
-		var chatMessageUserID string
+	for _, message := range meetingMessages {
+		var event = Event{}
 		var userName string
-		err = row.Scan(&chatMessageUserID, &chatMessageContent, &event.Time)
-		if err != nil {
-			fmt.Println(err)
+		if !message.SendTime.Valid {
+			fmt.Println("WARNING chat message has no sent time", message)
+			continue
 		}
 
+		event.Time = message.SendTime.Time
+
 		// Handle system message.
-		if chatMessageUserID == "SYSTEM" {
-			event.TextRepresentation = TranslateAdvanced("SystemSentMessage", map[string]string{"Message": chatMessageContent})
+		if message.InternalUserID == "SYSTEM" {
+			event.TextRepresentation = TranslateAdvanced("SystemSentMessage", map[string]string{"Message": message.MessageContent})
 			timeline = append(timeline, event)
 			continue
 		}
 
 		// we cannot use the same connection while the row is not closed.
-		conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+		userName, err = dbQueries.GetUserNameById(ctx, message.InternalUserID)
 		if err != nil {
-			fmt.Println("error connecting to the database at least twice. ->", err)
-		} else {
-			err = conn2.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", chatMessageUserID).Scan(&userName)
-			if err != nil {
-				fmt.Println("error obtaining user information of chat message")
-				fmt.Println(err)
-			}
-			event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": userName, "Message": chatMessageContent})
-			timeline = append(timeline, event)
-			err = conn2.Close(ctx)
-			if err != nil {
-				fmt.Println("error closing the database connection when getting additional user information")
-				return timeline, err
-			}
+			fmt.Println("error obtaining user information of chat message")
+			fmt.Println(err)
 		}
+		event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": userName, "Message": message.MessageContent})
+		timeline = append(timeline, event)
 	}
-	row.Close()
 	return timeline, err
 }
 

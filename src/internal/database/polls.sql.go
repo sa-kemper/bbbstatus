@@ -28,7 +28,9 @@ import (
 )
 
 const getPollAnswersByPollID = `-- name: GetPollAnswersByPollID :many
-SELECT answers FROM polls WHERE poll_id = $1
+SELECT answers
+FROM polls
+WHERE poll_id = $1
 `
 
 func (q *Queries) GetPollAnswersByPollID(ctx context.Context, pollID string) ([]string, error) {
@@ -52,7 +54,9 @@ func (q *Queries) GetPollAnswersByPollID(ctx context.Context, pollID string) ([]
 }
 
 const getPollResponsesByPollID = `-- name: GetPollResponsesByPollID :many
-SELECT internal_user_id, answer_ids, response_time FROM poll_responses WHERE poll_id = $1
+SELECT internal_user_id, answer_ids, response_time
+FROM poll_responses
+WHERE poll_id = $1
 `
 
 type GetPollResponsesByPollIDRow struct {

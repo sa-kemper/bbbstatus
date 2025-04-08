@@ -373,37 +373,28 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 	return timeline, err
 }
 
-func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (timeline []Event, err error) {
+func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []Event, err error) {
 	// insert user events into the timeline
-	row, err := conn.Query(ctx, "SELECT event_timestamp, internal_user_id, event_type FROM user_events WHERE internal_meeting_id = $1", internalMeetingID)
+	meetingEvents, err := dbQueries.GetUserEventsByMeetingID(ctx, internalMeetingID) // conn.Query(ctx, "SELECT event_timestamp, internal_user_id, event_type FROM user_events WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
 		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
-	for row.Next() {
-		var event Event
-		var userID string
-		var userName string
-		var eventType string
 
-		con2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	for _, userEvent := range meetingEvents { // convert each row in the db to a Event object so it can be used by the frontend template
+		var userName, err = dbQueries.GetUserNameById(ctx, userEvent.InternalUserID) // obtain username for the text representation
 		if err != nil {
-			fmt.Println("error connecting to the database at least twice. ->", err)
-			return timeline, err
-		}
-		err = row.Scan(&event.Time, &userID, &eventType)
-		if err != nil {
-			fmt.Println(err)
+			fmt.Println("WARNING obtaining user information of user event", userEvent)
+			continue
 		}
 
-		err = con2.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", userID).Scan(&userName)
-		if err != nil {
-			fmt.Println("error obtaining user information of user event")
-			return timeline, err
+		if !userEvent.EventTimestamp.Valid { // handle unlikely but possible
+			fmt.Println("WARNING user event has no sent time", userEvent)
+			continue
 		}
-		event.TextRepresentation = TranslateAdvanced(eventType, map[string]string{"Username": userName})
+
+		var event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: TranslateAdvanced(userEvent.EventType, map[string]string{"Username": userName})}
 		timeline = append(timeline, event)
 	}
-	row.Close()
 	return timeline, err
 }
 

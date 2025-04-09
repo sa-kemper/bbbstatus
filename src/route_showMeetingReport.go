@@ -61,13 +61,17 @@ func showMeetingReport(c echo.Context) error {
 	// Query and parse meeting using the row.next and row.scan methode of pgx
 	meetingExists, err = dbQueries.GetMeetingExistsByID(ctx, internalMeetingId)
 	if !meetingExists || err != nil {
-		fmt.Println(err)
+		if errors.Is(err, os.ErrDeadlineExceeded) {
+			fmt.Println("FATAL: database timeout!")
+		}
+		fmt.Println("error occured while checking meeting existence", err)
 		return c.Render(http.StatusNotFound, "notfound", nil)
 	}
 
 	report, err := GenerateWebReport(ctx, internalMeetingId)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
+			fmt.Println("FATAL: database timeout!")
 			return c.Render(http.StatusGatewayTimeout, "errorPage", frontendError{ErrorTitle: Translate("ErrorTitleApplicationTimeout"), ErrorParagraph: Translate("ErrorParagraphApplicationTimeout")})
 		}
 		fmt.Println(err)

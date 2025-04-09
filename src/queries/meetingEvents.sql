@@ -1,4 +1,4 @@
 -- name: GetMeetingEventsByInternalMeetingID :many
-SELECT event_type, event_timestamp
+SELECT *
 FROM meeting_events
 WHERE internal_meeting_id = $1;

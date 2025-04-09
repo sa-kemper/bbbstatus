@@ -23,33 +23,25 @@ package bbbstatus
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getUserById = `-- name: GetUserById :one
-SELECT internal_user_id, external_user_id, name, role, is_guest
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp
 FROM users
 WHERE internal_user_id = $1
 `
 
-type GetUserByIdRow struct {
-	InternalUserID string
-	ExternalUserID string
-	Name           string
-	Role           string
-	IsGuest        pgtype.Bool
-}
-
-func (q *Queries) GetUserById(ctx context.Context, internalUserID string) (GetUserByIdRow, error) {
+func (q *Queries) GetUserById(ctx context.Context, internalUserID string) (User, error) {
 	row := q.db.QueryRow(ctx, getUserById, internalUserID)
-	var i GetUserByIdRow
+	var i User
 	err := row.Scan(
 		&i.InternalUserID,
 		&i.ExternalUserID,
 		&i.Name,
 		&i.Role,
 		&i.IsGuest,
+		&i.JoinTimestamp,
+		&i.LeaveTimestamp,
 	)
 	return i, err
 }

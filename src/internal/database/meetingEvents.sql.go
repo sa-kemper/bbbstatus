@@ -23,31 +23,29 @@ package bbbstatus
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getMeetingEventsByInternalMeetingID = `-- name: GetMeetingEventsByInternalMeetingID :many
-SELECT event_type, event_timestamp
+SELECT event_id, internal_meeting_id, event_type, event_timestamp
 FROM meeting_events
 WHERE internal_meeting_id = $1
 `
 
-type GetMeetingEventsByInternalMeetingIDRow struct {
-	EventType      string
-	EventTimestamp pgtype.Timestamp
-}
-
-func (q *Queries) GetMeetingEventsByInternalMeetingID(ctx context.Context, internalMeetingID string) ([]GetMeetingEventsByInternalMeetingIDRow, error) {
+func (q *Queries) GetMeetingEventsByInternalMeetingID(ctx context.Context, internalMeetingID string) ([]MeetingEvent, error) {
 	rows, err := q.db.Query(ctx, getMeetingEventsByInternalMeetingID, internalMeetingID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetMeetingEventsByInternalMeetingIDRow
+	var items []MeetingEvent
 	for rows.Next() {
-		var i GetMeetingEventsByInternalMeetingIDRow
-		if err := rows.Scan(&i.EventType, &i.EventTimestamp); err != nil {
+		var i MeetingEvent
+		if err := rows.Scan(
+			&i.EventID,
+			&i.InternalMeetingID,
+			&i.EventType,
+			&i.EventTimestamp,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

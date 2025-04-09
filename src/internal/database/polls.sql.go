@@ -23,8 +23,6 @@ package bbbstatus
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getPollAnswersByPollID = `-- name: GetPollAnswersByPollID :many
@@ -54,27 +52,27 @@ func (q *Queries) GetPollAnswersByPollID(ctx context.Context, pollID string) ([]
 }
 
 const getPollResponsesByPollID = `-- name: GetPollResponsesByPollID :many
-SELECT internal_user_id, answer_ids, response_time
+SELECT response_id, poll_id, internal_user_id, answer_ids, response_time
 FROM poll_responses
 WHERE poll_id = $1
 `
 
-type GetPollResponsesByPollIDRow struct {
-	InternalUserID string
-	AnswerIds      string
-	ResponseTime   pgtype.Timestamp
-}
-
-func (q *Queries) GetPollResponsesByPollID(ctx context.Context, pollID string) ([]GetPollResponsesByPollIDRow, error) {
+func (q *Queries) GetPollResponsesByPollID(ctx context.Context, pollID string) ([]PollResponse, error) {
 	rows, err := q.db.Query(ctx, getPollResponsesByPollID, pollID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetPollResponsesByPollIDRow
+	var items []PollResponse
 	for rows.Next() {
-		var i GetPollResponsesByPollIDRow
-		if err := rows.Scan(&i.InternalUserID, &i.AnswerIds, &i.ResponseTime); err != nil {
+		var i PollResponse
+		if err := rows.Scan(
+			&i.ResponseID,
+			&i.PollID,
+			&i.InternalUserID,
+			&i.AnswerIds,
+			&i.ResponseTime,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

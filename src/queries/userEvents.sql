@@ -1,5 +1,5 @@
 -- name: GetUserEventsByMeetingID :many
-SELECT event_timestamp, internal_user_id, event_type
+SELECT *
 FROM user_events
 WHERE internal_meeting_id = $1;
 

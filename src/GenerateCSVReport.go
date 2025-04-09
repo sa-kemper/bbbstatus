@@ -75,7 +75,7 @@ func init() {
 func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, error) {
 	var result string
 	var timeline []CSVEvent
-	var polls *[]string
+	var polls []string
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
@@ -108,25 +108,25 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 		return nil, err
 	}
 
-	userEventTimeline, err := FillCSVUserEvents(ctx, internalMeetingID, conn)
+	userEventTimeline, err := FillCSVUserEvents(ctx, internalMeetingID, dbQueries)
 	if err != nil {
 		fmt.Println("error occurred while filling user event timeline (GenerateCSVReport)", err.Error())
 		return nil, err
 	}
 
-	pollTimeline, err := FillCsvPollEvents(ctx, internalMeetingID, conn, polls)
+	pollTimeline, err := FillCsvPollEvents(ctx, internalMeetingID, conn, &polls)
 	if err != nil {
 		fmt.Println("error occurred while filling poll timeline (GenerateCSVReport)", err.Error())
 		return nil, err
 	}
 
-	pollResponseTimeline, err := FillCsvPollResponses(ctx, conn, internalMeetingID, polls)
+	pollResponseTimeline, err := FillCsvPollResponses(ctx, internalMeetingID, &polls, conn)
 	if err != nil {
 		fmt.Println("error occurred while filling poll responses (GenerateCSVReport)", err.Error())
 		return nil, err
 	}
 
-	meetingEventTimeline, err := FillCsvMeetingEvents(ctx, conn, internalMeetingID)
+	meetingEventTimeline, err := FillCsvMeetingEvents(ctx, internalMeetingID, dbQueries)
 	if err != nil {
 		fmt.Println("error occurred while filling meeting event timeline (GenerateCSVReport)", err.Error())
 		return nil, err
@@ -155,18 +155,13 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 	return []byte(result), nil
 }
 
-func FillCsvMeetingEvents(ctx context.Context, conn *pgx.Conn, internalMeetingId string) (timeline []CSVEvent, err error) {
-	row, err := conn.Query(ctx, "SELECT event_type, event_timestamp FROM meeting_events WHERE internal_meeting_id=$1", internalMeetingId)
+func FillCsvMeetingEvents(ctx context.Context, internalMeetingId string, dbQueries *db.Queries) (timeline []CSVEvent, err error) {
+	meetingEvents, err := dbQueries.GetMeetingEventsByInternalMeetingID(ctx, internalMeetingId)
 	if err != nil {
 		return nil, err
 	}
-	defer row.Close()
-	for row.Next() {
-		var event = CSVEvent{User: "SYSTEM"}
-		var eventId string
-		err = row.Scan(&eventId, &event.Time)
-		event.TextRepresentation = Translate("CSVMeetingEvent-" + eventId)
-		event.Action = Translate("CSVMeetingAction-" + eventId)
+	for _, dbEvent := range meetingEvents {
+		var event = CSVEvent{Time: dbEvent.EventTimestamp.Time, User: "SYSTEM", TextRepresentation: Translate("CSVMeetingAction-" + dbEvent.EventType)}
 		timeline = append(timeline, event)
 	}
 
@@ -231,37 +226,24 @@ func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, dbQueri
 	return timeline, err
 }
 
-func FillCSVUserEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (timeline []CSVEvent, err error) {
+func FillCSVUserEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []CSVEvent, err error) {
 	// insert user events into the timeline
-	row, err := conn.Query(ctx, "SELECT event_timestamp, internal_user_id, event_type FROM user_events WHERE internal_meeting_id = $1", internalMeetingID)
+	userEvents, err := dbQueries.GetUserEventsByMeetingID(ctx, internalMeetingID)
 	if err != nil {
 		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
-	for row.Next() {
-		var event CSVEvent
-		var userID string
-		var eventType string
-
-		con2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
-		if err != nil {
-			fmt.Println("error connecting to the database at least twice. ->", err)
-			return timeline, err
-		}
-		err = row.Scan(&event.Time, &userID, &eventType)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		err = con2.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", userID).Scan(&event.User)
+	for _, dbEvent := range userEvents {
+		var event = CSVEvent{Time: dbEvent.EventTimestamp.Time}
+		event.User, err = dbQueries.GetUserNameById(ctx, dbEvent.InternalUserID)
 		if err != nil {
 			fmt.Println("error obtaining user information of user event")
 			return timeline, err
 		}
-		event.TextRepresentation = TranslateAdvanced(eventType, map[string]string{"Username": event.User})
-		event.Action = Translate("CSVReportAction-" + eventType)
+
+		event.TextRepresentation = TranslateAdvanced(dbEvent.EventType, map[string]string{"Username": event.User})
+		event.Action = Translate("CSVReportAction-" + dbEvent.EventType)
 		timeline = append(timeline, event)
 	}
-	row.Close()
 	return timeline, err
 }
 
@@ -318,7 +300,7 @@ func FillCsvPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.
 	return timeline, err
 }
 
-func FillCsvPollResponses(ctx context.Context, conn *pgx.Conn, internalMeetingID string, polls *[]string) (timeline []CSVEvent, err error) {
+func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *[]string, conn *pgx.Conn) (timeline []CSVEvent, err error) {
 	// insert the poll Answers into the timeline
 	for _, pollID := range *polls {
 		row, err := conn.Query(ctx, "SELECT internal_user_id, answer_ids, response_time FROM poll_responses WHERE poll_id = $1", pollID)

@@ -1,5 +1,5 @@
 -- name: GetPollResponsesByPollID :many
-SELECT internal_user_id, answer_ids, response_time
+SELECT *
 FROM poll_responses
 WHERE poll_id = $1;
 

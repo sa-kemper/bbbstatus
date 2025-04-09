@@ -17,6 +17,7 @@
 package main
 
 import (
+	db "bbbstatus/internal/database"
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -24,14 +25,12 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 )
 
 func downloadMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
-	var meetingName string
-	var meetingDate time.Time
-	var report, err = GenerateCSVReport(c.Request().Context(), internalMeetingId)
+	var ctx = c.Request().Context()
+	var report, err = GenerateCSVReport(ctx, internalMeetingId)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) { // this function may execute for a considerable amount of time. It's not completely unreasonable to assume that it may exceed time limits.
 			fmt.Println("Generate CSV Report Timed out.")
@@ -39,15 +38,23 @@ func downloadMeetingReport(c echo.Context) error {
 		return c.Render(http.StatusInternalServerError, "error", frontendError{ErrorTitle: Translate("ErrorTitleApplicationTimeout"), ErrorParagraph: Translate("ErrorParagraphApplicationTimeout")})
 	}
 
-	conn, err := pgx.Connect(c.Request().Context(), confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = conn.QueryRow(c.Request().Context(), "SELECT create_time, name FROM meetings WHERE internal_meeting_id = $1", internalMeetingId).Scan(&meetingDate, &meetingName)
+	defer conn.Close(ctx)
+	dbQueries := db.New(conn)
+
+	meeting, err := dbQueries.GetMeetingById(ctx, internalMeetingId)
 	if err != nil {
 		fmt.Println(err)
 	}
-	meetingName = strings.ReplaceAll(strings.ReplaceAll(meetingName, " ", "-"), "'", "")
-	c.Response().Header().Set("Content-Disposition", "attachment; filename="+fmt.Sprintf("bbbstatus-meeting-report-%s-%s.csv", meetingName, meetingDate.Format("2006-02-01")))
+
+	if !meeting.CreateTime.Valid {
+		fmt.Println("WARNING: meeting create time is invalid, looks like a data inconsistency.")
+	}
+
+	meeting.Name = strings.ReplaceAll(strings.ReplaceAll(meeting.Name, " ", "-"), "'", "")
+	c.Response().Header().Set("Content-Disposition", "attachment; filename="+fmt.Sprintf("bbbstatus-meeting-report-%s-%s.csv", meeting.Name, meeting.CreateTime.Time.Format("2006-02-01")))
 	return c.Blob(http.StatusOK, "text/csv", report)
 }

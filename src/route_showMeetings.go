@@ -17,9 +17,11 @@ package main
 
 import (
 	"bbbstatus/internal/BBBEvents"
+	db "bbbstatus/internal/database"
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
@@ -84,43 +86,51 @@ func showMeetings(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	dbQueries := db.New(conn)
+
 	//goland:noinspection ALL
 	defer conn.Close(ctx)
 	var meetings []MeetingListMeetingWrapper
-	var rows pgx.Rows
 	if isFilteredRequest {
 		if endDate.IsZero() {
 			endDate = time.Now()
 		}
 		endDate = endDate.Add(time.Hour * 25) // make the end date inclusive.
-		rows, err = conn.Query(ctx, "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, meeting_ended FROM meetings WHERE create_time BETWEEN $1 AND $2", startDate, endDate)
-
-	} else {
-		rows, err = conn.Query(ctx, "SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, meeting_ended FROM meetings")
-	}
-	if err != nil {
-		if errors.Is(err, os.ErrDeadlineExceeded) {
-			fmt.Println("FATAL: Database timed out")
-		}
-
-		return err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var m MeetingListMeetingWrapper
-		err = rows.Scan(&m.BBBEventsMeeting.InternalMeetingID, &m.BBBEventsMeeting.ExternalMeetingID, &m.BBBEventsMeeting.Name, &m.BBBEventsMeeting.IsBreakout, &m.BBBEventsMeeting.ParentID, &m.BBBEventsMeeting.CreateTime, &m.BBBEventsMeeting.ModeratorPass, &m.BBBEventsMeeting.ViewerPass, &m.BBBEventsMeeting.Record, &m.BBBEventsMeeting.VoiceConf, &m.BBBEventsMeeting.DialNumber, &m.BBBEventsMeeting.MaxUsers, &m.BBBEventsMeeting.Metadata, &m.BbbHostname, &m.BBBEventsMeeting.MeetingEnded)
+		dbMeetings, err := dbQueries.GetMeetingsBetweenDates(ctx, db.GetMeetingsBetweenDatesParams{
+			CreateTime: pgtype.Timestamp{
+				Valid: true,
+				Time:  startDate,
+			},
+			CreateTime_2: pgtype.Timestamp{
+				Valid: true,
+				Time:  endDate,
+			},
+		})
 		if err != nil {
-			fmt.Println("FATAL ERROR occurred, Cannot read meeting from database:", err)
+			if errors.Is(err, os.ErrDeadlineExceeded) {
+				fmt.Println("FATAL: Database timed out")
+			}
+			fmt.Println("Error occurred in GetMeetingsBetweenDates: ", err)
 			return err
 		}
-		m.BBBEventsMeeting.CreateDate = m.BBBEventsMeeting.CreateTime.Format("02.01.2006")
-		if m.BBBEventsMeeting.MeetingEnded == nil {
-			m.Active = true
-		} else {
-			// if a meeting has a end time stamp it's no longer active
-			m.Active = false
+
+		for _, m := range dbMeetings {
+			rm := BBBEvents.ConvertDBToBBBMeeting(m)
+			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Time.Before(time.Now())})
 		}
-		meetings = append(meetings, m)
+	} else {
+		dbMeetings, err := dbQueries.GetMeetings(ctx)
+		if err != nil {
+			if errors.Is(err, os.ErrDeadlineExceeded) {
+				fmt.Println("FATAL: Database timed out")
+			}
+			fmt.Println("Error getting meetings", err.Error())
+			return err
+		}
+		for _, m := range dbMeetings {
+			rm := BBBEvents.ConvertDBToBBBMeeting(m)
+			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Time.Before(time.Now())})
+		}
 	}
 
 	sort.Slice(meetings, func(i, j int) bool {

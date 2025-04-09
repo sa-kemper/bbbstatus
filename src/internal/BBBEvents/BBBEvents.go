@@ -17,6 +17,8 @@
 package BBBEvents
 
 import (
+	db "bbbstatus/internal/database"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -63,6 +65,79 @@ type Meeting struct {
 	BbbHostname       string
 	MeetingEnded      *time.Time
 	ParticipantCount  int
+}
+
+func ConvertDBToBBBMeeting(dbMeeting db.Meeting) Meeting {
+	// Handle ParentID conversion
+	var parentID *string
+	if dbMeeting.ParentID.Valid {
+		parentID = &dbMeeting.ParentID.String
+	}
+
+	// Handle CreateTime conversion
+	var createTime time.Time
+	var createTimestamp int64
+	if dbMeeting.CreateTime.Valid {
+		createTime = dbMeeting.CreateTime.Time
+		createTimestamp = createTime.UnixMilli()
+	}
+
+	// Handle MeetingEnded conversion
+	var meetingEnded *time.Time
+	if dbMeeting.MeetingEnded.Valid {
+		meetingEnded = &dbMeeting.MeetingEnded.Time
+	}
+
+	// Convert Metadata from []byte to map[string]string
+	metadata := make(map[string]string)
+	if len(dbMeeting.Metadata) > 0 {
+		json.Unmarshal(dbMeeting.Metadata, &metadata)
+	}
+
+	// Handle MaxUsers conversion
+	maxUsers := 0
+	if dbMeeting.MaxUsers.Valid {
+		maxUsers = int(dbMeeting.MaxUsers.Int32)
+	}
+
+	// Handle ParticipantCount conversion
+	participantCount := 0
+	if dbMeeting.ParticipantCount.Valid {
+		participantCount = int(dbMeeting.ParticipantCount.Int32)
+	}
+
+	// Handle VoiceConf conversion
+	voiceConf := ""
+	if dbMeeting.VoiceConf.Valid {
+		voiceConf = dbMeeting.VoiceConf.String
+	}
+
+	// Handle DialNumber conversion
+	dialNumber := ""
+	if dbMeeting.DialNumber.Valid {
+		dialNumber = dbMeeting.DialNumber.String
+	}
+
+	return Meeting{
+		InternalMeetingID: dbMeeting.InternalMeetingID,
+		ExternalMeetingID: dbMeeting.ExternalMeetingID,
+		Name:              dbMeeting.Name,
+		IsBreakout:        dbMeeting.IsBreakout.Bool,
+		ParentID:          parentID,
+		CreateTimeStamp:   createTimestamp,
+		CreateTime:        createTime,
+		CreateDate:        createTime.Format("2006-01-02"),
+		ModeratorPass:     dbMeeting.ModeratorPass,
+		ViewerPass:        dbMeeting.ViewerPass,
+		Record:            dbMeeting.Record.Bool,
+		VoiceConf:         voiceConf,
+		DialNumber:        dialNumber,
+		MaxUsers:          maxUsers,
+		Metadata:          metadata,
+		BbbHostname:       dbMeeting.Bbbhostname,
+		MeetingEnded:      meetingEnded,
+		ParticipantCount:  participantCount,
+	}
 }
 
 // User represents a meeting participant

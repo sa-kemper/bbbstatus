@@ -23,10 +23,15 @@ package bbbstatus
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getMeetingById = `-- name: GetMeetingById :one
-SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended FROM meetings WHERE internal_meeting_id = $1 LIMIT 1
+SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended
+FROM meetings
+WHERE internal_meeting_id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetMeetingById(ctx context.Context, internalMeetingID string) (Meeting, error) {
@@ -51,4 +56,91 @@ func (q *Queries) GetMeetingById(ctx context.Context, internalMeetingID string) 
 		&i.MeetingEnded,
 	)
 	return i, err
+}
+
+const getMeetings = `-- name: GetMeetings :many
+SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended FROM meetings
+`
+
+func (q *Queries) GetMeetings(ctx context.Context) ([]Meeting, error) {
+	rows, err := q.db.Query(ctx, getMeetings)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Meeting
+	for rows.Next() {
+		var i Meeting
+		if err := rows.Scan(
+			&i.InternalMeetingID,
+			&i.ExternalMeetingID,
+			&i.Name,
+			&i.IsBreakout,
+			&i.ParentID,
+			&i.CreateTime,
+			&i.ModeratorPass,
+			&i.ViewerPass,
+			&i.Record,
+			&i.VoiceConf,
+			&i.DialNumber,
+			&i.MaxUsers,
+			&i.Metadata,
+			&i.Bbbhostname,
+			&i.ParticipantCount,
+			&i.MeetingEnded,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMeetingsBetweenDates = `-- name: GetMeetingsBetweenDates :many
+SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended FROM meetings WHERE create_time BETWEEN $1 AND $2
+`
+
+type GetMeetingsBetweenDatesParams struct {
+	CreateTime   pgtype.Timestamp
+	CreateTime_2 pgtype.Timestamp
+}
+
+func (q *Queries) GetMeetingsBetweenDates(ctx context.Context, arg GetMeetingsBetweenDatesParams) ([]Meeting, error) {
+	rows, err := q.db.Query(ctx, getMeetingsBetweenDates, arg.CreateTime, arg.CreateTime_2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Meeting
+	for rows.Next() {
+		var i Meeting
+		if err := rows.Scan(
+			&i.InternalMeetingID,
+			&i.ExternalMeetingID,
+			&i.Name,
+			&i.IsBreakout,
+			&i.ParentID,
+			&i.CreateTime,
+			&i.ModeratorPass,
+			&i.ViewerPass,
+			&i.Record,
+			&i.VoiceConf,
+			&i.DialNumber,
+			&i.MaxUsers,
+			&i.Metadata,
+			&i.Bbbhostname,
+			&i.ParticipantCount,
+			&i.MeetingEnded,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

@@ -58,8 +58,20 @@ func (q *Queries) GetMeetingById(ctx context.Context, internalMeetingID string) 
 	return i, err
 }
 
+const getMeetingExistsByID = `-- name: GetMeetingExistsByID :one
+SELECT TRUE FROM meetings WHERE internal_meeting_id = $1 LIMIT 1
+`
+
+func (q *Queries) GetMeetingExistsByID(ctx context.Context, internalMeetingID string) (bool, error) {
+	row := q.db.QueryRow(ctx, getMeetingExistsByID, internalMeetingID)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const getMeetings = `-- name: GetMeetings :many
-SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended FROM meetings
+SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended
+FROM meetings
 `
 
 func (q *Queries) GetMeetings(ctx context.Context) ([]Meeting, error) {
@@ -100,7 +112,9 @@ func (q *Queries) GetMeetings(ctx context.Context) ([]Meeting, error) {
 }
 
 const getMeetingsBetweenDates = `-- name: GetMeetingsBetweenDates :many
-SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended FROM meetings WHERE create_time BETWEEN $1 AND $2
+SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended
+FROM meetings
+WHERE create_time BETWEEN $1 AND $2
 `
 
 type GetMeetingsBetweenDatesParams struct {

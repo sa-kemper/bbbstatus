@@ -13,3 +13,9 @@ WHERE create_time BETWEEN $1 AND $2;
 -- name: GetMeetings :many
 SELECT *
 FROM meetings;
+
+-- name: GetMeetingExistsByID :one
+SELECT TRUE
+FROM meetings
+WHERE internal_meeting_id = $1
+LIMIT 1;

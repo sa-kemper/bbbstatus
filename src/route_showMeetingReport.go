@@ -18,6 +18,7 @@ package main
 
 import (
 	"bbbstatus/internal/BBBEvents"
+	db "bbbstatus/internal/database"
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -42,7 +43,7 @@ func init() { // Add all messages that are related to this file into the localiz
 func showMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
-	var meetingExtists bool
+	var meetingExists bool
 	var ctx = c.Request().Context()
 	localizer = i18n.NewLocalizer(Bundle, requestLanguage, language.English.String())
 
@@ -51,12 +52,15 @@ func showMeetingReport(c echo.Context) error {
 	if err != nil {
 		return fmt.Errorf("Unable to connect to database: %v\n", err)
 	}
+
+	dbQueries := db.New(conn)
+
 	//goland:noinspection ALL
 	defer conn.Close(ctx)
 
 	// Query and parse meeting using the row.next and row.scan methode of pgx
-	err = conn.QueryRow(ctx, "SELECT TRUE FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingId).Scan(&meetingExtists)
-	if !meetingExtists || err != nil {
+	meetingExists, err = dbQueries.GetMeetingExistsByID(ctx, internalMeetingId)
+	if !meetingExists || err != nil {
 		fmt.Println(err)
 		return c.Render(http.StatusNotFound, "notfound", nil)
 	}

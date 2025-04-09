@@ -23,32 +23,31 @@ package bbbstatus
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getMeetingMessagesByID = `-- name: GetMeetingMessagesByID :many
-SELECT internal_user_id, message_content, send_time
+SELECT message_id, internal_meeting_id, internal_user_id, chat_id, message_content, send_time
 FROM chat_messages
 WHERE internal_meeting_id = $1
 `
 
-type GetMeetingMessagesByIDRow struct {
-	InternalUserID string
-	MessageContent string
-	SendTime       pgtype.Timestamp
-}
-
-func (q *Queries) GetMeetingMessagesByID(ctx context.Context, internalMeetingID string) ([]GetMeetingMessagesByIDRow, error) {
+func (q *Queries) GetMeetingMessagesByID(ctx context.Context, internalMeetingID string) ([]ChatMessage, error) {
 	rows, err := q.db.Query(ctx, getMeetingMessagesByID, internalMeetingID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetMeetingMessagesByIDRow
+	var items []ChatMessage
 	for rows.Next() {
-		var i GetMeetingMessagesByIDRow
-		if err := rows.Scan(&i.InternalUserID, &i.MessageContent, &i.SendTime); err != nil {
+		var i ChatMessage
+		if err := rows.Scan(
+			&i.MessageID,
+			&i.InternalMeetingID,
+			&i.InternalUserID,
+			&i.ChatID,
+			&i.MessageContent,
+			&i.SendTime,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

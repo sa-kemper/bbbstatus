@@ -59,7 +59,10 @@ func (q *Queries) GetMeetingById(ctx context.Context, internalMeetingID string) 
 }
 
 const getMeetingExistsByID = `-- name: GetMeetingExistsByID :one
-SELECT TRUE FROM meetings WHERE internal_meeting_id = $1 LIMIT 1
+SELECT TRUE
+FROM meetings
+WHERE internal_meeting_id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetMeetingExistsByID(ctx context.Context, internalMeetingID string) (bool, error) {

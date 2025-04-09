@@ -18,6 +18,7 @@ package main
 
 import (
 	"bbbstatus/internal/BBBEvents"
+	db "bbbstatus/internal/database"
 	"context"
 	"encoding/json"
 	"errors"
@@ -82,11 +83,15 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 		}
 		return nil, err
 	}
+	defer conn.Close(ctx)
+
 	err = conn.Ping(ctx)
 	if err != nil {
 		fmt.Println("error occurred while connecting to database (GenerateCSVReport)")
 		return nil, err
 	}
+
+	dbQueries := db.New(conn)
 
 	// Translate CSV Header
 	splitResult := strings.Split(confGet("CSV_STRUCTURE"), ",")
@@ -97,7 +102,7 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 		result += Translate("CSVReportConfig-"+value) + ","
 	}
 
-	messageTimeline, err := fillCSVMessageEvents(ctx, internalMeetingID, conn)
+	messageTimeline, err := fillCSVMessageEvents(ctx, internalMeetingID, dbQueries)
 	if err != nil {
 		fmt.Println("error occurred while filling message timeline (GenerateCSVReport)", err.Error())
 		return nil, err
@@ -186,19 +191,19 @@ func (e CSVEvent) ReturnCSVRow(CsvStructureConfig []string) string {
 	return result
 }
 
-func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn) (timeline []CSVEvent, err error) {
+func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []CSVEvent, err error) {
 	// insert user messages into the timeline
-	row, err := conn.Query(ctx, "SELECT internal_user_id, message_content, send_time FROM chat_messages WHERE internal_meeting_id = $1", internalMeetingID)
+	messages, err := dbQueries.GetMeetingMessagesByID(ctx, internalMeetingID)
 	if err != nil {
 		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
-	for row.Next() {
-		var event CSVEvent
-		var chatMessageContent string
-		var chatMessageUserID string
-		err = row.Scan(&chatMessageUserID, &chatMessageContent, &event.Time)
-		if err != nil {
-			fmt.Println(err)
+	for _, message := range messages {
+		var event = CSVEvent{Time: message.SendTime.Time}
+		var chatMessageContent = message.MessageContent
+		var chatMessageUserID = message.InternalUserID
+
+		if !message.SendTime.Valid {
+			fmt.Println("WARNING: message send time is not valid, this is likely a bug")
 		}
 
 		// Handle system messages
@@ -212,26 +217,17 @@ func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, conn *p
 		}
 
 		// we cannot use the same connection while the row is not closed.
-		conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+		event.User, err = dbQueries.GetUserNameById(ctx, message.InternalUserID)
 		if err != nil {
-			fmt.Println("error connecting to the database at least twice. ->", err)
-		} else {
-			err = conn2.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", chatMessageUserID).Scan(&event.User)
-			if err != nil {
-				fmt.Println("error obtaining user information of chat message")
-				fmt.Println(err)
-			}
-			event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": event.User, "Message": chatMessageContent})
-			event.Action = Translate("CSVReportActionChatted")
-			timeline = append(timeline, event)
-			err = conn2.Close(ctx)
-			if err != nil {
-				fmt.Println("error closing the database connection when getting additional user information")
-				return timeline, err
-			}
+			fmt.Println("error obtaining user information of chat message")
+			fmt.Println(err)
+			event.User = chatMessageUserID
 		}
+
+		event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": event.User, "Message": chatMessageContent})
+		event.Action = Translate("CSVReportActionChatted")
+		timeline = append(timeline, event)
 	}
-	row.Close()
 	return timeline, err
 }
 

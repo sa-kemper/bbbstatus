@@ -30,3 +30,13 @@ WHERE internal_user_id = $1;
 -- name: InsertUser :exec
 INSERT INTO users (internal_user_id, external_user_id, name, role, is_guest)
 VALUES ($1, $2, $3, $4, $5);
+
+-- name: GetUserCountBetweenDates :one
+SELECT COUNT(*)
+FROM users
+WHERE join_timestamp BETWEEN $1 AND $2;
+
+-- name: GetUsersWhoJoinedBetween :many
+SELECT *
+FROM users
+WHERE join_timestamp BETWEEN $1 AND $2;

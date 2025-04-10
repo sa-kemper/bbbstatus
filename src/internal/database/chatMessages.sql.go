@@ -61,7 +61,8 @@ func (q *Queries) GetMeetingMessagesByID(ctx context.Context, internalMeetingID 
 }
 
 const insertChatMessageToMeetingByID = `-- name: InsertChatMessageToMeetingByID :exec
-INSERT INTO chat_messages (internal_meeting_id, internal_user_id, chat_id, message_content, send_time) VALUES ($1,$2,$3,$4,$5)
+INSERT INTO chat_messages (internal_meeting_id, internal_user_id, chat_id, message_content, send_time)
+VALUES ($1, $2, $3, $4, $5)
 `
 
 type InsertChatMessageToMeetingByIDParams struct {

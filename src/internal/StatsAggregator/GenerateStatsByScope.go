@@ -17,9 +17,11 @@
 package StatsAggregator
 
 import (
+	db "bbbstatus/internal/database"
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"time"
 )
 
@@ -35,6 +37,8 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 	}
 	defer conn.Close(ctx)
 
+	dbQueries := db.New(conn)
+
 	timeFrames := map[string]TimeFrame{}
 	if scope == "week" {
 		timeFrames = generateWeekTimeFrames(targetTime)
@@ -46,50 +50,70 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 		timeFrames = generateYearTimeFrames(targetTime)
 	}
 	for index, tf := range timeFrames {
-		var conferences int
-		var userCount int
+		var conferences int64
+		var userCount int64
 		var conferenceUsageHours time.Duration
 		var userUsageHours time.Duration
-		err = conn.QueryRow(ctx, "SELECT COUNT(*) FROM meetings WHERE create_time BETWEEN $1 AND $2", tf.Start, tf.End).Scan(&conferences)
+		conferences, err = dbQueries.GetMeetingCountBetweenDates(
+			ctx,
+			db.GetMeetingCountBetweenDatesParams{
+				CreateTime:   pgtype.Timestamp{Valid: true, Time: tf.Start},
+				CreateTime_2: pgtype.Timestamp{Valid: true, Time: tf.End},
+			},
+		)
 		if err != nil {
 			return stats, fmt.Errorf("statsPage -> generateStatsByScope queryRow (meetings count): %w", err)
 		}
-		err = conn.QueryRow(ctx, "SELECT COUNT(*) FROM meetings WHERE create_time BETWEEN $1 AND $2", tf.Start, tf.End).Scan(&userCount)
+		userCount, err = dbQueries.GetUserCountBetweenDates(ctx, db.GetUserCountBetweenDatesParams{
+			JoinTimestamp:   pgtype.Timestamp{Time: tf.Start, Valid: true},
+			JoinTimestamp_2: pgtype.Timestamp{Time: tf.End, Valid: true},
+		})
 		if err != nil {
 			return stats, fmt.Errorf("statsPage -> generateStatsByScope queryRow (user count): %w", err)
 		}
-		rows, err := conn.Query(ctx, "SELECT create_time, meeting_ended FROM meetings WHERE meeting_ended IS NOT NULL AND create_time BETWEEN $1 AND $2", tf.Start, tf.End)
+
+		meetings, err := dbQueries.GetMeetingsBetweenDates(ctx, db.GetMeetingsBetweenDatesParams{
+			CreateTime:   pgtype.Timestamp{Valid: true, Time: tf.Start},
+			CreateTime_2: pgtype.Timestamp{Valid: true, Time: tf.End},
+		})
 		if err != nil {
 			return stats, fmt.Errorf("statsPage -> generateStatsByScope queryRow (meeting time): %w", err)
 		}
 
-		for rows.Next() {
-			startTime, endTime := time.Time{}, time.Time{}
-			err = rows.Scan(&startTime, &endTime)
-			if err != nil {
-				return stats, fmt.Errorf("statsPage -> generateStatsByScope (conference usage hours) rows.Scan: %w", err)
+		for _, meeting := range meetings {
+			startTime, endTime := meeting.CreateTime.Time, meeting.MeetingEnded.Time
+			if !meeting.MeetingEnded.Valid {
+				continue
 			}
+			if meeting.MeetingEnded.Time.IsZero() {
+				continue
+			}
+			if meeting.CreateTime.Time.Before(tf.Start) == true || meeting.MeetingEnded.Time.After(tf.End) == true {
+				continue
+			}
+
 			conferenceUsageHours += endTime.Sub(startTime)
 		}
-		rows.Close()
 
-		rows, err = conn.Query(ctx, "SELECT join_timestamp, leave_timestamp FROM users WHERE users.leave_timestamp IS NOT NULL AND join_timestamp BETWEEN $1 AND $2", tf.Start, tf.End)
+		users, err := dbQueries.GetUsersWhoJoinedBetween(ctx, db.GetUsersWhoJoinedBetweenParams{
+			JoinTimestamp:   pgtype.Timestamp{Valid: true, Time: tf.Start},
+			JoinTimestamp_2: pgtype.Timestamp{Valid: true, Time: tf.End},
+		})
 		if err != nil {
 			return stats, fmt.Errorf("statsPage -> generateStatsByScope queryRow (users usage hours time): %w", err)
 		}
-
-		for rows.Next() {
-			startTime, endTime := time.Time{}, time.Time{}
-			err = rows.Scan(&startTime, &endTime)
-			if err != nil {
-				return stats, fmt.Errorf("statsPage -> generateStatsByScope (users usage hours) rows.Scan: %w", err)
+		for _, user := range users {
+			if !user.LeaveTimestamp.Valid {
+				continue
 			}
-			userUsageHours += endTime.Sub(startTime)
+			if user.LeaveTimestamp.Time.IsZero() == true {
+				continue
+			}
+			userUsageHours += user.LeaveTimestamp.Time.Sub(user.JoinTimestamp.Time)
 		}
-		rows.Close()
 
-		stats.ConferenceCount[index] = conferences
-		stats.MaxUserCount[index] = userCount
+		stats.ConferenceCount[index] = int(conferences)
+		stats.MaxUserCount[index] = int(userCount)
 		stats.ConferenceUsageHours[index] = int(conferenceUsageHours.Hours())
 		stats.ConferenceUsersUsageHours[index] = int(userUsageHours.Hours())
 		// used for normalizing the graph

@@ -86,7 +86,8 @@ func (q *Queries) GetUserIDsFromMeetingByMeetingID(ctx context.Context, internal
 }
 
 const insertUserEvent = `-- name: InsertUserEvent :exec
-INSERT INTO user_events (internal_meeting_id, internal_user_id, event_type, event_timestamp) VALUES ($1, $2, $3, $4)
+INSERT INTO user_events (internal_meeting_id, internal_user_id, event_type, event_timestamp)
+VALUES ($1, $2, $3, $4)
 `
 
 type InsertUserEventParams struct {

@@ -28,7 +28,13 @@ import (
 )
 
 const getPresenterUserByMeetingID = `-- name: GetPresenterUserByMeetingID :one
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp FROM users WHERE internal_user_id = (SELECT user_events.internal_user_id FROM user_events WHERE internal_meeting_id = $1 ORDER BY event_timestamp DESC LIMIT 1)
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp
+FROM users
+WHERE internal_user_id = (SELECT user_events.internal_user_id
+                          FROM user_events
+                          WHERE internal_meeting_id = $1
+                          ORDER BY event_timestamp DESC
+                          LIMIT 1)
 `
 
 func (q *Queries) GetPresenterUserByMeetingID(ctx context.Context, internalMeetingID string) (User, error) {
@@ -47,7 +53,9 @@ func (q *Queries) GetPresenterUserByMeetingID(ctx context.Context, internalMeeti
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp FROM users WHERE internal_user_id = $1
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp
+FROM users
+WHERE internal_user_id = $1
 `
 
 func (q *Queries) GetUserById(ctx context.Context, internalUserID string) (User, error) {
@@ -65,8 +73,26 @@ func (q *Queries) GetUserById(ctx context.Context, internalUserID string) (User,
 	return i, err
 }
 
+const getUserCountBetweenDates = `-- name: GetUserCountBetweenDates :one
+SELECT COUNT(*) FROM users WHERE join_timestamp BETWEEN $1 AND $2
+`
+
+type GetUserCountBetweenDatesParams struct {
+	JoinTimestamp   pgtype.Timestamp
+	JoinTimestamp_2 pgtype.Timestamp
+}
+
+func (q *Queries) GetUserCountBetweenDates(ctx context.Context, arg GetUserCountBetweenDatesParams) (int64, error) {
+	row := q.db.QueryRow(ctx, getUserCountBetweenDates, arg.JoinTimestamp, arg.JoinTimestamp_2)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getUserExistsByID = `-- name: GetUserExistsByID :one
-SELECT TRUE FROM users WHERE internal_user_id = $1
+SELECT TRUE
+FROM users
+WHERE internal_user_id = $1
 `
 
 func (q *Queries) GetUserExistsByID(ctx context.Context, internalUserID string) (bool, error) {
@@ -77,7 +103,9 @@ func (q *Queries) GetUserExistsByID(ctx context.Context, internalUserID string) 
 }
 
 const getUserNameById = `-- name: GetUserNameById :one
-SELECT name FROM users WHERE internal_user_id = $1
+SELECT name
+FROM users
+WHERE internal_user_id = $1
 `
 
 func (q *Queries) GetUserNameById(ctx context.Context, internalUserID string) (string, error) {
@@ -87,8 +115,46 @@ func (q *Queries) GetUserNameById(ctx context.Context, internalUserID string) (s
 	return name, err
 }
 
+const getUsersWhoJoinedBetween = `-- name: GetUsersWhoJoinedBetween :many
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp FROM users WHERE join_timestamp BETWEEN $1 AND $2
+`
+
+type GetUsersWhoJoinedBetweenParams struct {
+	JoinTimestamp   pgtype.Timestamp
+	JoinTimestamp_2 pgtype.Timestamp
+}
+
+func (q *Queries) GetUsersWhoJoinedBetween(ctx context.Context, arg GetUsersWhoJoinedBetweenParams) ([]User, error) {
+	rows, err := q.db.Query(ctx, getUsersWhoJoinedBetween, arg.JoinTimestamp, arg.JoinTimestamp_2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.InternalUserID,
+			&i.ExternalUserID,
+			&i.Name,
+			&i.Role,
+			&i.IsGuest,
+			&i.JoinTimestamp,
+			&i.LeaveTimestamp,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertUser = `-- name: InsertUser :exec
-INSERT INTO users (internal_user_id, external_user_id, name, role, is_guest) VALUES ($1, $2, $3, $4, $5)
+INSERT INTO users (internal_user_id, external_user_id, name, role, is_guest)
+VALUES ($1, $2, $3, $4, $5)
 `
 
 type InsertUserParams struct {
@@ -111,7 +177,9 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
 }
 
 const leaveUserByID = `-- name: LeaveUserByID :exec
-UPDATE users SET leave_timestamp = $1 WHERE internal_user_id = $2
+UPDATE users
+SET leave_timestamp = $1
+WHERE internal_user_id = $2
 `
 
 type LeaveUserByIDParams struct {

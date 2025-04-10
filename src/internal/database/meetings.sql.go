@@ -28,7 +28,9 @@ import (
 )
 
 const endMeetingAtTimestampByID = `-- name: EndMeetingAtTimestampByID :exec
-UPDATE meetings SET meeting_ended = $1 WHERE internal_meeting_id = $2
+UPDATE meetings
+SET meeting_ended = $1
+WHERE internal_meeting_id = $2
 `
 
 type EndMeetingAtTimestampByIDParams struct {
@@ -70,6 +72,22 @@ func (q *Queries) GetMeetingById(ctx context.Context, internalMeetingID string) 
 		&i.MeetingEnded,
 	)
 	return i, err
+}
+
+const getMeetingCountBetweenDates = `-- name: GetMeetingCountBetweenDates :one
+SELECT COUNT(*) FROM meetings WHERE create_time BETWEEN $1 AND $2
+`
+
+type GetMeetingCountBetweenDatesParams struct {
+	CreateTime   pgtype.Timestamp
+	CreateTime_2 pgtype.Timestamp
+}
+
+func (q *Queries) GetMeetingCountBetweenDates(ctx context.Context, arg GetMeetingCountBetweenDatesParams) (int64, error) {
+	row := q.db.QueryRow(ctx, getMeetingCountBetweenDates, arg.CreateTime, arg.CreateTime_2)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const getMeetingExistsByID = `-- name: GetMeetingExistsByID :one
@@ -177,7 +195,9 @@ func (q *Queries) GetMeetingsBetweenDates(ctx context.Context, arg GetMeetingsBe
 }
 
 const insertMeeting = `-- name: InsertMeeting :exec
-INSERT INTO meetings (internal_meeting_id, external_meeting_id, name, is_breakout, parent_id,  create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+INSERT INTO meetings (internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time,
+                      moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 `
 
 type InsertMeetingParams struct {

@@ -29,3 +29,8 @@ WHERE internal_meeting_id = $2;
 INSERT INTO meetings (internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time,
                       moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);
+
+-- name: GetMeetingCountBetweenDates :one
+SELECT COUNT(*)
+FROM meetings
+WHERE create_time BETWEEN $1 AND $2;

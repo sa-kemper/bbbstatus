@@ -17,18 +17,27 @@
 package BBBEvents
 
 import (
+	db "bbbstatus/internal/database"
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func handleMeetingEnded(ctx context.Context, conn *pgx.Conn, meeting Meeting, b *BaseEvent) (err error) {
-	_, err = conn.Exec(ctx, "INSERT INTO meeting_events (internal_meeting_id, event_type, event_timestamp) VALUES ($1, $2, $3)", meeting.InternalMeetingID, EventMeetingEnded, b.GetTimestamp())
+func handleMeetingEnded(ctx context.Context, dbQueries *db.Queries, meeting Meeting, b *BaseEvent) (err error) {
+	err = dbQueries.InsertMeetingEventForID(ctx, db.InsertMeetingEventForIDParams{
+		InternalMeetingID: meeting.InternalMeetingID,
+		EventType:         EventMeetingEnded,
+		EventTimestamp:    pgtype.Timestamp{Valid: true, Time: b.GetTimestamp()},
+	})
+
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	_, err = conn.Exec(ctx, "UPDATE meetings SET meeting_ended = $1 WHERE internal_meeting_id = $2", b.GetTimestamp(), meeting.InternalMeetingID)
+	err = dbQueries.EndMeetingAtTimestampByID(ctx, db.EndMeetingAtTimestampByIDParams{
+		MeetingEnded:      pgtype.Timestamp{Valid: true, Time: b.GetTimestamp()},
+		InternalMeetingID: meeting.InternalMeetingID,
+	})
 	if err != nil {
 		fmt.Println("Failed ending the meeting.")
 		fmt.Println(err)

@@ -64,8 +64,11 @@ func showMeetingReport(c echo.Context) error {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
 			fmt.Println("FATAL: database timeout!")
 		}
-		fmt.Println("error occured while checking meeting existence", err)
-		return c.Render(http.StatusNotFound, "notfound", nil)
+		if !errors.Is(err, pgx.ErrNoRows) {
+			fmt.Println("error occured while checking meeting existence", err)
+			return c.Render(http.StatusNotFound, "notfound", nil)
+		}
+		meetingExists = false
 	}
 
 	report, err := GenerateWebReport(ctx, internalMeetingId)

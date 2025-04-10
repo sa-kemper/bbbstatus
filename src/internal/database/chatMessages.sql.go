@@ -23,6 +23,8 @@ package bbbstatus
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getMeetingMessagesByID = `-- name: GetMeetingMessagesByID :many
@@ -56,4 +58,27 @@ func (q *Queries) GetMeetingMessagesByID(ctx context.Context, internalMeetingID 
 		return nil, err
 	}
 	return items, nil
+}
+
+const insertChatMessageToMeetingByID = `-- name: InsertChatMessageToMeetingByID :exec
+INSERT INTO chat_messages (internal_meeting_id, internal_user_id, chat_id, message_content, send_time) VALUES ($1,$2,$3,$4,$5)
+`
+
+type InsertChatMessageToMeetingByIDParams struct {
+	InternalMeetingID string
+	InternalUserID    string
+	ChatID            string
+	MessageContent    string
+	SendTime          pgtype.Timestamp
+}
+
+func (q *Queries) InsertChatMessageToMeetingByID(ctx context.Context, arg InsertChatMessageToMeetingByIDParams) error {
+	_, err := q.db.Exec(ctx, insertChatMessageToMeetingByID,
+		arg.InternalMeetingID,
+		arg.InternalUserID,
+		arg.ChatID,
+		arg.MessageContent,
+		arg.SendTime,
+	)
+	return err
 }

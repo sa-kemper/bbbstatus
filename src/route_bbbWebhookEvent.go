@@ -18,6 +18,7 @@ package main
 
 import (
 	"bbbstatus/internal/BBBEvents"
+	db "bbbstatus/internal/database"
 	"encoding/json"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -54,7 +55,7 @@ func bbbWebHookEvent(c echo.Context) error {
 	if confGet("CLEAR_QUEUE") == "true" {
 		return c.String(http.StatusOK, "Event was dropped.")
 	}
-
+	var ctx = c.Request().Context()
 	var event BBBEvents.BaseEvent
 	postEvent := c.FormValue("event")
 	postEvent = strings.TrimLeft(postEvent, "[")
@@ -74,6 +75,57 @@ func bbbWebHookEvent(c echo.Context) error {
 		fmt.Println("Error occurred during unmarshalling of the event: ", err)
 		return c.String(http.StatusBadRequest, "Error occurred during unmarshalling of the event")
 	}
+	addr, err := authorizeBBBServer(c, requesterIpAddress)
+	if err != nil {
+		fmt.Println("Error occurred during authorizing of the bbbserver for event: with", postEvent, "error: ", err)
+		return c.String(http.StatusBadRequest, "Error occurred during authorizing of the event")
+	}
+
+	if len(addr) > 1 {
+		fmt.Println("LookupAddr returned more then one addr:", addr)
+	}
+	if len(addr) != 0 {
+		event.Data.Attributes.Meeting.BbbHostname = strings.TrimSpace(strings.TrimRight(addr[0], "."))
+		//fmt.Println("DEBUG bbbWebHookEvent -> BBBServer: '" + event.Data.Attributes.Meeting.BbbHostname + "'")
+	}
+	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	if err != nil {
+		fmt.Println("error occurred during pgx connect (bbbWebHookEvent): ", err)
+		return c.String(http.StatusInternalServerError, "Error occurred database connect (bbbWebHookEvent)")
+	}
+	defer conn.Close(ctx)
+
+	dbQueries := db.New(conn)
+
+	// Simple host based webhook safety, not really great but better than nothing at all.
+	bbbServers := confGetServers(event.Data.Attributes.Meeting.BbbHostname)
+	if len(bbbServers) < 1 {
+		//fmt.Println("List of valid hosts: ", confGetServers(""))
+		//fmt.Println("Failed to authenticate host: '" + event.Data.Attributes.Meeting.BbbHostname + "'")
+		return c.String(http.StatusUnauthorized, "Unauthorized")
+	} else {
+		server := bbbServers[0]
+		if server.SharedSecret != apiKey {
+			//fmt.Println("DEBUG: updating bbb API key")
+			//fmt.Println("DEBUG server.SharedSecret='" + server.SharedSecret + "' api_key='" + apiKey + "'")
+			server.SharedSecret = apiKey
+			err = confSetServer(ctx, server)
+			if err != nil {
+				fmt.Println("error occurred during confSetServer: ", err)
+			}
+		}
+	}
+
+	err = event.Save(ctx, dbQueries, conn)
+	if err != nil {
+		fmt.Println("error occurred during save event: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
+	}
+
+	return c.String(http.StatusOK, "")
+}
+
+func authorizeBBBServer(c echo.Context, requesterIpAddress string) ([]string, error) {
 	frameworkExtractedIP := c.RealIP()
 	customIpExtractor := getIpFromContext(c).String()
 
@@ -91,52 +143,12 @@ func bbbWebHookEvent(c echo.Context) error {
 	if err != nil {
 		fmt.Println("Failed to obtain BBBServer hostname of host:", requesterIpAddress)
 		fmt.Println("Error:", err)
-		return c.String(http.StatusBadRequest, "Failed to obtain BBBServer hostname of host")
+		return nil, c.String(http.StatusBadRequest, "Failed to obtain BBBServer hostname of host")
 
 	}
 	if len(addr) == 0 {
 		fmt.Println("Failed to obtain BBBServer hostname of host (Zero addresses returned.):", requesterIpAddress)
-		return c.String(http.StatusBadRequest, "Failed to obtain BBBServer hostname of host")
+		return nil, c.String(http.StatusBadRequest, "Failed to obtain BBBServer hostname of host")
 	}
-
-	if len(addr) > 1 {
-		fmt.Println("LookupAddr returned more then one addr:", addr)
-	}
-	if len(addr) != 0 {
-		event.Data.Attributes.Meeting.BbbHostname = strings.TrimSpace(strings.TrimRight(addr[0], "."))
-		//fmt.Println("DEBUG bbbWebHookEvent -> BBBServer: '" + event.Data.Attributes.Meeting.BbbHostname + "'")
-	}
-	conn, err := pgx.Connect(c.Request().Context(), confGet("DB_CONNECTION_STRING"))
-	if err != nil {
-		fmt.Println("error occurred during pgx connect (bbbWebHookEvent): ", err)
-		return c.String(http.StatusInternalServerError, "Error occurred database connect (bbbWebHookEvent)")
-	}
-	defer conn.Close(c.Request().Context())
-
-	// Simple host based webhook safety, not really great but better than nothing at all.
-	bbbServers := confGetServers(event.Data.Attributes.Meeting.BbbHostname)
-	if len(bbbServers) < 1 {
-		//fmt.Println("List of valid hosts: ", confGetServers(""))
-		//fmt.Println("Failed to authenticate host: '" + event.Data.Attributes.Meeting.BbbHostname + "'")
-		return c.String(http.StatusUnauthorized, "Unauthorized")
-	} else {
-		server := bbbServers[0]
-		if server.SharedSecret != apiKey {
-			//fmt.Println("DEBUG: updating bbb API key")
-			//fmt.Println("DEBUG server.SharedSecret='" + server.SharedSecret + "' api_key='" + apiKey + "'")
-			server.SharedSecret = apiKey
-			err = confSetServer(c.Request().Context(), server)
-			if err != nil {
-				fmt.Println("error occurred during confSetServer: ", err)
-			}
-		}
-	}
-
-	err = event.Save(c.Request().Context(), conn)
-	if err != nil {
-		fmt.Println("error occurred during save event: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
-	}
-
-	return c.String(http.StatusOK, "")
+	return addr, err
 }

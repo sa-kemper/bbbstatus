@@ -23,12 +23,31 @@ package bbbstatus
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getPresenterUserByMeetingID = `-- name: GetPresenterUserByMeetingID :one
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp FROM users WHERE internal_user_id = (SELECT user_events.internal_user_id FROM user_events WHERE internal_meeting_id = $1 ORDER BY event_timestamp DESC LIMIT 1)
+`
+
+func (q *Queries) GetPresenterUserByMeetingID(ctx context.Context, internalMeetingID string) (User, error) {
+	row := q.db.QueryRow(ctx, getPresenterUserByMeetingID, internalMeetingID)
+	var i User
+	err := row.Scan(
+		&i.InternalUserID,
+		&i.ExternalUserID,
+		&i.Name,
+		&i.Role,
+		&i.IsGuest,
+		&i.JoinTimestamp,
+		&i.LeaveTimestamp,
+	)
+	return i, err
+}
+
 const getUserById = `-- name: GetUserById :one
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp
-FROM users
-WHERE internal_user_id = $1
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp FROM users WHERE internal_user_id = $1
 `
 
 func (q *Queries) GetUserById(ctx context.Context, internalUserID string) (User, error) {
@@ -46,10 +65,19 @@ func (q *Queries) GetUserById(ctx context.Context, internalUserID string) (User,
 	return i, err
 }
 
+const getUserExistsByID = `-- name: GetUserExistsByID :one
+SELECT TRUE FROM users WHERE internal_user_id = $1
+`
+
+func (q *Queries) GetUserExistsByID(ctx context.Context, internalUserID string) (bool, error) {
+	row := q.db.QueryRow(ctx, getUserExistsByID, internalUserID)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const getUserNameById = `-- name: GetUserNameById :one
-SELECT name
-FROM users
-WHERE internal_user_id = $1
+SELECT name FROM users WHERE internal_user_id = $1
 `
 
 func (q *Queries) GetUserNameById(ctx context.Context, internalUserID string) (string, error) {
@@ -57,4 +85,41 @@ func (q *Queries) GetUserNameById(ctx context.Context, internalUserID string) (s
 	var name string
 	err := row.Scan(&name)
 	return name, err
+}
+
+const insertUser = `-- name: InsertUser :exec
+INSERT INTO users (internal_user_id, external_user_id, name, role, is_guest) VALUES ($1, $2, $3, $4, $5)
+`
+
+type InsertUserParams struct {
+	InternalUserID string
+	ExternalUserID string
+	Name           string
+	Role           string
+	IsGuest        pgtype.Bool
+}
+
+func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
+	_, err := q.db.Exec(ctx, insertUser,
+		arg.InternalUserID,
+		arg.ExternalUserID,
+		arg.Name,
+		arg.Role,
+		arg.IsGuest,
+	)
+	return err
+}
+
+const leaveUserByID = `-- name: LeaveUserByID :exec
+UPDATE users SET leave_timestamp = $1 WHERE internal_user_id = $2
+`
+
+type LeaveUserByIDParams struct {
+	LeaveTimestamp pgtype.Timestamp
+	InternalUserID string
+}
+
+func (q *Queries) LeaveUserByID(ctx context.Context, arg LeaveUserByIDParams) error {
+	_, err := q.db.Exec(ctx, leaveUserByID, arg.LeaveTimestamp, arg.InternalUserID)
+	return err
 }

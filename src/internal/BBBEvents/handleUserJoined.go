@@ -17,12 +17,15 @@
 package BBBEvents
 
 import (
+	db "bbbstatus/internal/database"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func handleUserJoined(ctx context.Context, conn *pgx.Conn, user *User, meeting Meeting, b *BaseEvent) error {
+func handleUserJoined(ctx context.Context, dbQueries *db.Queries, user *User, meeting Meeting, b *BaseEvent) error {
 	var err error
 	var userInRequestExists bool
 
@@ -30,21 +33,30 @@ func handleUserJoined(ctx context.Context, conn *pgx.Conn, user *User, meeting M
 		return fmt.Errorf("user is unexpectedly nil")
 	}
 
-	userInRequestExists, err = userExists(ctx, conn, user.InternalUserID)
+	userInRequestExists, err = dbQueries.GetUserExistsByID(ctx, user.InternalUserID)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		if !errors.Is(err, pgx.ErrNoRows) {
+			fmt.Println("error occured while checking if user exists: ", err)
+			return err
+		}
+		userInRequestExists = false
 	}
+	fmt.Println("DEBUG: handleUserJoined -> user exists: ", userInRequestExists)
 
 	if !userInRequestExists {
-		_, err := conn.Exec(context.Background(), "INSERT INTO users (internal_user_id, external_user_id, name, role, is_guest) VALUES ($1, $2, $3, $4, $5)", user.InternalUserID, user.ExternalUserID, user.Name, user.Role, user.Guest)
+		err := dbQueries.InsertUser(ctx, db.InsertUserParams{InternalUserID: user.InternalUserID, ExternalUserID: user.ExternalUserID, Name: user.Name, Role: user.Role, IsGuest: pgtype.Bool{Bool: user.Guest, Valid: true}})
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
 	}
 
-	_, err = conn.Exec(context.Background(), "INSERT INTO user_events (internal_meeting_id, internal_user_id, event_type, event_timestamp) VALUES ($1, $2, $3, $4)", meeting.InternalMeetingID, user.InternalUserID, b.Data.ID, b.GetTimestamp())
+	err = dbQueries.InsertUserEvent(ctx, db.InsertUserEventParams{
+		InternalMeetingID: meeting.InternalMeetingID,
+		InternalUserID:    user.InternalUserID,
+		EventType:         EventUserJoined,
+		EventTimestamp:    pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true},
+	})
 	if err != nil {
 		fmt.Println(err)
 		return err

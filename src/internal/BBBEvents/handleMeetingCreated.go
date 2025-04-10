@@ -17,35 +17,54 @@
 package BBBEvents
 
 import (
+	db "bbbstatus/internal/database"
 	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func handleMeetingCreated(ctx context.Context, conn *pgx.Conn, meeting Meeting, b *BaseEvent) error {
+func handleMeetingCreated(ctx context.Context, dbQueries *db.Queries, meeting Meeting, b *BaseEvent) error {
 	var err error
-	_, err = conn.Exec(ctx,
-		"INSERT INTO meetings (internal_meeting_id, external_meeting_id, name, is_breakout, parent_id,  create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
-		meeting.InternalMeetingID,
-		meeting.ExternalMeetingID,
-		meeting.Name,
-		meeting.IsBreakout,
-		meeting.ParentID,
-		b.GetTimestamp(),
-		meeting.ModeratorPass,
-		meeting.ViewerPass,
-		meeting.Record,
-		meeting.VoiceConf,
-		meeting.DialNumber,
-		meeting.MaxUsers,
-		meeting.Metadata,
-		meeting.BbbHostname,
-	)
+	params := db.InsertMeetingParams{InternalMeetingID: meeting.InternalMeetingID,
+		ExternalMeetingID: meeting.ExternalMeetingID,
+		Name:              meeting.Name,
+		IsBreakout:        pgtype.Bool{Bool: meeting.IsBreakout, Valid: true},
+		CreateTime:        pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true},
+		ModeratorPass:     meeting.ModeratorPass,
+		ViewerPass:        meeting.ViewerPass,
+		Record:            pgtype.Bool{Bool: meeting.Record, Valid: true},
+		VoiceConf:         pgtype.Text{String: meeting.VoiceConf, Valid: true},
+		DialNumber:        pgtype.Text{String: meeting.DialNumber, Valid: true},
+		MaxUsers:          pgtype.Int4{Int32: int32(meeting.MaxUsers), Valid: true},
+		Bbbhostname:       meeting.BbbHostname,
+	}
+
+	if meeting.ParentID != nil {
+		params.ParentID = pgtype.Text{String: *meeting.ParentID, Valid: true}
+	} else {
+		params.ParentID = pgtype.Text{String: "", Valid: false}
+	}
+
+	if meeting.VoiceConf != "" {
+		params.VoiceConf = pgtype.Text{String: meeting.VoiceConf, Valid: true}
+	} else {
+		params.VoiceConf = pgtype.Text{String: "", Valid: false}
+	}
+
+	metadataBytes, err := json.Marshal(meeting.Metadata)
+	if err != nil {
+		fmt.Println("error marshalling meeting metadata")
+		return err
+	}
+	params.Metadata = metadataBytes
+
+	err = dbQueries.InsertMeeting(ctx, params)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	_, err = conn.Exec(ctx, "INSERT INTO meeting_events (internal_meeting_id, event_type, event_timestamp) VALUES ($1, $2, $3)", meeting.InternalMeetingID, EventMeetingCreated, b.GetTimestamp())
+	err = dbQueries.InsertMeetingEventForID(ctx, db.InsertMeetingEventForIDParams{InternalMeetingID: meeting.InternalMeetingID, EventType: EventMeetingCreated, EventTimestamp: pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true}})
 	if err != nil {
 		fmt.Println(err)
 		return err

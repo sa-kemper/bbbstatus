@@ -17,24 +17,17 @@
 package BBBEvents
 
 import (
+	db "bbbstatus/internal/database"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"slices"
 	"strings"
 )
 
-func userExists(ctx context.Context, conn *pgx.Conn, InternalUserID string) (exists bool, err error) {
-	err = conn.QueryRow(ctx, "SELECT COUNT(*) > 0 AS user_exists FROM users WHERE internal_user_id = $1", InternalUserID).Scan(&exists)
-	if err != nil {
-		fmt.Println("error occurred during user exists check: ", err)
-		return false, err
-	}
-	return exists, nil
-}
-
-func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
+func (b *BaseEvent) Save(ctx context.Context, dbQueries *db.Queries, conn *pgx.Conn) error {
 	var err error
 	var meeting = b.Data.Attributes.Meeting
 	var user *User
@@ -48,40 +41,46 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 		return nil
 	}
 
-	if isUserEvent := strings.Contains(b.Data.ID, "user"); isUserEvent {
-		if joinEvent := strings.Contains(b.Data.ID, "joined"); !joinEvent {
-			err = loadAdditionalUserData(user, conn)
-
-			if b.Data.ID == EventUserPresenterAssigned { // This is a special case because bbb-webhooks does not maintain the event queue order, if one event is not delivered. (Throw away presenter assigned events if the user is unknown)
-				if errors.Is(err, pgx.ErrNoRows) {
-					return nil
-				}
-			}
-
+	if isUserEvent(b.Data.ID) {
+		if slices.Contains([]string{EventMeetingScreenshareStarted, EventMeetingScreenshareStopped}, b.Data.ID) {
+			dbUser, err := dbQueries.GetPresenterUserByMeetingID(ctx, meeting.InternalMeetingID)
 			if err != nil {
-				fmt.Println("error occurred during save event -> loadAdditionalUserData: ", err)
+				fmt.Println("error occured whilst loadAdditionalUserData -> get meeting presenter: ", err)
 				return err
 			}
+			user = &User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.Name, Role: dbUser.Role, Presenter: true, Guest: dbUser.IsGuest.Bool}
+		}
+
+		err = loadAdditionalUserData(ctx, user, dbQueries)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				// bbb-webhooks messed up the queue order again
+
+			}
+		}
+
+		if b.Data.ID == EventUserPresenterAssigned { // This is a special case because bbb-webhooks does not maintain the event queue order, if one event is not delivered. (Throw away presenter assigned events if the user is unknown)
+			if errors.Is(err, pgx.ErrNoRows) {
+				return nil
+			}
+		}
+
+		if err != nil {
+			fmt.Println("error occurred during save event -> loadAdditionalUserData: ", err)
+			return err
 		}
 	}
 
 	if b.Data.ID != EventMeetingCreated {
-		err = loadAdditionalMeetingData(&meeting, conn)
+		err = loadAdditionalMeetingData(ctx, &meeting, dbQueries)
 		if err != nil {
 			fmt.Println("error occurred during save event -> loadAdditionalMeetingData: ", err)
 			return err
 		}
 	}
 
-	if isUserEvent := strings.Contains(b.Data.ID, "user"); isUserEvent {
-		err = handleUserEvent(ctx, conn, user, meeting, b)
-		if err != nil {
-			fmt.Println("error occurred during save event -> handleUserEvent: ", err)
-		}
-	}
-
-	if b.Data.ID == EventMeetingScreenshareStarted || b.Data.ID == EventMeetingScreenshareStopped {
-		err = handleUserEvent(ctx, conn, user, meeting, b)
+	if isUserEvent(b.Data.ID) {
+		err = handleUserEvent(ctx, dbQueries, user, meeting, b)
 		if err != nil {
 			fmt.Println("error occurred during save event -> handleUserEvent: ", err)
 		}
@@ -89,27 +88,40 @@ func (b *BaseEvent) Save(ctx context.Context, conn *pgx.Conn) error {
 
 	switch b.Data.ID {
 	case EventMeetingCreated:
-		return handleMeetingCreated(ctx, conn, meeting, b)
+		return handleMeetingCreated(ctx, dbQueries, meeting, b)
 	case EventChatGroupMessageSent:
-		return handleChatMessage(ctx, conn, b, meeting)
+		return handleChatMessage(ctx, dbQueries, b, meeting)
 	case EventPollStarted: //
 		return handlePollCreation(ctx, conn, b, user, meeting)
 	case EventPollResponded:
-		return handlePollResponse(b, user, conn)
+		return handlePollResponse(b, conn, user)
 	case EventMeetingEnded:
-		return handleMeetingEnded(ctx, conn, meeting, b)
+		return handleMeetingEnded(ctx, dbQueries, meeting, b)
 	case MeetingRecordingStarted:
-		return handleMeetingRecordEvent(ctx, conn, meeting, b)
+		return handleMeetingRecordEvent(ctx, dbQueries, meeting, b)
 	case MeetingRecordingStopped:
-		return handleMeetingRecordEvent(ctx, conn, meeting, b)
+		return handleMeetingRecordEvent(ctx, dbQueries, meeting, b)
 	}
 	return nil
 
 }
 
-func handleMeetingRecordEvent(ctx context.Context, conn *pgx.Conn, meeting Meeting, b *BaseEvent) (err error) {
-	// {"data":{"type":"event","id":"meeting-recording-started","attributes":{"meeting":{"internal-meeting-id":"e6e630064669a3491c571e46c02091acc4ef99e9-1742912517852","external-meeting-id":"nogeseza921ixradoodrdpjvolltv6keqhv9r9eo"}},"event":{"ts":1742912530304}}}
-	_, err = conn.Exec(ctx, "INSERT INTO meeting_events (internal_meeting_id, event_type, event_timestamp) VALUES ($1, $2, $3)", meeting.InternalMeetingID, b.Data.ID, b.GetTimestamp())
+// isUserEvent determines if the given event ID should be handled as a user event.
+// It includes events containing "user" and specific meeting-related events.
+func isUserEvent(eventID string) bool {
+	if strings.Contains(eventID, "user") {
+		return true
+	}
+	switch eventID {
+	case EventMeetingScreenshareStarted, EventMeetingScreenshareStopped:
+		return true
+	default:
+		return false
+	}
+}
+
+func handleMeetingRecordEvent(ctx context.Context, dbQueries *db.Queries, meeting Meeting, b *BaseEvent) (err error) {
+	err = dbQueries.InsertMeetingEventForID(ctx, db.InsertMeetingEventForIDParams{InternalMeetingID: meeting.InternalMeetingID, EventType: b.Data.ID, EventTimestamp: pgtype.Timestamp{Valid: true, Time: b.GetTimestamp()}})
 	if err != nil {
 		fmt.Println("error occurred during save event -> handleMeetingRecordEvent: ", err)
 		return err

@@ -19,3 +19,13 @@ SELECT TRUE
 FROM meetings
 WHERE internal_meeting_id = $1
 LIMIT 1;
+
+-- name: EndMeetingAtTimestampByID :exec
+UPDATE meetings
+SET meeting_ended = $1
+WHERE internal_meeting_id = $2;
+
+-- name: InsertMeeting :exec
+INSERT INTO meetings (internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time,
+                      moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);

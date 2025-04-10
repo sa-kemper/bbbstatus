@@ -17,19 +17,23 @@
 package BBBEvents
 
 import (
+	db "bbbstatus/internal/database"
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 )
 
-func loadAdditionalUserData(user *User, conn *pgx.Conn) error {
+func loadAdditionalUserData(ctx context.Context, user *User, dbQueries *db.Queries) (err error) {
+	if user == nil {
+		fmt.Println("error occured whilst loadAdditionalUserData, user is nil.")
+		return fmt.Errorf("user is nil")
+	}
 	if user.InternalUserID == "SYSTEM" {
 		user.Name = "SYSTEM"
 		user.Role = "SYSTEM"
 		return nil
 	}
 	if user.Name == "" && user.InternalUserID != "" {
-		err := conn.QueryRow(context.Background(), "SELECT name FROM users WHERE internal_user_id=$1", user.InternalUserID).Scan(&user.Name)
+		user.Name, err = dbQueries.GetUserNameById(ctx, user.InternalUserID)
 		if err != nil {
 			fmt.Println("error occurred during loadAdditionalUserData: ", err)
 			return err

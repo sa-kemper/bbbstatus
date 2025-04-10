@@ -17,19 +17,22 @@
 package BBBEvents
 
 import (
+	db "bbbstatus/internal/database"
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func handleUserEvent(ctx context.Context, conn *pgx.Conn, user *User, meeting Meeting, b *BaseEvent) error {
+// handleUserEvent is a function to handle edge cases of the insert into 'user_events' table.
+// some events do not provide a user or a
+func handleUserEvent(ctx context.Context, dbQueries *db.Queries, user *User, meeting Meeting, b *BaseEvent) error {
 	var userInRequestExists bool
 	var err error
 	if b.Data.ID == "user-joined" {
-		return handleUserJoined(ctx, conn, user, meeting, b)
+		return handleUserJoined(ctx, dbQueries, user, meeting, b)
 	}
 	if b.Data.ID == "user-left" {
-		_, err = conn.Exec(ctx, "UPDATE users SET leave_timestamp = $1 WHERE internal_user_id = $2", b.GetTimestamp(), user.InternalUserID)
+		err = dbQueries.LeaveUserByID(ctx, db.LeaveUserByIDParams{LeaveTimestamp: pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true}, InternalUserID: user.InternalUserID})
 		if err != nil {
 			fmt.Printf("Data invalidation Error -> updating users.leave_timestamp (userID:%v): %v\n", user.InternalUserID, err)
 			return err
@@ -39,22 +42,18 @@ func handleUserEvent(ctx context.Context, conn *pgx.Conn, user *User, meeting Me
 	if user == nil {
 		if b.Data.ID == EventMeetingScreenshareStopped || b.Data.ID == EventMeetingScreenshareStarted {
 			user = &User{}
-			err = conn.QueryRow(ctx, "SELECT internal_user_id FROM user_events WHERE event_type = 'user-presenter-assigned' ORDER BY event_timestamp DESC LIMIT 1").Scan(&user.InternalUserID) // Obtain the current presenter's InternalUserId
-			if err != nil {                                                                                                                                                                    // handle the failure of the query
+			dbUser, err := dbQueries.GetPresenterUserByMeetingID(ctx, meeting.InternalMeetingID) // huh?
+			if err != nil {                                                                      // handle the failure of the query
 				fmt.Println("Failed obtaining the presenters userID ->", err)
-			} else { // obtain the username of the current presenter, if possible.
-				err = conn.QueryRow(ctx, "SELECT name FROM users WHERE internal_user_id = $1", user.InternalUserID).Scan(&user.Name)
-				if err != nil {
-					fmt.Println("Failed obtaining the username ->", err)
-					return err
-				}
 			}
+
+			user.Name = dbUser.Name
 
 		} else {
 			return fmt.Errorf("user is unexpectedly nil")
 		}
 	}
-	userInRequestExists, err = userExists(ctx, conn, user.InternalUserID)
+	userInRequestExists, err = dbQueries.GetUserExistsByID(ctx, user.InternalUserID)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -62,7 +61,12 @@ func handleUserEvent(ctx context.Context, conn *pgx.Conn, user *User, meeting Me
 	if !userInRequestExists {
 		return fmt.Errorf("user %s is not present. This is unexpected behaviour, check your DB integrity and the API authorisation", user.InternalUserID)
 	}
-	_, err = conn.Exec(context.Background(), "INSERT INTO user_events (internal_meeting_id, internal_user_id, event_type, event_timestamp) VALUES ($1, $2, $3, $4)", meeting.InternalMeetingID, user.InternalUserID, b.Data.ID, b.GetTimestamp())
+	err = dbQueries.InsertUserEvent(ctx, db.InsertUserEventParams{
+		EventTimestamp:    pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true},
+		InternalUserID:    user.InternalUserID,
+		EventType:         b.Data.ID,
+		InternalMeetingID: meeting.InternalMeetingID,
+	})
 	if err != nil {
 		fmt.Println(err)
 		return err

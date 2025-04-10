@@ -16,6 +16,8 @@ sql:
           - db_type: "jsonb"
             go_type: "string"
           - db_type: "timestamp"
-            go_type: "time.Time"
+            nullable: true
+            engine: "postgresql"
           - db_type: "timestamptz"
-            go_type: "time.Time"
+            nullable: true
+            engine: "postgresql"

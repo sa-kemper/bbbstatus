@@ -17,19 +17,22 @@
 package BBBEvents
 
 import (
+	db "bbbstatus/internal/database"
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func handleChatMessage(ctx context.Context, conn *pgx.Conn, b *BaseEvent, meeting Meeting) (err error) {
+func handleChatMessage(ctx context.Context, dbQueries *db.Queries, b *BaseEvent, meeting Meeting) (err error) {
 	message := b.Data.Attributes.Message
 	var userInRequestExists bool
-	if b.Data.Attributes.Message.Sender.InternalUserID == "SYSTEM" {
+	var senderID = b.Data.Attributes.Message.Sender.InternalUserID
+
+	if senderID == "SYSTEM" {
 		userInRequestExists = true
 
 	} else {
-		userInRequestExists, err = userExists(ctx, conn, b.Data.Attributes.Message.Sender.InternalUserID)
+		userInRequestExists, err = dbQueries.GetUserExistsByID(ctx, senderID)
 		if err != nil {
 			fmt.Println(err)
 			return err
@@ -37,9 +40,15 @@ func handleChatMessage(ctx context.Context, conn *pgx.Conn, b *BaseEvent, meetin
 	}
 
 	if !userInRequestExists {
-		return fmt.Errorf("user %s is not present. This is unexpected behaviour, check your DB integrity and the API authorisation", b.Data.Attributes.Message.Sender.InternalUserID)
+		return fmt.Errorf("user %s is not present. This is unexpected behaviour, check your DB integrity and the API authorisation", senderID)
 	}
-	_, err = conn.Exec(ctx, "INSERT INTO chat_messages (internal_meeting_id, internal_user_id, chat_id, message_content, send_time) VALUES ($1,$2,$3,$4,$5)", meeting.InternalMeetingID, message.Sender.InternalUserID, b.Data.Attributes.ChatID, message.Message, b.GetTimestamp())
+	err = dbQueries.InsertChatMessageToMeetingByID(ctx, db.InsertChatMessageToMeetingByIDParams{
+		InternalMeetingID: meeting.InternalMeetingID,
+		InternalUserID:    senderID,
+		ChatID:            b.Data.Attributes.ChatID,
+		MessageContent:    message.Message,
+		SendTime:          pgtype.Timestamp{Valid: true, Time: b.GetTimestamp()},
+	})
 	if err != nil {
 		fmt.Println(err)
 		return err

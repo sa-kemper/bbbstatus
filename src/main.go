@@ -34,6 +34,7 @@ type Template struct {
 	templates *template.Template
 }
 
+// Render is a function hook to provide function calls inside html templates, such as Translate
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	// Genius move right there, not because it's hard but because I've not seen this documented at the time of writing.
 	t.templates.Funcs(template.FuncMap{"t": func(text string) string {
@@ -44,6 +45,8 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
+// Translate is a simple i18n function that translates text and fails at runtime if the string is not available in the requested language.
+// failing hard makes testing the code a lot easier.
 func Translate(text string) string {
 	re := regexp.MustCompile("CW(?i)[0-9]{1,2}")
 	matched := re.MatchString(text)
@@ -56,6 +59,7 @@ func Translate(text string) string {
 	return localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: text})
 }
 
+// TranslateAdvanced is a simple i18n function that supports text templating
 func TranslateAdvanced(text string, data map[string]string) string {
 	return localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: text, TemplateData: data})
 }

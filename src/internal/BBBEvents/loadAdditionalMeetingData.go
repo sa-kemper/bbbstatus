@@ -17,18 +17,19 @@
 package BBBEvents
 
 import (
+	db "bbbstatus/internal/database"
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 )
 
-func loadAdditionalMeetingData(meeting *Meeting, conn *pgx.Conn) error {
+func loadAdditionalMeetingData(ctx context.Context, meeting *Meeting, dbQueries *db.Queries) error {
 	if meeting.Name == "" && meeting.InternalMeetingID != "" {
-		err := conn.QueryRow(context.Background(), "SELECT name FROM meetings WHERE internal_meeting_id=$1", meeting.InternalMeetingID).Scan(&meeting.Name)
+		dbMeeting, err := dbQueries.GetMeetingById(ctx, meeting.InternalMeetingID) // conn.QueryRow(context.Background(), "SELECT name FROM meetings WHERE internal_meeting_id=$1", meeting.InternalMeetingID).Scan(&meeting.Name)
 		if err != nil {
 			fmt.Println("error occurred during save event -> loadAdditionalMeetingData: ", err)
 			return err
 		}
+		meeting.Name = dbMeeting.Name
 	}
 	return nil
 }

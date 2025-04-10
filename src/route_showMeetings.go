@@ -116,7 +116,7 @@ func showMeetings(c echo.Context) error {
 
 		for _, m := range dbMeetings {
 			rm := BBBEvents.ConvertDBToBBBMeeting(m)
-			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Time.Before(time.Now())})
+			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: m.MeetingEnded.Time.Before(time.Now())})
 		}
 	} else {
 		dbMeetings, err := dbQueries.GetMeetings(ctx)
@@ -129,7 +129,7 @@ func showMeetings(c echo.Context) error {
 		}
 		for _, m := range dbMeetings {
 			rm := BBBEvents.ConvertDBToBBBMeeting(m)
-			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Time.Before(time.Now())})
+			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: m.MeetingEnded.Time.Before(time.Now())})
 		}
 	}
 

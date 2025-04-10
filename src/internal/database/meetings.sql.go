@@ -27,6 +27,20 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const endMeetingAtTimestampByID = `-- name: EndMeetingAtTimestampByID :exec
+UPDATE meetings SET meeting_ended = $1 WHERE internal_meeting_id = $2
+`
+
+type EndMeetingAtTimestampByIDParams struct {
+	MeetingEnded      pgtype.Timestamp
+	InternalMeetingID string
+}
+
+func (q *Queries) EndMeetingAtTimestampByID(ctx context.Context, arg EndMeetingAtTimestampByIDParams) error {
+	_, err := q.db.Exec(ctx, endMeetingAtTimestampByID, arg.MeetingEnded, arg.InternalMeetingID)
+	return err
+}
+
 const getMeetingById = `-- name: GetMeetingById :one
 SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended
 FROM meetings
@@ -160,4 +174,45 @@ func (q *Queries) GetMeetingsBetweenDates(ctx context.Context, arg GetMeetingsBe
 		return nil, err
 	}
 	return items, nil
+}
+
+const insertMeeting = `-- name: InsertMeeting :exec
+INSERT INTO meetings (internal_meeting_id, external_meeting_id, name, is_breakout, parent_id,  create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+`
+
+type InsertMeetingParams struct {
+	InternalMeetingID string
+	ExternalMeetingID string
+	Name              string
+	IsBreakout        pgtype.Bool
+	ParentID          pgtype.Text
+	CreateTime        pgtype.Timestamp
+	ModeratorPass     string
+	ViewerPass        string
+	Record            pgtype.Bool
+	VoiceConf         pgtype.Text
+	DialNumber        pgtype.Text
+	MaxUsers          pgtype.Int4
+	Metadata          []byte
+	Bbbhostname       string
+}
+
+func (q *Queries) InsertMeeting(ctx context.Context, arg InsertMeetingParams) error {
+	_, err := q.db.Exec(ctx, insertMeeting,
+		arg.InternalMeetingID,
+		arg.ExternalMeetingID,
+		arg.Name,
+		arg.IsBreakout,
+		arg.ParentID,
+		arg.CreateTime,
+		arg.ModeratorPass,
+		arg.ViewerPass,
+		arg.Record,
+		arg.VoiceConf,
+		arg.DialNumber,
+		arg.MaxUsers,
+		arg.Metadata,
+		arg.Bbbhostname,
+	)
+	return err
 }

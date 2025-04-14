@@ -116,7 +116,7 @@ func showMeetings(c echo.Context) error {
 
 		for _, m := range dbMeetings {
 			rm := BBBEvents.ConvertDBToBBBMeeting(m)
-			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: m.MeetingEnded.Time.Before(time.Now())})
+			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Valid})
 		}
 	} else {
 		dbMeetings, err := dbQueries.GetMeetings(ctx)
@@ -129,7 +129,8 @@ func showMeetings(c echo.Context) error {
 		}
 		for _, m := range dbMeetings {
 			rm := BBBEvents.ConvertDBToBBBMeeting(m)
-			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: m.MeetingEnded.Time.Before(time.Now())})
+			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Valid})
+			// fmt.Println("DEBUG: m.MeetingEnded valid =", m.MeetingEnded.Valid, "m.MeetingEnded.time=", m.MeetingEnded.Time.Format(time.RFC3339), "time.Now() =", time.Now(), "m.MeetingEnded.Time.Before(time.Now()) =", m.MeetingEnded.Time.Before(time.Now()))
 		}
 	}
 

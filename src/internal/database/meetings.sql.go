@@ -75,7 +75,9 @@ func (q *Queries) GetMeetingById(ctx context.Context, internalMeetingID string) 
 }
 
 const getMeetingCountBetweenDates = `-- name: GetMeetingCountBetweenDates :one
-SELECT COUNT(*) FROM meetings WHERE create_time BETWEEN $1 AND $2
+SELECT COUNT(*)
+FROM meetings
+WHERE create_time BETWEEN $1 AND $2
 `
 
 type GetMeetingCountBetweenDatesParams struct {

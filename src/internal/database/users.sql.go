@@ -74,7 +74,9 @@ func (q *Queries) GetUserById(ctx context.Context, internalUserID string) (User,
 }
 
 const getUserCountBetweenDates = `-- name: GetUserCountBetweenDates :one
-SELECT COUNT(*) FROM users WHERE join_timestamp BETWEEN $1 AND $2
+SELECT COUNT(*)
+FROM users
+WHERE join_timestamp BETWEEN $1 AND $2
 `
 
 type GetUserCountBetweenDatesParams struct {
@@ -116,7 +118,9 @@ func (q *Queries) GetUserNameById(ctx context.Context, internalUserID string) (s
 }
 
 const getUsersWhoJoinedBetween = `-- name: GetUsersWhoJoinedBetween :many
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp FROM users WHERE join_timestamp BETWEEN $1 AND $2
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp
+FROM users
+WHERE join_timestamp BETWEEN $1 AND $2
 `
 
 type GetUsersWhoJoinedBetweenParams struct {

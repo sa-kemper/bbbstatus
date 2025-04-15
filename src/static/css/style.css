@@ -551,6 +551,25 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         width: 100%;
     }
 
+
+    .server-filter-card {
+        position: static !important;
+        margin-left: auto;
+    }
+
+    #server-filter-submit {
+        display: none;
+    }
+
+    #filter-group-submit-div {
+        display: block !important;
+        flex: 0 0 100%;
+    }
+
+    #filter-group-submit-input {
+        width: 100%;
+    }
+
 }
 
 @media print {
@@ -584,6 +603,7 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     .filter-action {
         justify-content: center; /* Center-align the button on small screens */
     }
+
 }
 
 .not-found-container {
@@ -742,4 +762,58 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
 
 .link-group .link .name.active::after {
     --direction: 10px;
+}
+
+#server-filter-submit {
+    margin-top: 0.5rem;
+}
+
+.server-filter-card {
+    display: grid;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.server-filter-servers > :first-child .server-filter-label {
+    border-top: rgba(0, 0, 0, 0.1) 1px solid;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.server-filter-servers > :last-child .server-filter-label {
+    border-bottom: rgba(0, 0, 0, 0.1) 1px solid;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+
+}
+
+.server-filter-servers {
+    list-style-type: none;
+
+}
+
+.server-filter-checkbox {
+    display: none;
+}
+
+.server-filter-label {
+    border-left: rgba(0, 0, 0, 0.1) 1px solid;
+    border-right: rgba(0, 0, 0, 0.1) 1px solid;
+    padding: 0.75rem 1.5rem;
+    display: grid;
+}
+
+.server-filter-checkbox:checked + .server-filter-label {
+    background: linear-gradient(90deg, #1565c0, #1e88e5);
+    color: #fff;
+}
+
+.server-filter-checkbox:not(:checked) + .server-filter-label {
+    background-color: #f5f7fa;
+    color: black;
 }

@@ -202,9 +202,9 @@ other = "Die Aufzeichnung der Sitzung wurde gestoppt"
 hash = "sha1-40dc448a962e5fe46d99f57ab5bbb9ad1da10770"
 other = "Interne ID"
 
-[MeetingMaxUsers]
-hash = "sha1-b596635d2f535d00bb781d4a143be711cda7488d"
-other = "Maximale Benutzer"
+[MeetingUserCount]
+hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"
+other = "Users"
 
 [MeetingNoMeetingsExist]
 hash = "sha1-6c91094f705185eae005c75e7355e7bc29c050a9"

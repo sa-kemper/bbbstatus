@@ -91,6 +91,17 @@ func (q *Queries) GetUserCountBetweenDates(ctx context.Context, arg GetUserCount
 	return count, err
 }
 
+const getUserCountInMeetingByInternalID = `-- name: GetUserCountInMeetingByInternalID :one
+SELECT count(internal_user_id) AS userCount FROM users WHERE internal_user_id IN (SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1)
+`
+
+func (q *Queries) GetUserCountInMeetingByInternalID(ctx context.Context, internalMeetingID string) (int64, error) {
+	row := q.db.QueryRow(ctx, getUserCountInMeetingByInternalID, internalMeetingID)
+	var usercount int64
+	err := row.Scan(&usercount)
+	return usercount, err
+}
+
 const getUserExistsByID = `-- name: GetUserExistsByID :one
 SELECT TRUE
 FROM users

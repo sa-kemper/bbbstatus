@@ -40,3 +40,8 @@ WHERE join_timestamp BETWEEN $1 AND $2;
 SELECT *
 FROM users
 WHERE join_timestamp BETWEEN $1 AND $2;
+
+-- name: GetUserCountInMeetingByInternalID :one
+SELECT count(internal_user_id) AS userCount
+FROM users
+WHERE internal_user_id IN (SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1);

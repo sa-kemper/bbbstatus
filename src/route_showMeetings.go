@@ -43,7 +43,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "MeetingToReport", Other: "Go to report"},
 		{ID: "MeetingOpenDetails", Other: "Open details"},
 		{ID: "MeetingExternalID", Other: "Internal ID"},
-		{ID: "MeetingMaxUsers", Other: "Max Users"},
+		{ID: "MeetingUserCount", Other: "Users"},
 		{ID: "MeetingCreateTime", Other: "Create Time"},
 		{ID: "MeetingDuration", Other: "Duration"},
 		{ID: "MeetingRecordingStatusHeader", Other: "Recording"},
@@ -66,6 +66,7 @@ func init() { // Add all messages that are related to this file into the localiz
 type MeetingListMeetingWrapper struct {
 	BBBEventsMeeting BBBEvents.Meeting
 	BbbHostname      string
+	UserCount        int
 	Active           bool
 }
 
@@ -136,7 +137,6 @@ func showMeetings(c echo.Context) error {
 	if serverStats.TotalMeetings > 0 {
 		for iterator, count := range serverStats.ServerCounts {
 			serverStats.ServerCounts[iterator].Percentage = float32(count.Meetings/serverStats.TotalMeetings) * 100
-			fmt.Println(count.Hostname, count.Percentage)
 		}
 	}
 
@@ -179,10 +179,37 @@ func showMeetings(c echo.Context) error {
 		}
 	}
 
+	fmt.Println("Meetings:", len(meetings))
+	for iterator, meeting := range meetings {
+		if meeting.Active {
+			servers := confGetServers(meeting.BbbHostname)
+			var server bbbServer
+			if len(servers) > 0 {
+				server = servers[0]
+			} else {
+				continue
+			}
+			apiTimeout := time.Duration(server.APITimeout) * time.Second
+			bbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apiTimeout}
+			details, err := bbbApi.GetMeetingDetails(ctx, meeting.BBBEventsMeeting.InternalMeetingID)
+			if err != nil {
+				fmt.Println("Error getting meeting details", err.Error())
+				meetings[iterator].UserCount = 0
+			}
+			meetings[iterator].UserCount = details.ParticipantCount
+		} else {
+			usrCount, err := dbQueries.GetUserCountInMeetingByInternalID(ctx, meeting.BBBEventsMeeting.InternalMeetingID)
+			if err != nil {
+				fmt.Println("Error getting user count in meetings", err.Error())
+				continue
+			}
+			meetings[iterator].UserCount = int(usrCount)
+		}
+	}
+
 	sort.Slice(meetings, func(i, j int) bool {
 		return meetings[i].BBBEventsMeeting.CreateTime.After(meetings[j].BBBEventsMeeting.CreateTime)
 	})
-
 	err = c.Render(http.StatusOK, "meetings", map[string]interface{}{"Request": struct {
 		StartDate    string
 		EndDate      string

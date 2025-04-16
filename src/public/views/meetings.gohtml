@@ -75,6 +75,8 @@
 							<div class="detail-item">
 								<span class="detail-label">{{t "MeetingCreated"}}</span>
 								<span class="detail-value">{{ .BBBEventsMeeting.CreateDate }}</span>
+
+
 							</div>
 
 
@@ -91,6 +93,8 @@
 								<div class="detail-item">
 									<span class="detail-label">{{t "MeetingCreateTime"}}</span>
 									<span class="detail-value">{{formatTime .BBBEventsMeeting.CreateTime }}</span>
+									<span class="detail-label">{{t "MeetingUserCount"}}</span>
+									<span class="detail-value">{{ .UserCount }}</span>
 								</div>
 							</div>
 						</div>

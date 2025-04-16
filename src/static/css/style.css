@@ -604,6 +604,10 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         justify-content: center; /* Center-align the button on small screens */
     }
 
+    .server-filter-card {
+        margin-left: initial;
+    }
+
 }
 
 .not-found-container {

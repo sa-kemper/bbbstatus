@@ -555,6 +555,7 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     .server-filter-card {
         position: static !important;
         margin-left: auto;
+        padding: 0 !important;
     }
 
     #server-filter-submit {
@@ -596,7 +597,7 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         gap: 1rem;
     }
 
-    .filter-group {
+    .filter-group, #start-date, #end-date {
         width: 100%; /* Full width for all filter groups */
     }
 
@@ -607,6 +608,7 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     .server-filter-card {
         margin-left: initial;
     }
+
 
 }
 

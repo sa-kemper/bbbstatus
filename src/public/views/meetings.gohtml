@@ -28,38 +28,32 @@
 					<label for="end-date">{{t "meetingListFilterEndDate"}}</label>
 					<input type="date" id="end-date" name="end-date" value="{{.Request.EndDate}}">
 				</div>
-
-
 				<div class="server-filter-card">
 					Server filter
 					<ul class="server-filter-servers">
-						<li>
-							<input class="server-filter-checkbox" type="checkbox" id="server-filter-bbb.example.de"
-								   name="server-filter" value="bbb.example.de">
-							<label for="server-filter-bbb.example.de" class="server-filter-label">bbb.example.de (4
-								user)</label>
-						</li>
-						<li>
-							<input class="server-filter-checkbox" type="checkbox"
-								   id="server-filter-bbb.bigbluebutton.org" name="server-filter"
-								   value="bbb.bigbluebutton.org">
-							<label for="server-filter-bbb.bigbluebutton.org"
-								   class="server-filter-label">bbb.bigbluebutton.org (12 user)</label>
-						</li>
-						<li>
-							<input class="server-filter-checkbox" type="checkbox" id="server-filter-bbb1.whitehouse.gov"
-								   name="server-filter" value="bbb1.whitehouse.gov">
-							<label for="server-filter-bbb1.whitehouse.gov"
-								   class="server-filter-label">bbb1.whitehouse.gov (50 user)</label>
-						</li>
+                        {{ range .Request.ServerFilter }}
+							<li>
+								<input class="server-filter-checkbox"
+									   type="checkbox" {{if .FilteredFor }} checked {{end}}
+									   id="server-filter-{{.Hostname}}" name="server-filter-bbb.0gb.de">
+								<label for="server-filter-{{.Hostname}}" class="server-filter-label">{{.Hostname}}
+									({{.Users}}
+                                    {{t "meetingListUserCountLabel"}})</label>
+							</li>
+                        {{ end }}
 					</ul>
-					<input type="submit" class="meeting-button" id="server-filter-submit" value="{{t "
-                    meetingListFilterFilterButton"}}">
-					<div class=" filter-group filter-action" id="filter-group-submit-div">
-					<input type="submit" class="meeting-button" id="filter-group-submit-input" value="{{t "
-                    meetingListFilterFilterButton"}}">
-					</div>
+					<input type="submit" class="meeting-button" id="server-filter-submit"
+						   value="{{t "meetingListFilterFilterButton"}}">
+				</div>
+
+				<div class=" filter-group filter-action" id="filter-group-submit-div">
+					<input type="submit" class="meeting-button" id="filter-group-submit-input"
+						   value="{{t "meetingListFilterFilterButton"}}">
+				</div>
+
+
 			</form>
+
 		</div>
 
 
@@ -67,8 +61,7 @@
 					<!-- Example Meeting Card -->
                     {{ range .Meetings}}
 						<div class="meeting-card" tabindex="0">
-							<div class="status-badge status-{{if .Active}}active{{else}}ended{{end}}">{{ if .Active}}{{t
-                                "MeetingActive"}}{{else}}{{t "MeetingEnded"}}{{end}}</div>
+							<div class="status-badge status-{{if .Active}}active{{else}}ended{{end}}">{{ if .Active}}{{t "MeetingActive"}}{{else}}{{t "MeetingEnded"}}{{end}}</div>
 							<h3>{{ .BBBEventsMeeting.Name}}</h3>
 							<div class="detail-item">
 								<span class="detail-label">{{t "ReportMeetingDetailBBBHostname"}}</span>
@@ -81,10 +74,8 @@
 
 
 							<div class="detail-item">
-								<a class="meeting-button meeting-button-to-report" href="{{ reverse " report"
-                                .BBBEventsMeeting.InternalMeetingID }}"
-								   onclick="window.location.href='{{ reverse " report"
-                                   .BBBEventsMeeting.InternalMeetingID }}'">
+								<a class="meeting-button meeting-button-to-report"
+								   href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}">
                                     {{t "MeetingToReport"}}
 								</a>
 								<a class="meeting-button meeting-button-details">

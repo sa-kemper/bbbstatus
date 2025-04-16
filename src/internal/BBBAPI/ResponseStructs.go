@@ -54,10 +54,10 @@ type RecordingMetadata struct {
 
 type GetMeetingsResponse struct {
 	ReturnCode string      `xml:"returncode"`
-	Meetings   allMeetings `xml:"meetings"`
+	Meetings   AllMeetings `xml:"meetings"`
 	MessageKey string      `xml:"messageKey"`
 }
-type allMeetings struct {
+type AllMeetings struct {
 	MeetingInfo []GetMeetingInfoResponse `xml:"meeting"`
 }
 

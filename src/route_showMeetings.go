@@ -16,8 +16,10 @@
 package main
 
 import (
+	"bbbstatus/internal/BBBAPI"
 	"bbbstatus/internal/BBBEvents"
 	db "bbbstatus/internal/database"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -27,6 +29,7 @@ import (
 	"golang.org/x/text/language"
 	"net/http"
 	"os"
+	"slices"
 	"sort"
 	"time"
 )
@@ -52,6 +55,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "meetingListFilterEndDate", Other: "End Date"},
 		{ID: "meetingListFilterFilterButton", Other: "Filter"},
 		{ID: "meetingListHeaderSeeStatisticsButton", Other: "See statistics"},
+		{ID: "meetingListUserCountLabel", One: "User", Other: "Users"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 }
@@ -66,6 +70,11 @@ type MeetingListMeetingWrapper struct {
 
 // e.Get("/meetings/", showMeetings)
 func showMeetings(c echo.Context) error {
+	type ServerFilter struct {
+		Hostname    string
+		Users       int
+		FilteredFor bool
+	}
 	var isFilteredRequest bool
 	var startDate, endDate time.Time
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
@@ -75,7 +84,28 @@ func showMeetings(c echo.Context) error {
 	// handle filtered request
 	startDateParam := c.FormValue("start-date")
 	endDateParam := c.FormValue("end-date")
-	if startDateParam != "" || endDateParam != "" {
+
+	var selectedServers []bbbServer
+	var showMeetingsServerFiltered []ServerFilter
+
+	for _, server := range confGetServers("") {
+		apiTimeout := time.Duration(server.APITimeout) * time.Second
+		BbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apiTimeout}
+		selectedServers = append(selectedServers, server)
+
+		userCount, err := BbbApi.GetServerUserCount(ctx)
+		if err != nil {
+			fmt.Println("Error getting user count:", err)
+			continue
+		}
+		currentServer := ServerFilter{Hostname: server.Hostname, Users: userCount}
+		if c.FormValue("server-filter-"+server.Hostname) != "" {
+			currentServer.FilteredFor = true
+		}
+		showMeetingsServerFiltered = append(showMeetingsServerFiltered, currentServer)
+	}
+
+	if startDateParam != "" || endDateParam != "" || len(selectedServers) > 0 {
 		isFilteredRequest = true
 	}
 
@@ -92,32 +122,12 @@ func showMeetings(c echo.Context) error {
 	defer conn.Close(ctx)
 	var meetings []MeetingListMeetingWrapper
 	if isFilteredRequest {
-		if endDate.IsZero() {
-			endDate = time.Now()
-		}
-		endDate = endDate.Add(time.Hour * 25) // make the end date inclusive.
-		dbMeetings, err := dbQueries.GetMeetingsBetweenDates(ctx, db.GetMeetingsBetweenDatesParams{
-			CreateTime: pgtype.Timestamp{
-				Valid: true,
-				Time:  startDate,
-			},
-			CreateTime_2: pgtype.Timestamp{
-				Valid: true,
-				Time:  endDate,
-			},
-		})
+		filteredMeetings, err := HandleFilteredRequest(ctx, dbQueries, startDate, endDate, selectedServers, &meetings)
 		if err != nil {
-			if errors.Is(err, os.ErrDeadlineExceeded) {
-				fmt.Println("FATAL: Database timed out")
-			}
-			fmt.Println("Error occurred in GetMeetingsBetweenDates: ", err)
+			fmt.Println("error handeling filtered request:", err)
 			return err
 		}
-
-		for _, m := range dbMeetings {
-			rm := BBBEvents.ConvertDBToBBBMeeting(m)
-			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Valid})
-		}
+		meetings = *filteredMeetings
 	} else {
 		dbMeetings, err := dbQueries.GetMeetings(ctx)
 		if err != nil {
@@ -139,11 +149,57 @@ func showMeetings(c echo.Context) error {
 	})
 
 	err = c.Render(http.StatusOK, "meetings", map[string]interface{}{"Request": struct {
-		StartDate string
-		EndDate   string
-	}{StartDate: startDateParam, EndDate: endDateParam}, "Meetings": meetings})
+		StartDate    string
+		EndDate      string
+		ServerFilter []ServerFilter
+	}{StartDate: startDateParam, EndDate: endDateParam, ServerFilter: showMeetingsServerFiltered}, "Meetings": meetings})
 	if err != nil {
 		fmt.Println(err)
 	}
 	return nil
+}
+
+func HandleFilteredRequest(ctx context.Context, dbQueries *db.Queries, startDate time.Time, endDate time.Time, filteredServers []bbbServer, meetings *[]MeetingListMeetingWrapper) (filteredMeetings *[]MeetingListMeetingWrapper, err error) {
+
+	if endDate.IsZero() {
+		endDate = time.Now()
+	}
+	endDate = endDate.Add(time.Hour * 25) // make the end date inclusive.
+	dbMeetings, err := dbQueries.GetMeetingsBetweenDates(ctx, db.GetMeetingsBetweenDatesParams{
+		CreateTime: pgtype.Timestamp{
+			Valid: true,
+			Time:  startDate,
+		},
+		CreateTime_2: pgtype.Timestamp{
+			Valid: true,
+			Time:  endDate,
+		},
+	})
+	if err != nil {
+		if errors.Is(err, os.ErrDeadlineExceeded) {
+			fmt.Println("FATAL: Database timed out")
+		}
+		fmt.Println("Error occurred in GetMeetingsBetweenDates: ", err)
+		return meetings, err
+	}
+
+	for _, m := range dbMeetings {
+		rm := BBBEvents.ConvertDBToBBBMeeting(m)
+		*meetings = append(*meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Valid})
+	}
+	var meetingClone = slices.Clone(*meetings)
+	if len(filteredServers) > 0 {
+		var filteredSlice []MeetingListMeetingWrapper
+		var allowedHostnames []string
+
+		for _, meeting := range meetingClone {
+			if slices.Contains(allowedHostnames, meeting.BbbHostname) {
+				filteredSlice = append(filteredSlice, meeting)
+			}
+			continue
+		}
+
+	}
+
+	return &meetingClone, nil
 }

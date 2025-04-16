@@ -56,6 +56,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "meetingListFilterFilterButton", Other: "Filter"},
 		{ID: "meetingListHeaderSeeStatisticsButton", Other: "See statistics"},
 		{ID: "meetingListUserCountLabel", One: "User", Other: "Users"},
+		{ID: "ServerStatsMeetings", One: "Meeting", Other: "Meetings"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 }
@@ -75,6 +76,14 @@ func showMeetings(c echo.Context) error {
 		Users       int
 		FilteredFor bool
 	}
+	var serverStats struct {
+		TotalMeetings int
+		ServerCounts  []struct {
+			Percentage float32
+			Hostname   string
+			Meetings   int
+		}
+	}
 	var isFilteredRequest bool
 	var startDate, endDate time.Time
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
@@ -91,6 +100,24 @@ func showMeetings(c echo.Context) error {
 	for _, server := range confGetServers("") {
 		apiTimeout := time.Duration(server.APITimeout) * time.Second
 		BbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apiTimeout}
+
+		// fill server usage stats by meeting count
+		serverMeetings, err := BbbApi.GetMeetings(ctx)
+		if err != nil {
+			fmt.Printf("Error getting meetings: %v\n", err)
+			continue
+		}
+		serverStats.TotalMeetings += len(serverMeetings)
+		serverStats.ServerCounts = append(serverStats.ServerCounts, struct {
+			Percentage float32
+			Hostname   string
+			Meetings   int
+		}{
+			Percentage: 0.0,
+			Hostname:   server.Hostname,
+			Meetings:   len(serverMeetings),
+		})
+
 		selectedServers = append(selectedServers, server)
 
 		userCount, err := BbbApi.GetServerUserCount(ctx)
@@ -103,6 +130,14 @@ func showMeetings(c echo.Context) error {
 			currentServer.FilteredFor = true
 		}
 		showMeetingsServerFiltered = append(showMeetingsServerFiltered, currentServer)
+	}
+
+	// update server stats percentages
+	if serverStats.TotalMeetings > 0 {
+		for iterator, count := range serverStats.ServerCounts {
+			serverStats.ServerCounts[iterator].Percentage = float32(count.Meetings/serverStats.TotalMeetings) * 100
+			fmt.Println(count.Hostname, count.Percentage)
+		}
 	}
 
 	if startDateParam != "" || endDateParam != "" || len(selectedServers) > 0 {
@@ -152,7 +187,7 @@ func showMeetings(c echo.Context) error {
 		StartDate    string
 		EndDate      string
 		ServerFilter []ServerFilter
-	}{StartDate: startDateParam, EndDate: endDateParam, ServerFilter: showMeetingsServerFiltered}, "Meetings": meetings})
+	}{StartDate: startDateParam, EndDate: endDateParam, ServerFilter: showMeetingsServerFiltered}, "Meetings": meetings, "ServerStats": serverStats})
 	if err != nil {
 		fmt.Println(err)
 	}

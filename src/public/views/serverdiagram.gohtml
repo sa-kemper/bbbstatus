@@ -1,0 +1,14 @@
+{{ define "server_diagram" }}
+    {{ if .ServerCounts  }}
+		<div class="server-bar">
+            {{ range .ServerCounts }}
+				<div class="server-section" style="--width: {{ .Percentage }}%;"
+					 title="{{ .Hostname }}: {{ .Meetings }} meetings"
+					 aria-label="{{ .Hostname }}: {{ .Meetings }} meetings">
+					<span class="server-name">{{ .Hostname }}</span>
+					<span class="meeting-count">({{ .Meetings }} {{t "ServerStatsMeetings"}})</span>
+				</div>
+            {{ end }}
+		</div>
+    {{end}}
+{{ end }}

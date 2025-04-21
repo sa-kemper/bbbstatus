@@ -101,6 +101,16 @@ func showMeetings(c echo.Context) error {
 	for _, server := range confGetServers("") {
 		apiTimeout := time.Duration(server.APITimeout) * time.Second
 		BbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apiTimeout}
+		if valid, err := BbbApi.ValidateApiSettings(ctx); err != nil || !valid {
+			if err != nil {
+				fmt.Println("error occurred validating API settings for server '"+server.Hostname+"': ", err)
+				continue
+			}
+			if !valid {
+				fmt.Println(server.Hostname, "has no valid API settings")
+				continue
+			}
+		}
 
 		// fill server usage stats by meeting count
 		serverMeetings, err := BbbApi.GetMeetings(ctx)
@@ -191,7 +201,17 @@ func showMeetings(c echo.Context) error {
 			}
 			apiTimeout := time.Duration(server.APITimeout) * time.Second
 			bbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apiTimeout}
-			details, err := bbbApi.GetMeetingDetails(ctx, meeting.BBBEventsMeeting.InternalMeetingID)
+			if valid, err := bbbApi.ValidateApiSettings(ctx); err == nil || !valid {
+				if !valid {
+					fmt.Println(server.Hostname, "has no valid API settings")
+				}
+				if err != nil {
+					fmt.Println("error occurred validating API settings for server '"+server.Hostname+"': ", err)
+				}
+				continue
+			}
+
+			details, err := bbbApi.GetMeetingDetails(ctx, meeting.BBBEventsMeeting.ExternalMeetingID)
 			if err != nil {
 				fmt.Println("Error getting meeting details", err.Error())
 				meetings[iterator].UserCount = 0

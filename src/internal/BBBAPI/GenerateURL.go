@@ -40,7 +40,7 @@ func generateURL(config URLConfig) string {
 		var empty string // remove port param if it's the default https port.
 		config.ApiPort = &empty
 	}
-
+	// fmt.Println("DEBUG generateURL -> config.Hostname = '" + config.Hostname + "'")
 	result := fmt.Sprintf("https://%s%s/bigbluebutton/api/%s?", config.Hostname, *config.ApiPort, config.Methode)
 
 	keys := make([]string, 0, len(config.Parameters))
@@ -54,8 +54,10 @@ func generateURL(config URLConfig) string {
 		paramString += fmt.Sprintf("%s=%s&", key, config.Parameters[key])
 	}
 
-	checksumString := config.Methode + strings.TrimRight(paramString, "&") + config.SharedSecret
+	checksumString := config.Methode + strings.TrimRight(paramString, "") + config.SharedSecret
 	checksum := sha1.New()
 	checksum.Write([]byte(checksumString))
+	// fmt.Println("DEBUG Input: ", result, " checksum: ", hex.EncodeToString(checksum.Sum(nil)), "shared secret: ", config.SharedSecret)
+	// fmt.Println("DEBUG generateURL -> result =", fmt.Sprintf("%schecksum=%s", result, hex.EncodeToString(checksum.Sum(nil))))
 	return fmt.Sprintf("%schecksum=%s", result, hex.EncodeToString(checksum.Sum(nil)))
 }

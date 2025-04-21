@@ -25,9 +25,9 @@ import (
 )
 
 // GetMeetingDetails gets information from the bbb server about the meeting in question
-func (a *API) GetMeetingDetails(ctx context.Context, internalMeetingId string) (MeetingInfo GetMeetingInfoResponse, err error) {
+func (a *API) GetMeetingDetails(ctx context.Context, externalMeetingID string) (MeetingInfo GetMeetingInfoResponse, err error) {
 	var client = a.getHTTPClient()
-	var requestParameters = map[string]string{"meetingID": internalMeetingId}
+	var requestParameters = map[string]string{"meetingID": externalMeetingID}
 	var url = generateURL(URLConfig{Hostname: a.Hostname, Methode: "getMeetingInfo", Parameters: requestParameters, SharedSecret: a.SharedSecret})
 	request, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {

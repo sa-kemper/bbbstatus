@@ -27,6 +27,7 @@ func (a *API) GetMeetings(ctx context.Context) (meetings []GetMeetingInfoRespons
 	var client = a.getHTTPClient()
 	var requestParameters = make(map[string]string)
 	var apiResponse GetMeetingsResponse
+	// fmt.Println("DEBUG: GetMeetings -> a.Hostname = ", a.Hostname)
 	var url = generateURL(URLConfig{Hostname: a.Hostname, Methode: "getMeetings", Parameters: requestParameters, SharedSecret: a.SharedSecret}) // we use the getMeetings methode as it should always respond with SUCCESS, even if no meetings exist.
 
 	request, err := http.NewRequestWithContext(ctx, "GET", url, nil)

@@ -17,13 +17,16 @@ limitations under the License.
     <div class="card">
         <h2>{{t "ReportParticipantsHeader"}}</h2>
         <div class="participants-list">
+            {{ with .Report.Participants }}
             {{ range . }}
-                <div class="participant-card">
+                <a class="participant-card"
+                   href="{{ reverse "inspectReport" $.InternalMeetingID }}?participants={{.InternalUserID}}">
                     <div class="participant-info">
                         <h3>{{ .Name }}</h3>
                         <span class="role-badge role-moderator">{{ .Role }}</span>
                     </div>
-                </div>
+                </a>
+            {{ end }}
             {{ end }}
         </div>
     </div>

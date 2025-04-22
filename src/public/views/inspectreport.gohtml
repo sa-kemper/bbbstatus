@@ -1,0 +1,49 @@
+{{ define "inspectReport" }}
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>{{t "ReportHeader"}}</title>
+		<link rel="stylesheet" href="/static/css/style.css">
+		<link rel="stylesheet" href="/static/fontawesome.min.css">
+	</head>
+	<body>
+	<div class="container">
+		<div class="action-buttons">
+			<button class="action-button" onclick="window.print()">
+				<i class="fas fa-print"></i>
+				<span>{{t "ReportPrintReportButton"}}</span>
+			</button>
+			<a class="action-button" href="{{reverse "reportCsv" .InternalMeetingID}}">
+				<i class="fas fa-file-excel"></i>
+				<span>{{t "ReportOpenInExcelButton"}}</span>
+			</a>
+		</div>
+
+		<div class="card header">
+			<h1>{{t "ReportHeader"}}</h1>
+		</div>
+		<a class="meeting-button report-back-meeting-button" href="{{reverse "meetings"}}" id="topBackToMeetings">
+			<i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
+		</a>
+
+		<!-- Meeting Details -->
+        {{template "meetingdetails" .Report.Details}}
+		<!-- TODO: Participants form sub template. -->
+
+		<!-- Recordings -->
+        {{ if .Report.Recordings }}
+            {{template "recordings" .Report.Recordings}}
+        {{ end }}
+		<!-- Timeline -->
+        {{template "timeline" .Report.Timeline}}
+
+		<a class="meeting-button report-back-meeting-button" href="{{reverse "meetings"}}" id="bottomBackToMeetings">
+			<i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
+		</a>
+	</div>
+	</body>
+	</html>
+
+{{ end }}

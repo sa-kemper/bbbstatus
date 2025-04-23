@@ -30,7 +30,26 @@
 
 		<!-- Meeting Details -->
         {{template "meetingdetails" .Report.Details}}
-		<!-- TODO: Participants form sub template. -->
+
+		<div class="card">
+			<h2>{{t "ReportParticipantsHeader"}}</h2>
+			<form class="participants-list">
+                {{ with .Report.Participants }}
+                    {{ range . }}
+						<div>
+							<input type="checkbox" class="participant-checkbox" name="{{.InternalUserID}}"
+								   id="{{.InternalUserID}}"/>
+							<label class="participant-card" for="{{.InternalUserID}}">
+								<h3>{{ .Name }}</h3>
+								<span class="role-badge role-moderator">{{ .Role }}</span>
+							</label>
+						</div>
+                    {{ end }}
+                {{ end }}
+				<input type="submit" class="meeting-button participant-filter-submit" value="filter">
+			</form>
+		</div>
+
 
 		<!-- Recordings -->
         {{ if .Report.Recordings }}

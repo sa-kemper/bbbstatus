@@ -240,19 +240,32 @@ body {
 }
 
 .participant-card {
-    display: flex;
+    display: block;
     align-items: center;
     padding: 1rem;
-    background: #f8f9fa;
+    background: #dde5ed;
     border-radius: 6px;
     transition: transform 0.2s;
+    text-decoration: none;
+    color: #000;
 }
 
-.participant-card:hover {
+.participant-checkbox {
+    display: none;
+    box-sizing: border-box;
+    word-wrap: break-word;
+}
+
+.participant-checkbox:checked + .participant-card, .participant-card:hover, .participant-card:active {
     transform: translateY(-2px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #1e88e5;
+    color: white;
 }
 
+.participant-filter-submit {
+    grid-column: span 3;
+}
 .participant-info {
     flex-grow: 1;
 }

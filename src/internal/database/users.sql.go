@@ -92,7 +92,9 @@ func (q *Queries) GetUserCountBetweenDates(ctx context.Context, arg GetUserCount
 }
 
 const getUserCountInMeetingByInternalID = `-- name: GetUserCountInMeetingByInternalID :one
-SELECT count(internal_user_id) AS userCount FROM users WHERE internal_user_id IN (SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1)
+SELECT count(internal_user_id) AS userCount
+FROM users
+WHERE internal_user_id IN (SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1)
 `
 
 func (q *Queries) GetUserCountInMeetingByInternalID(ctx context.Context, internalMeetingID string) (int64, error) {
@@ -126,6 +128,32 @@ func (q *Queries) GetUserNameById(ctx context.Context, internalUserID string) (s
 	var name string
 	err := row.Scan(&name)
 	return name, err
+}
+
+const getUsersInMeetingByInternalID = `-- name: GetUsersInMeetingByInternalID :many
+SELECT internal_user_id AS users
+FROM users
+WHERE internal_user_id IN (SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1)
+`
+
+func (q *Queries) GetUsersInMeetingByInternalID(ctx context.Context, internalMeetingID string) ([]string, error) {
+	rows, err := q.db.Query(ctx, getUsersInMeetingByInternalID, internalMeetingID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var users string
+		if err := rows.Scan(&users); err != nil {
+			return nil, err
+		}
+		items = append(items, users)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getUsersWhoJoinedBetween = `-- name: GetUsersWhoJoinedBetween :many

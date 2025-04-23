@@ -27,6 +27,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"os"
+	"slices"
 	"sort"
 	"time"
 )
@@ -79,7 +80,7 @@ func init() { // Add all messages that are related to this file into the localiz
 	}
 }
 
-func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, error) {
+func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredForUserIds *[]string) (Report, error) {
 	var details []Detail
 	var participants []BBBEvents.User
 	var timeline []Event
@@ -143,13 +144,13 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string) (Report, e
 		//fmt.Println("DEBUG: recordings: ", recordings)
 	}
 
-	userEvents, err := FillMeetingUserEvents(ctx, internalMeetingID, dbQueries)
+	userEvents, err := FillMeetingUserEvents(ctx, internalMeetingID, dbQueries, filteredForUserIds)
 	if err != nil {
 		return Report{}, err
 	}
 	timeline = append(timeline, userEvents...)
 
-	messageTimeline, err := FillMeetingMessageEvents(ctx, internalMeetingID, dbQueries)
+	messageTimeline, err := FillMeetingMessageEvents(ctx, internalMeetingID, dbQueries, filteredForUserIds)
 	if err != nil {
 		return Report{}, err
 	}
@@ -320,7 +321,7 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 	return timeline, err
 }
 
-func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []Event, err error) {
+func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries, filteredForUserIds *[]string) (timeline []Event, err error) {
 	// insert user messages into the timeline
 	meetingMessages, err := dbQueries.GetMeetingMessagesByID(ctx, internalMeetingID)
 	if err != nil {
@@ -343,6 +344,12 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 			continue
 		}
 
+		if filteredForUserIds != nil {
+			if !slices.Contains(*filteredForUserIds, message.InternalUserID) {
+				continue
+			}
+		}
+
 		// we cannot use the same connection while the row is not closed.
 		userName, err = dbQueries.GetUserNameById(ctx, message.InternalUserID)
 		if err != nil {
@@ -355,7 +362,7 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 	return timeline, err
 }
 
-func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []Event, err error) {
+func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries, filteredForUserIds *[]string) (timeline []Event, err error) {
 	// insert user events into the timeline
 	meetingEvents, err := dbQueries.GetUserEventsByMeetingID(ctx, internalMeetingID)
 	if err != nil {
@@ -363,6 +370,12 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 	}
 
 	for _, userEvent := range meetingEvents { // convert each row in the db to a Event object so it can be used by the frontend template
+		if filteredForUserIds != nil {
+			if !slices.Contains(*filteredForUserIds, userEvent.InternalUserID) {
+				continue
+			}
+		}
+
 		var userName, err = dbQueries.GetUserNameById(ctx, userEvent.InternalUserID) // obtain username for the text representation
 		if err != nil {
 			fmt.Println("WARNING obtaining user information of user event", userEvent)

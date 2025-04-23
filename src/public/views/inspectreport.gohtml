@@ -38,7 +38,7 @@
                     {{ range . }}
 						<div>
 							<input type="checkbox" class="participant-checkbox" name="{{.InternalUserID}}"
-								   id="{{.InternalUserID}}"/>
+								   id="{{.InternalUserID}}" {{if .IsFilteredFor}}checked{{end}}/>
 							<label class="participant-card" for="{{.InternalUserID}}">
 								<h3>{{ .Name }}</h3>
 								<span class="role-badge role-moderator">{{ .Role }}</span>

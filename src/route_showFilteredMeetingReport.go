@@ -23,12 +23,19 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"golang.org/x/text/language"
+	"html/template"
 	"net/http"
 	"slices"
+	"strings"
 	"time"
 )
 
 func showFilteredMeetingReport(context echo.Context) error {
+	if localizer == nil {
+		localizer = i18n.NewLocalizer(Bundle, context.Request().Header.Get("Accept-Language"), language.English.String())
+	}
 	type customUserType struct {
 		InternalUserID string
 		ExternalUserID string
@@ -48,6 +55,7 @@ func showFilteredMeetingReport(context echo.Context) error {
 	var internalMeetingId = context.Param("id")
 	var customParticipants []customUserType
 	var filteredForUserIds []string
+	var filterParamsString string
 
 	// use the context provided by the user request in order to respect the browsers / servers / admins settings.
 	var ctx = context.Request().Context()
@@ -74,6 +82,7 @@ func showFilteredMeetingReport(context echo.Context) error {
 	for _, participant := range participants {
 		if context.QueryParam(participant) == "on" {
 			filteredForUserIds = append(filteredForUserIds, participant)
+			filterParamsString += fmt.Sprintf("%s=on&", participant)
 		}
 	}
 
@@ -109,5 +118,5 @@ func showFilteredMeetingReport(context echo.Context) error {
 		Timeline     []Event
 		Recordings   []BBBAPI.Recording
 	}{Details: report.Details, Participants: customParticipants, Timeline: report.Timeline, Recordings: report.Recordings}
-	return context.Render(http.StatusOK, "inspectReport", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": filteredReport})
+	return context.Render(http.StatusOK, "inspectReport", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": filteredReport, "FilteredUsersParam": template.URL(strings.TrimRight(filterParamsString, "&"))})
 }

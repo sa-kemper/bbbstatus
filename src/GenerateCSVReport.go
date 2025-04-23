@@ -26,6 +26,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"os"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -72,7 +73,7 @@ func init() {
 	FrontendTextMessages = append(FrontendTextMessages, messages...)
 }
 
-func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, error) {
+func GenerateCSVReport(ctx context.Context, internalMeetingID string, filteredUserIds *[]string) ([]byte, error) {
 	var result string
 	var timeline []CSVEvent
 	var polls []string
@@ -102,13 +103,13 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string) ([]byte, e
 		result += Translate("CSVReportConfig-"+value) + ","
 	}
 
-	messageTimeline, err := fillCSVMessageEvents(ctx, internalMeetingID, dbQueries)
+	messageTimeline, err := fillCSVMessageEvents(ctx, internalMeetingID, dbQueries, filteredUserIds)
 	if err != nil {
 		fmt.Println("error occurred while filling message timeline (GenerateCSVReport)", err.Error())
 		return nil, err
 	}
 
-	userEventTimeline, err := FillCSVUserEvents(ctx, internalMeetingID, dbQueries)
+	userEventTimeline, err := FillCSVUserEvents(ctx, internalMeetingID, dbQueries, filteredUserIds)
 	if err != nil {
 		fmt.Println("error occurred while filling user event timeline (GenerateCSVReport)", err.Error())
 		return nil, err
@@ -186,7 +187,7 @@ func (e CSVEvent) ReturnCSVRow(CsvStructureConfig []string) string {
 	return result
 }
 
-func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []CSVEvent, err error) {
+func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries, filteredForUserIds *[]string) (timeline []CSVEvent, err error) {
 	// insert user messages into the timeline
 	messages, err := dbQueries.GetMeetingMessagesByID(ctx, internalMeetingID)
 	if err != nil {
@@ -211,6 +212,12 @@ func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, dbQueri
 			continue
 		}
 
+		if filteredForUserIds != nil {
+			if !slices.Contains(*filteredForUserIds, message.InternalUserID) {
+				continue
+			}
+		}
+
 		// we cannot use the same connection while the row is not closed.
 		event.User, err = dbQueries.GetUserNameById(ctx, message.InternalUserID)
 		if err != nil {
@@ -226,13 +233,18 @@ func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, dbQueri
 	return timeline, err
 }
 
-func FillCSVUserEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (timeline []CSVEvent, err error) {
+func FillCSVUserEvents(ctx context.Context, internalMeetingID string, dbQueries *db.Queries, filteredForUserIds *[]string) (timeline []CSVEvent, err error) {
 	// insert user events into the timeline
 	userEvents, err := dbQueries.GetUserEventsByMeetingID(ctx, internalMeetingID)
 	if err != nil {
 		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
 	for _, dbEvent := range userEvents {
+		if filteredForUserIds != nil {
+			if !slices.Contains(*filteredForUserIds, dbEvent.InternalUserID) {
+				continue
+			}
+		}
 		var event = CSVEvent{Time: dbEvent.EventTimestamp.Time}
 		event.User, err = dbQueries.GetUserNameById(ctx, dbEvent.InternalUserID)
 		if err != nil {

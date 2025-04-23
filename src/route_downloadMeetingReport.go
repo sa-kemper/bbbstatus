@@ -30,7 +30,7 @@ import (
 func downloadMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
 	var ctx = c.Request().Context()
-	var report, err = GenerateCSVReport(ctx, internalMeetingId)
+	var report, err = GenerateCSVReport(ctx, internalMeetingId, nil)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) { // this function may execute for a considerable amount of time. It's not completely unreasonable to assume that it may exceed time limits.
 			fmt.Println("Generate CSV Report Timed out.")

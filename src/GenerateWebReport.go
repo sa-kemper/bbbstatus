@@ -81,7 +81,7 @@ func init() { // Add all messages that are related to this file into the localiz
 }
 
 func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredForUserIds *[]string) (Report, error) {
-	var details []Detail
+	var details = make([]Detail, 0)
 	var participants []BBBEvents.User
 	var timeline []Event
 	var polls []string

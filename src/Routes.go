@@ -44,6 +44,7 @@ var routes = []route{
 	{Name: "report", Method: "GET", Path: "/report/:id", HandlerFunc: showMeetingReport},
 	{Name: "reportCsv", Method: "GET", Path: "/report/:id/csv", HandlerFunc: downloadMeetingReport},
 	{Name: "inspectReport", Method: "GET", Path: "/report/:id/inspect", HandlerFunc: showFilteredMeetingReport},
+	{Name: "inspectedReportCsv", Method: "GET", Path: "/report/:id/inspect/csv", HandlerFunc: downloadFilteredMeetingReport},
 	{Name: "webhookEvent", Method: "POST", Path: "/event", HandlerFunc: bbbWebHookEvent},
 	{Name: "statistics", Method: "GET", Path: "/statistics", HandlerFunc: statsPage},
 	{Name: "statisticsCsv", Method: "GET", Path: "/statistics/csv", HandlerFunc: statsPageCSV},

@@ -72,6 +72,9 @@
                        onblur="this.form.submit();" name="startTime"
                        value="{{ .StartTime }}" min="{{ .StartTimeMin }}"
                        max="{{ .StartTimeMax }}" required id="StatsPageTimeSelector">
+                <noscript>
+                    <input type="submit" class="meeting-button">
+                </noscript>
             </form>
 
             <!-- Placeholder for charts -->

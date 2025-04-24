@@ -37,11 +37,14 @@ type Template struct {
 // Render is a function hook to provide function calls inside html templates, such as Translate
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	// Genius move right there, not because it's hard but because I've not seen this documented at the time of writing.
-	t.templates.Funcs(template.FuncMap{"t": func(text string) string {
-		localizer = i18n.NewLocalizer(Bundle, c.Request().Header.Get("Accept-Language"), language.English.String())
-		return Translate(text)
+	t.templates.Funcs(template.FuncMap{
+		"t": func(text string) string {
+			localizer = i18n.NewLocalizer(Bundle, c.Request().Header.Get("Accept-Language"), language.English.String())
+			return Translate(text)
 
-	}, "reverse": c.Echo().Reverse})
+		},
+		"reverse": c.Echo().Reverse,
+	})
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 

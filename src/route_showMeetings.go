@@ -189,7 +189,6 @@ func showMeetings(c echo.Context) error {
 		}
 	}
 
-	fmt.Println("Meetings:", len(meetings))
 	for iterator, meeting := range meetings {
 		if meeting.Active {
 			servers := confGetServers(meeting.BbbHostname)

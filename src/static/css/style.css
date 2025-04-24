@@ -807,7 +807,7 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
 }
 
 .server-section:nth-child(10) {
-    background-color: #6f42c1;
+    background-color: #4a8abf;
 }
 
 @keyframes grow {
@@ -853,6 +853,19 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         display: inline;
     }
 
+
+
+    #filter-group-submit-div {
+        display: block !important;
+        flex: 0 0 100%;
+    }
+
+    #filter-group-submit-input {
+        width: 100%;
+    }
+}
+
+@media (max-width: 1712px) {
     .meeting-button.report-back-meeting-button {
         position: unset !important;
         margin-left: 0;
@@ -869,14 +882,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         display: none;
     }
 
-    #filter-group-submit-div {
-        display: block !important;
-        flex: 0 0 100%;
-    }
-
-    #filter-group-submit-input {
-        width: 100%;
-    }
 }
 
 @media (max-width: 768px) {

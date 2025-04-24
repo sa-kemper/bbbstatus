@@ -7,6 +7,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>{{t "meetingListHeader"}}</title>
 		<link rel="stylesheet" href="/static/css/style.css">
+		<link rel="stylesheet" href="/static/fontawesome.min.css">
 	</head>
 
 	<body>
@@ -24,7 +25,7 @@
 		</div>
 
 		<div class="card">
-			<form class="filters" method="GET" action="{{ reverse " meetings" }}">
+			<form class="filters" method="GET" action="{{ reverse "meetings" }}">
 				<div class="filter-group">
 					<label for="start-date">{{t "meetingListFilterStartDate"}}</label>
 					<input type="date" id="start-date" name="start-date" value="{{.Request.StartDate}}">
@@ -61,6 +62,13 @@
 
 		</div>
 
+
+		<div class="reload-container" onclick="location.reload()">
+			<a href="{{reverse "meetings" }}?ts={{ timestamp }}" class="reload-button">
+				<i class="fa-solid fa-rotate-right"></i>
+				Reload
+			</a>
+		</div>
 
 		<div class=" meetings-list">
 					<!-- Example Meeting Card -->

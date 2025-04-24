@@ -485,6 +485,23 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     font-weight: 500;
 }
 
+.reload-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    border: rgba(128, 128, 128, 0.22) 1px solid;
+    border-right: transparent;
+    border-left: transparent;
+    cursor: pointer;
+}
+
+.reload-button {
+    color: gray;
+    text-decoration: none;
+    padding: 0.5rem;
+}
+
+
 /* ==========================================================================
    Status Indicators
    ========================================================================== */

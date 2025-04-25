@@ -25,6 +25,8 @@ Configuration sources:
 | `SERVE_STATIC_CONTENT` | `true`                                               | Serving static content (`true` or `false`).                                                                                                                                | BaseConfig     |
 | `BBB_SERVERS`          | *None*                                               | A list of Big Blue Button servers used for webhook validation, API functions and Report configuration                                                                      | BBBServers     |
 | `TRUSTED_PROXIES`      | `127.0.0.1/8,172.17.0.1/16,::1/128`                  | A comma seperated list of CIDR notated network ranges, used to identify the *real ip* of the client, configure this value to be the list of proxies in your infrastructure | BaseConfig     | 
+| `SERVER_LANG`          | `en`                                                 | A setting defining the language the server uses for anonymising users if DSGVO is enabled                                                                                  | BaseConfig     |
+| `DSGVO`                | `false`                                              | Defines weather or not user identifying information should be saved                                                                                                        | BaseConfig     |
 
 ## Configuration behavior
 

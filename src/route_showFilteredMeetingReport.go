@@ -80,8 +80,8 @@ func showFilteredMeetingReport(context echo.Context) error {
 	}
 
 	for _, participant := range participants {
-		if context.QueryParam(participant) == "on" {
-			filteredForUserIds = append(filteredForUserIds, participant)
+		if context.QueryParam(participant.InternalUserID) == "on" {
+			filteredForUserIds = append(filteredForUserIds, participant.InternalUserID)
 			filterParamsString += fmt.Sprintf("%s=on&", participant)
 		}
 	}

@@ -61,8 +61,8 @@ func downloadFilteredMeetingReport(c echo.Context) (err error) {
 	}
 
 	for _, participant := range participants {
-		if c.QueryParam(participant) == "on" {
-			filteredForUserIds = append(filteredForUserIds, participant)
+		if c.QueryParam(participant.InternalUserID) == "on" {
+			filteredForUserIds = append(filteredForUserIds, participant.InternalUserID)
 		}
 	}
 

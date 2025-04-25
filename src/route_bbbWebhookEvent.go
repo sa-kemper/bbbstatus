@@ -19,12 +19,15 @@ package main
 import (
 	"bbbstatus/internal/BBBEvents"
 	db "bbbstatus/internal/database"
+	"bbbstatus/internal/namegen"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"net"
 	"net/http"
+	"slices"
 	"strings"
 )
 
@@ -116,6 +119,38 @@ func bbbWebHookEvent(c echo.Context) error {
 		}
 	}
 
+	if confGet("DSGVO") == "true" {
+		users, err := dbQueries.GetUsersInMeetingByInternalID(ctx, event.Data.Attributes.Meeting.InternalMeetingID)
+		if err != nil {
+			fmt.Println("error occurred during GetUsersInMeetingByInternalID: ", err)
+			return c.String(http.StatusInternalServerError, "Error occurred during GetUsersInMeetingByInternalID")
+		}
+
+		userNames := make([]string, len(users))
+		for i, user := range users {
+			userNames[i] = user.Name
+		}
+
+		// when the user joins, bbb-webhooks supplies the users real name. We therefore have to anonymise the user
+		if event.Data.ID == "user-joined" {
+			// exchange the users name with a random alias.
+			event.Data.Attributes.User.Name = namegen.GenerateUnique(confGet("SERVER_LANG"), userNames)
+		}
+
+		// there might be edge cases, where bbb-webhooks sends the original name of the user, we need to make sure that those names never make it into the database.
+		if event.Data.Attributes.User != nil {
+			// there is an edge case for name anonymisation, the SYSTEM user is a user provided by bbb-webhooks, and it should never be anonymised, this is expected behaviour.
+			if event.Data.Attributes.User.InternalUserID != "SYSTEM" {
+				err = handleBBBWebhooksNameLeak(ctx, dbQueries, event, users, userNames)
+				if err != nil {
+					fmt.Println("error occurred during handleBBBWebhooksNameLeak: ", err)
+					return c.String(http.StatusInternalServerError, "Error occurred during handleBBBWebhooksNameLeak")
+				}
+			}
+		}
+
+	}
+
 	err = event.Save(ctx, dbQueries, conn)
 	if err != nil {
 		fmt.Println("error occurred during save event: ", err)
@@ -123,6 +158,34 @@ func bbbWebHookEvent(c echo.Context) error {
 	}
 
 	return c.String(http.StatusOK, "")
+}
+
+func handleBBBWebhooksNameLeak(ctx context.Context, dbQueries *db.Queries, event BBBEvents.BaseEvent, dbUserEntries []db.User, userNames []string) (err error) {
+	if !namegen.IsGeneratedName(confGet("SERVER_LANG"), event.Data.Attributes.User.Name) {
+		userIndex := slices.IndexFunc(
+			dbUserEntries,
+			func(user db.User) bool {
+				return user.InternalUserID == event.Data.Attributes.User.InternalUserID
+			})
+
+		if userIndex != -1 {
+			if namegen.IsGeneratedName(confGet("SERVER_LANG"), dbUserEntries[userIndex].Name) {
+				event.Data.Attributes.User.Name = dbUserEntries[userIndex].Name
+			} else {
+				event.Data.Attributes.User.Name = namegen.GenerateUnique(confGet("SERVER_LANG"), userNames)
+				err = dbQueries.SetUserNameByID(ctx, db.SetUserNameByIDParams{
+					Name:           event.Data.Attributes.User.Name,
+					InternalUserID: event.Data.Attributes.User.InternalUserID,
+				})
+
+				if err != nil {
+					fmt.Println("error occurred during bbb-webhook event, the real username was used for some reason, which is not DSGVO compliant")
+					fmt.Println("error occurred during SetUserNameByID: ", err)
+				}
+			}
+		}
+	}
+	return
 }
 
 func authorizeBBBServer(c echo.Context, requesterIpAddress string) ([]string, error) {

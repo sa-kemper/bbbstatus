@@ -52,7 +52,7 @@ func Test_isGeneratedName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsGeneratedName(tt.args.name, tt.args.lang); got != tt.want {
+			if got := IsGeneratedName(tt.args.lang, tt.args.name); got != tt.want {
 				t.Errorf("isGeneratedName() = %v, want %v", got, tt.want)
 			}
 		})

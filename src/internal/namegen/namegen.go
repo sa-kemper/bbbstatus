@@ -78,7 +78,7 @@ func GenerateUnique(lang string, existingNames []string) (name string) {
 	}
 }
 
-func IsGeneratedName(name, lang string) bool {
+func IsGeneratedName(lang, name string) bool {
 	adjectives, err := assets.ReadFile(fmt.Sprintf("assets/adjective_%s.txt", lang))
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {

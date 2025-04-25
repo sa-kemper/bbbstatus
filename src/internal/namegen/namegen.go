@@ -77,3 +77,31 @@ func GenerateUnique(lang string, existingNames []string) (name string) {
 		}
 	}
 }
+
+func IsGeneratedName(name, lang string) bool {
+	adjectives, err := assets.ReadFile(fmt.Sprintf("assets/adjective_%s.txt", lang))
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			log.Fatal("error occurred while reading adjectives file, language " + lang + " does not exist.")
+		}
+		log.Fatal(err)
+	}
+
+	animals, err := assets.ReadFile(fmt.Sprintf("assets/animals_%s.txt", lang))
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			log.Fatal("error occurred while reading animals file, language " + lang + " does not exist.")
+		}
+		log.Fatal(err)
+	}
+	adjArray := strings.Split(string(adjectives), "\n")
+	aniArray := strings.Split(string(animals), "\n")
+
+	for _, animal := range aniArray {
+		if strings.Contains(strings.ToLower(name), strings.ToLower(animal)) {
+			pos := strings.Index(strings.ToLower(name), strings.ToLower(animal))
+			return slices.Contains(adjArray, name[0:pos])
+		}
+	}
+	return false
+}

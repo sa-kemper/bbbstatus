@@ -43,6 +43,24 @@ func (q *Queries) EndMeetingAtTimestampByID(ctx context.Context, arg EndMeetingA
 	return err
 }
 
+const getMeetingActiveByID = `-- name: GetMeetingActiveByID :one
+SELECT COALESCE(
+               EXISTS (
+                   SELECT 1
+                   FROM meetings
+                   WHERE meeting_ended IS NULL AND internal_meeting_id = $1
+               ),
+               FALSE
+       )
+`
+
+func (q *Queries) GetMeetingActiveByID(ctx context.Context, internalMeetingID string) (interface{}, error) {
+	row := q.db.QueryRow(ctx, getMeetingActiveByID, internalMeetingID)
+	var coalesce interface{}
+	err := row.Scan(&coalesce)
+	return coalesce, err
+}
+
 const getMeetingById = `-- name: GetMeetingById :one
 SELECT internal_meeting_id, external_meeting_id, name, is_breakout, parent_id, create_time, moderator_pass, viewer_pass, record, voice_conf, dial_number, max_users, metadata, bbbhostname, participant_count, meeting_ended
 FROM meetings

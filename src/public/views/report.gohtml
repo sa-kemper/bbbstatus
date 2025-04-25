@@ -48,6 +48,16 @@ limitations under the License.
         {{template "meetingdetails" .Report.Details}}
         <!-- Participants -->
         {{template "participants" .}}
+
+        {{ if .MeetingActive }}
+            <div class="reload-container" onclick="location.reload()">
+                <a href="{{reverse "report" .InternalMeetingID }}?ts={{ timestamp }}" class="reload-button">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    Reload
+                </a>
+            </div>
+        {{ end }}
+
         <!-- Recordings -->
         {{ if .Report.Recordings }}
             {{template "recordings" .Report.Recordings}}

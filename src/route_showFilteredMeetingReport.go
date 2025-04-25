@@ -56,6 +56,7 @@ func showFilteredMeetingReport(context echo.Context) error {
 	var customParticipants []customUserType
 	var filteredForUserIds []string
 	var filterParamsString string
+	var meetingActive bool
 
 	// use the context provided by the user request in order to respect the browsers / servers / admins settings.
 	var ctx = context.Request().Context()
@@ -82,7 +83,7 @@ func showFilteredMeetingReport(context echo.Context) error {
 	for _, participant := range participants {
 		if context.QueryParam(participant.InternalUserID) == "on" {
 			filteredForUserIds = append(filteredForUserIds, participant.InternalUserID)
-			filterParamsString += fmt.Sprintf("%s=on&", participant)
+			filterParamsString += fmt.Sprintf("%s=on&", participant.InternalUserID)
 		}
 	}
 
@@ -112,11 +113,14 @@ func showFilteredMeetingReport(context echo.Context) error {
 		})
 	}
 
+	result, err := dbQueries.GetMeetingActiveByID(ctx, internalMeetingId)
+	meetingActive = result.(bool)
+
 	filteredReport := struct {
 		Details      []Detail
 		Participants []customUserType
 		Timeline     []Event
 		Recordings   []BBBAPI.Recording
 	}{Details: report.Details, Participants: customParticipants, Timeline: report.Timeline, Recordings: report.Recordings}
-	return context.Render(http.StatusOK, "inspectReport", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": filteredReport, "FilteredUsersParam": template.URL(strings.TrimRight(filterParamsString, "&"))})
+	return context.Render(http.StatusOK, "inspectReport", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": filteredReport, "FilteredUsersParam": template.URL(strings.TrimRight(filterParamsString, "&")), "MeetingActive": meetingActive})
 }

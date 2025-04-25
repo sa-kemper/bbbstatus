@@ -4,7 +4,6 @@ FROM meetings
 WHERE internal_meeting_id = $1
 LIMIT 1;
 
-
 -- name: GetMeetingsBetweenDates :many
 SELECT *
 FROM meetings
@@ -34,3 +33,12 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);
 SELECT COUNT(*)
 FROM meetings
 WHERE create_time BETWEEN $1 AND $2;
+
+-- name: GetMeetingActiveByID :one
+SELECT COALESCE(
+               EXISTS (SELECT 1
+                       FROM meetings
+                       WHERE meeting_ended IS NULL
+                         AND internal_meeting_id = $1),
+               FALSE
+       );

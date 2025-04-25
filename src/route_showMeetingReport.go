@@ -44,6 +44,7 @@ func showMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
 	var meetingExists bool
+	var meetingActive bool
 	var ctx = c.Request().Context()
 	localizer = i18n.NewLocalizer(Bundle, requestLanguage, language.English.String())
 
@@ -81,5 +82,8 @@ func showMeetingReport(c echo.Context) error {
 		return err
 	}
 
-	return c.Render(http.StatusOK, "report", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": report})
+	result, err := dbQueries.GetMeetingActiveByID(ctx, internalMeetingId)
+	meetingActive = result.(bool)
+
+	return c.Render(http.StatusOK, "report", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": report, "MeetingActive": meetingActive})
 }

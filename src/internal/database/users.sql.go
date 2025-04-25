@@ -244,7 +244,9 @@ func (q *Queries) LeaveUserByID(ctx context.Context, arg LeaveUserByIDParams) er
 }
 
 const setUserNameByID = `-- name: SetUserNameByID :exec
-UPDATE users set name = $1 where internal_user_id = $2
+UPDATE users
+set name = $1
+where internal_user_id = $2
 `
 
 type SetUserNameByIDParams struct {

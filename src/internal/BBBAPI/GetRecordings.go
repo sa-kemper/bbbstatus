@@ -83,7 +83,7 @@ func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters,
 	}
 	var cleanedRecordings []Recording
 	for _, recording := range apiResponse.Recordings.Recording {
-		if recording.InternalMeetingID == meeting.InternalMeetingID {
+		if recording.InternalMeetingID == meeting.InternalMeetingID || meeting.InternalMeetingID == "" {
 			cleanedRecordings = append(cleanedRecordings, recording)
 		}
 	}

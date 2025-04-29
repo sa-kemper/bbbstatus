@@ -60,7 +60,7 @@ limitations under the License.
 
         <!-- Recordings -->
         {{ if .Report.Recordings }}
-            {{template "recordings" .Report.Recordings}}
+            {{template "inlineRecordings" .Report.Recordings}}
         {{ end }}
         <!-- Timeline -->
         {{template "timeline" .Report.Timeline}}

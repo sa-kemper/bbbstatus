@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-/* ==========================================================================
-   Reset and Base Styles
-   ========================================================================== */
-
+/* Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -32,15 +29,22 @@ body {
     background-color: #f5f7fa;
 }
 
-/* ==========================================================================
-   Layout Components
-   ========================================================================== */
+/* NEW: Updated body background for recordings page */
+body.recordings-page {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e0e7ff 100%);
+    min-height: 100vh;
+}
 
 .container {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
     position: relative;
+}
+
+/* NEW: Wider container for recordings page */
+.container.recordings-container {
+    max-width: 1400px;
 }
 
 .card {
@@ -51,15 +55,23 @@ body {
     margin-bottom: 1.5rem;
 }
 
-/* ==========================================================================
-   Header Components
-   ========================================================================== */
-
 .header {
     border-bottom: 2px solid #e9ecef;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     display: flex;
+}
+
+/* MODIFIED: Enhanced header for recordings page */
+.header.recordings-header {
+    border-bottom: none;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
 }
 
 .header h1 {
@@ -69,9 +81,13 @@ body {
     flex: 1;
 }
 
-/* ==========================================================================
-   Meeting Components
-   ========================================================================== */
+/* NEW: Styling for recordings header h1 */
+.header.recordings-header h1 {
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
 
 .meetings-list {
     display: grid;
@@ -100,8 +116,8 @@ body {
     margin-bottom: 2rem;
 }
 
-.meeting-card:focus-within .meeting-details,
-.meeting-card:active .meeting-details {
+.meeting-card:active .meeting-details,
+.meeting-card:focus-within .meeting-details {
     display: block;
 }
 
@@ -123,10 +139,6 @@ body {
     word-break: break-all;
 }
 
-/* ==========================================================================
-   Status Badges
-   ========================================================================== */
-
 .status-badge {
     display: inline-block;
     padding: 0.25rem 0.75rem;
@@ -135,6 +147,17 @@ body {
     font-weight: 600;
     text-transform: uppercase;
     margin-bottom: 0.5rem;
+}
+
+/* NEW: Additional status badge styles for recordings */
+.status-published {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-unpublished {
+    background: #ffebee;
+    color: #c62828;
 }
 
 .status-active {
@@ -151,10 +174,6 @@ body {
     background: #C24444;
     color: #fff;
 }
-
-/* ==========================================================================
-   Buttons
-   ========================================================================== */
 
 .meeting-button {
     display: inline-block;
@@ -204,13 +223,13 @@ body {
     display: block;
 }
 
-.meeting-card:focus-within .meeting-button-details,
-.meeting-card:active .meeting-button-details {
+.meeting-card:active .meeting-button-details,
+.meeting-card:focus-within .meeting-button-details {
     display: none;
 }
 
-.meeting-card:focus-within .meeting-button-to-report,
-.meeting-card:active .meeting-button-to-report {
+.meeting-card:active .meeting-button-to-report,
+.meeting-card:focus-within .meeting-button-to-report {
     display: block;
 }
 
@@ -225,6 +244,14 @@ body {
     transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
+/* MODIFIED: Enhanced home button for recordings page */
+.home-button.recordings-home-button {
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .home-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -236,10 +263,6 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* ==========================================================================
-   Filters and Forms
-   ========================================================================== */
-
 .filters {
     display: flex;
     gap: 1rem;
@@ -247,27 +270,97 @@ body {
     flex-wrap: wrap;
 }
 
+/* NEW: Search and filter section for recordings */
+.search-filter {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input-wrapper input:focus {
+    outline: none;
+    border-color: #42a5f5;
+    box-shadow: 0 0 6px rgba(66, 165, 245, 0.3);
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
 .filter-group {
     display: flex;
-    align-items: center;
     flex-direction: column;
+    min-width: 150px;
 }
 
 .filter-group label {
-    margin-right: 0.5rem;
     color: #6c757d;
     margin-bottom: 0.5rem;
+    font-size: 0.875rem;
 }
 
-.filter-group select {
-    padding: 0.5rem;
-    border: 1px solid #e9ecef;
-    border-radius: 4px;
-    background-color: white;
-}
-
+.filter-group select,
 .filter-group input[type="date"] {
-    max-width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.filter-group select:focus,
+.filter-group input[type="date"]:focus {
+    outline: none;
+    border-color: #42a5f5;
+    box-shadow: 0 0 6px rgba(66, 165, 245, 0.3);
+}
+
+.search-button {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(90deg, #1976d2, #42a5f5);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .filter-action {
@@ -311,10 +404,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     transform: scale(1.1);
 }
 
-/* ==========================================================================
-   Checkbox Components
-   ========================================================================== */
-
 .toggle-details {
     position: absolute;
     opacity: 0;
@@ -333,10 +422,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     display: none;
 }
 
-/* ==========================================================================
-   Participant Components
-   ========================================================================== */
-
 .participants-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -354,9 +439,9 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     color: #000;
 }
 
-.participant-checkbox:checked + .participant-card,
+.participant-card:active,
 .participant-card:hover,
-.participant-card:active {
+.participant-checkbox:checked + .participant-card {
     transform: translateY(-2px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     background-color: #1e88e5;
@@ -388,10 +473,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     background: #f5f5f5;
     color: #616161;
 }
-
-/* ==========================================================================
-   Timeline Components
-   ========================================================================== */
 
 .timeline {
     position: relative;
@@ -436,10 +517,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     padding: 1rem;
     border-radius: 6px;
 }
-
-/* ==========================================================================
-   Action Components
-   ========================================================================== */
 
 .action-buttons {
     position: absolute;
@@ -501,11 +578,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     padding: 0.5rem;
 }
 
-
-/* ==========================================================================
-   Status Indicators
-   ========================================================================== */
-
 .status-indicator {
     display: inline-flex;
     align-items: center;
@@ -525,19 +597,27 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     color: #2e7d32;
 }
 
-/* ==========================================================================
-   Error and Not Found Pages
-   ========================================================================== */
-
 .not-found-container {
     text-align: center;
     padding: 4rem 1rem;
+}
+
+/* MODIFIED: Enhanced not-found styling for recordings */
+.not-found-container.recordings-not-found {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .not-found-container h1 {
     font-size: 3rem;
     color: #2c3e50;
     margin-bottom: 1rem;
+}
+
+/* MODIFIED: Adjusted not-found h1 for recordings */
+.not-found-container.recordings-not-found h1 {
+    font-size: 2.5rem;
 }
 
 .not-found-container p {
@@ -568,10 +648,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     margin-bottom: 2rem;
 }
 
-/* ==========================================================================
-   Recordings
-   ========================================================================== */
-
 #topBackToMeetings {
     margin-bottom: 1rem;
 }
@@ -580,6 +656,67 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
+}
+
+/* NEW: Recordings grid layout */
+.recordings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+/* NEW: Recording card styling */
+.recording-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.recording-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* NEW: Recording header */
+.recording-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.recording-header h2 {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    font-weight: 600;
+    max-width: 70%;
+}
+
+/* NEW: Recording meta data */
+.recording-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.meta-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.meta-value {
+    font-weight: 500;
+    color: #2c3e50;
 }
 
 .recording-link {
@@ -591,14 +728,50 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     transition: background-color 0.3s, transform 0.2s;
 }
 
+/* MODIFIED: Enhanced recording link for recordings page */
+.recording-link.recordings-play-link {
+    background: linear-gradient(90deg, #1976d2, #42a5f5);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .recording-link:hover {
     background-color: #bbdefb;
     transform: translateY(-2px);
 }
 
-/* ==========================================================================
-   Link Group (From Uiverse.io)
-   ========================================================================== */
+/* NEW: Recording link hover for recordings page */
+.recording-link.recordings-play-link:hover {
+    background: linear-gradient(90deg, #1565c0, #1e88e5);
+}
+
+/* NEW: Recording actions container */
+.recording-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* NEW: Recording preview */
+.recording-preview {
+    text-align: center;
+}
+
+.preview-image {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.preview-image:hover {
+    transform: scale(1.05);
+}
 
 .link-group {
     position: relative;
@@ -607,7 +780,7 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     border-radius: 0.5rem;
     background-color: #eee;
     box-sizing: border-box;
-    box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
     padding: 0.25rem;
     width: 300px;
     font-size: 14px;
@@ -642,8 +815,8 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
-.link-group .link .name.active::before,
-.link-group .link .name.active::after {
+.link-group .link .name.active::after,
+.link-group .link .name.active::before {
     content: "";
     position: absolute;
     width: 4px;
@@ -694,10 +867,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     }
 }
 
-/* ==========================================================================
-   Server Filter Components
-   ========================================================================== */
-
 #server-filter-submit {
     margin-top: 0.5rem;
 }
@@ -745,10 +914,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     background-color: #f5f7fa;
     color: black;
 }
-
-/* ==========================================================================
-   Server Diagram
-   ========================================================================== */
 
 .server-bar {
     display: flex;
@@ -836,10 +1001,26 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     }
 }
 
-/* ==========================================================================
-   Responsive Styles
-   ========================================================================== */
+/* NEW: Animation styles for recordings page */
+.animate-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
 
+.animate-slide-in {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.animate-fade-in.visible,
+.animate-slide-in.visible {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+}
+
+/* Responsive Design */
 @media (max-width: 1205px) {
     .container {
         margin: 1rem;
@@ -870,8 +1051,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         display: inline;
     }
 
-
-
     #filter-group-submit-div {
         display: block !important;
         flex: 0 0 100%;
@@ -898,7 +1077,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     #server-filter-submit {
         display: none;
     }
-
 }
 
 @media (max-width: 768px) {
@@ -907,9 +1085,9 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         gap: 1rem;
     }
 
-    .filter-group,
+    #end-date,
     #start-date,
-    #end-date {
+    .filter-group {
         width: 100%;
     }
 
@@ -917,8 +1095,24 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         justify-content: center;
     }
 
-    .server-filter-card {
-        margin-left: initial;
+    /* NEW: Responsive adjustments for recordings page */
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-input-wrapper,
+    .filter-group {
+        min-width: 100%;
+    }
+
+    .recordings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .recording-header h2 {
+        font-size: 1.25rem;
+        max-width: 60%;
     }
 }
 

@@ -1,27 +1,112 @@
-<!--
-Copyright 2025 Samuel Kemper
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
 {{ define "recordings" }}
-    <div class="card">
-        <h2>{{t "RecordingsHeader"}}</h2>
-        <div class="recordings-list">
-            {{ range . }}
-                {{ range .Playback.Format }}
-                    <a href="{{ .Url }}" class="recording-link">{{ .Type }}</a>
-                {{ end }}
-            {{ end }}
-        </div>
-    </div>
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Meeting Recordings</title>
+		<link rel="stylesheet" href="/static/css/style.css">
+		<link rel="stylesheet" href="/static/fontawesome.min.css">
+	</head>
+	<body>
+	<div class="container">
+		<!-- Header -->
+		<div class="header animate-slide-in">
+			<h1><i class="fas fa-video"></i> Meeting Recordings</h1>
+			<a href="{{ reverse "meetings" }}" class="home-button"><i class="fas fa-home"></i> Back to Meetings</a>
+		</div>
+
+		<!-- Search and Filters -->
+		<div class="search-filter animate-fade-in">
+			<form class="search-form" method="GET" action="/recordings">
+				<div class="search-input-wrapper">
+					<i class="fas fa-search search-icon"></i>
+					<input type="text" name="query" placeholder="Search by meeting name or ID..." value="{{.Query}}">
+				</div>
+				<div class="filter-group">
+					<label for="state">Status</label>
+					<select name="state" id="state">
+						<option value="">All Statuses</option>
+						<option value="published" {{if eq .State "published"}}selected{{end}}>Published</option>
+						<option value="unpublished" {{if eq .State "unpublished"}}selected{{end}}>Unpublished</option>
+					</select>
+				</div>
+				<div class="filter-group">
+					<label for="start-date">Start Date</label>
+					<input type="date" name="start-date" id="start-date" value="{{.StartDate}}">
+				</div>
+				<div class="filter-group">
+					<label for="end-date">End Date</label>
+					<input type="date" name="end-date" id="end-date" value="{{.EndDate}}">
+				</div>
+				<button type="submit" class="search-button"><i class="fas fa-filter"></i> Apply Filters</button>
+			</form>
+		</div>
+
+		<!-- Recordings List -->
+		<div class="recordings-grid animate-fade-in">
+            {{range .Recordings.Recording}}
+				<div class="recording-card">
+					<div class="recording-header">
+						<h2>{{.Name}}</h2>
+						<span class="status-badge status-{{if .Published}}published{{else}}unpublished{{end}}">
+                        {{if .Published}}Published{{else}}Unpublished{{end}}
+                    </span>
+					</div>
+					<div class="recording-meta">
+						<div class="meta-item">
+							<span class="meta-label">Meeting ID:</span>
+							<span class="meta-value">{{.MeetingID}}</span>
+						</div>
+						<div class="meta-item">
+							<span class="meta-label">Participants:</span>
+							<span class="meta-value">{{.Participants}}</span>
+						</div>
+						<div class="meta-item">
+							<span class="meta-label">Start Time:</span>
+							<span class="meta-value">{{.StartTime}}</span>
+						</div>
+						<div class="meta-item">
+							<span class="meta-label">Duration:</span>
+							<span class="meta-value">{{(index .Playback.Format 0).Length}} mins</span>
+						</div>
+                        {{if .IsBreakout}}
+							<div class="meta-item">
+								<span class="meta-label">Type:</span>
+								<span class="meta-value">Breakout</span>
+							</div>
+                        {{end}}
+					</div>
+					<div class="recording-actions">
+                        {{range .Playback.Format}}
+							<a href="{{.Url}}" class="recording-link" target="_blank">
+								<i class="fas fa-play"></i> Play {{.Type}}
+							</a>
+                        {{end}}
+					</div>
+				</div>
+            {{else}}
+				<div class="not-found-container animate-fade-in">
+					<h1>No Recordings Found</h1>
+					<p>Try adjusting your search or filters to find recordings.</p>
+				</div>
+            {{end}}
+		</div>
+	</div>
+
+	<script>
+        // Add animation trigger on scroll
+        const elements = document.querySelectorAll('.animate-fade-in, .animate-slide-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {threshold: 0.1});
+
+        elements.forEach(el => observer.observe(el));
+	</script>
+	</body>
+	</html>
 {{ end }}

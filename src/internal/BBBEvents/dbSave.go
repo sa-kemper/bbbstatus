@@ -101,9 +101,22 @@ func (b *BaseEvent) Save(ctx context.Context, dbQueries *db.Queries, conn *pgx.C
 		return handleMeetingRecordEvent(ctx, dbQueries, meeting, b)
 	case MeetingRecordingStopped:
 		return handleMeetingRecordEvent(ctx, dbQueries, meeting, b)
+	case EventMeetingRapArchiveEnded:
+		return handleRecordingArchivedEvent(ctx, dbQueries, meeting, b)
 	}
 	return nil
 
+}
+
+func handleRecordingArchivedEvent(ctx context.Context, queries *db.Queries, meeting Meeting, b *BaseEvent) (err error) {
+	if b.Data.ID == "rap-archive-ended" { // when a recording is processed this event is sent.
+		err = queries.IncrementRecordingsCountForServer(ctx, meeting.BbbHostname)
+		if err != nil {
+			fmt.Println("error occurred during IncrementRecordingsCountForServer: ", err, "Server: ", b.Data.Attributes.Meeting.BbbHostname)
+			return err
+		}
+	}
+	return nil
 }
 
 // isUserEvent determines if the given event ID should be handled as a user event.

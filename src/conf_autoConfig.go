@@ -18,10 +18,12 @@ package main
 
 import (
 	"bbbstatus/internal/BBBAPI"
+	db "bbbstatus/internal/database"
 	"context"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"github.com/jackc/pgx/v5"
+	"log"
 	"os"
 	"slices"
 	"strings"
@@ -136,6 +138,7 @@ func parseBBBServersFromEnv() {
 		return
 	}
 	defer conn.Close(context.TODO())
+	dbQueries := db.New(conn)
 
 	for _, serverUrl := range strings.Split(bbbServersEnv, ",") { // serverUrl is expected to be hostname:port, omitting the protocol as it's https in most cases. port and colon are optional
 		var serverHostname, serverPort string
@@ -151,7 +154,7 @@ func parseBBBServersFromEnv() {
 			serverPort = "443"
 		}
 		//fmt.Println("DEBUG: parseBBBServersFromEnv->serverUrl:'" + serverUrl + "', ServerHostname:'" + serverHostname + "', ServerPort:'" + serverPort + "'")
-		err = addBBBServerToDb(conn, bbbServer{Hostname: serverHostname, ApiPort: serverPort})
+		err = dbQueries.InsertBBBServer(context.TODO(), db.InsertBBBServerParams{Hostname: serverHostname, ApiPort: serverPort})
 		if err != nil {
 			fmt.Println("Error occurred adding BBB server to database:", err)
 		}
@@ -176,6 +179,24 @@ func ValidateConfiguredBBBServers() {
 			fmt.Println(server.Hostname + ": Invalid API settings")
 			fmt.Println("Error occurred validating the API settings: ", err)
 		}
+
+		// Set recordings count in the database, this makes it easier to render the meetings template
+		conn, err := pgx.Connect(context.TODO(), confGet("DB_CONNECTION_STRING"))
+		if err != nil {
+			fmt.Println("error ValidateConfiguredBBBServers -> connecting to database:", err)
+			return
+		}
+		defer conn.Close(context.TODO())
+		dbQueries := db.New(conn)
+
+		recordings, err := api.GetRecordings(context.TODO(),
+			BBBAPI.GetRecordingsParameters{}, db.Meeting{})
+		if err != nil {
+			log.Fatal("Error occurred getting recordings: ", err)
+		}
+
+		err = dbQueries.SetRecordingsCountForHostname(context.TODO(), db.SetRecordingsCountForHostnameParams{Hostname: api.Hostname, RecordingsCount: int32(len(recordings.Recording))})
+
 		runtimeBbbServers = append(runtimeBbbServers, server)
 		fmt.Printf("the server %s is configured with the api key '%s'", server.Hostname, server.SharedSecret)
 	}

@@ -122,11 +122,12 @@ func (ns NullUserEventType) Value() (driver.Value, error) {
 }
 
 type BbbServer struct {
-	Hostname     string
-	ApiKey       string
-	FriendlyName string
-	Active       bool
-	ApiPort      string
+	Hostname        string
+	ApiKey          string
+	FriendlyName    string
+	Active          bool
+	ApiPort         string
+	RecordingsCount int32
 }
 
 type ChatMessage struct {

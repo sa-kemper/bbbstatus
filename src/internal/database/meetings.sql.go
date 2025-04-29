@@ -45,11 +45,10 @@ func (q *Queries) EndMeetingAtTimestampByID(ctx context.Context, arg EndMeetingA
 
 const getMeetingActiveByID = `-- name: GetMeetingActiveByID :one
 SELECT COALESCE(
-               EXISTS (
-                   SELECT 1
-                   FROM meetings
-                   WHERE meeting_ended IS NULL AND internal_meeting_id = $1
-               ),
+               EXISTS (SELECT 1
+                       FROM meetings
+                       WHERE meeting_ended IS NULL
+                         AND internal_meeting_id = $1),
                FALSE
        )
 `

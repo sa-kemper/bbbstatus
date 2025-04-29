@@ -27,7 +27,6 @@ import (
 	"net/http"
 	"slices"
 	"sort"
-	"strings"
 	"time"
 )
 
@@ -128,12 +127,12 @@ func showRecordings(context echo.Context) (err error) {
 
 		var matchedRecordings []BBBAPI.Recording
 		for _, recording := range globalRecordings {
-			pariticipants, err := dbQueries.GetUsersInMeetingByInternalID(ctx, recording.MeetingID)
+			participants, err := dbQueries.GetUsersInMeetingByInternalID(ctx, recording.InternalMeetingID)
 			if err != nil {
 				_ = context.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": err.Error()})
 			}
-			var participantNames = make([]string, len(pariticipants))
-			for iterator, participant := range pariticipants {
+			var participantNames = make([]string, len(participants))
+			for iterator, participant := range participants {
 				participantNames[iterator] = participant.Name
 			}
 
@@ -141,8 +140,11 @@ func showRecordings(context echo.Context) (err error) {
 				fuzzy.Match(userQuery, recording.RecordID),
 				fuzzy.Match(userQuery, recording.MeetingID),
 				fuzzy.Match(userQuery, recording.Name),
-				fuzzy.Match(userQuery, strings.Join(participantNames, " ")),
 			}
+			for _, participant := range participantNames {
+				fuzzyMatches = append(fuzzyMatches, fuzzy.Match(userQuery, participant))
+			}
+
 			if slices.Contains(fuzzyMatches, true) {
 				matchedRecordings = append(matchedRecordings, recording)
 			}

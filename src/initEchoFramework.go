@@ -49,6 +49,7 @@ func initEchoFramework() {
 		},
 		"reverse":      func(string, ...interface{}) string { return "x" },
 		"formatTime":   func(t time.Time) string { return t.Format("15:04:05") },
+		"formatDate":   func(t time.Time) string { return t.Format("2006.01.02 - 15:04") },
 		"valFromIndex": func(m map[string]int, s string) int { return m[s] },
 		"timestamp":    func() string { return strconv.Itoa(int(time.Now().Unix())) },
 	}

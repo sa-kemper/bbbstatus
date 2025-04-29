@@ -122,3 +122,4 @@ Backend:
 - github.com/nicksnyder/go-i18n/v2
 - github.com/pressly/goose/v3
 - golang.org/x/text
+- github.com/lithammer/fuzzysearch

@@ -14,6 +14,14 @@ other = "Aug"
 hash = "sha1-a00619a52130bf71a69db12a9b4cda996d3d91cc"
 other = "zurück zur Übersicht"
 
+[CSVMeetingAction-meeting-created]
+hash = "sha1-740fe1de219024332094840763a1fea397c1b8a4"
+other = "Meeting erstellt"
+
+[CSVMeetingAction-meeting-ended]
+hash = "sha1-86fd1d773fe75aa1c6a04682bae1556ef8a9b582"
+other = "Meeting beendet"
+
 [CSVMeetingAction-meeting-recording-started]
 hash = "sha1-bde81afa928840be70c67638434105d89efb658e"
 other = "Aufzeichnungs start"
@@ -202,10 +210,6 @@ other = "Die Aufzeichnung der Sitzung wurde gestoppt"
 hash = "sha1-40dc448a962e5fe46d99f57ab5bbb9ad1da10770"
 other = "Interne ID"
 
-[MeetingUserCount]
-hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"
-other = "Users"
-
 [MeetingNoMeetingsExist]
 hash = "sha1-6c91094f705185eae005c75e7355e7bc29c050a9"
 other = "Es existieren keine Meetings"
@@ -229,6 +233,10 @@ other = "Aufzeichnungen"
 [MeetingToReport]
 hash = "sha1-114c4dd2498e790e45bdba42832d78da0edbe889"
 other = "Zur Zusammenfassung"
+
+[MeetingUserCount]
+hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"
+other = "Benutzer"
 
 [Mon]
 hash = "sha1-24b2a0993d0cfa93c44282d6bba72bcf58b300d6"
@@ -254,9 +262,57 @@ other = "Okt"
 hash = "sha1-0514d1aa241c1f9d5ea11c534d4aa508b533268a"
 other = "Die aufgerufene seite konnte nicht gefunden werden"
 
+[RecordingPageNoRecordingsFound]
+hash = "sha1-64a52d0ca3ce5d32810fa0fc94fff03fac26f95c"
+other = "Keine aufzeichnugnen gefunden"
+
+[RecordingPageNoRecordingsFoundHint]
+hash = "sha1-bf2f8f34d4d81d7c48fe0badf16ddf33075b141b"
+other = "Versuchen Sie, Ihre Suche oder Filter anzupassen, um Aufnahmen zu finden."
+
+[RecordingPageRecordingBreakout]
+hash = "sha1-48d6857f6b2869d031f463b13aa34df47e18c548"
+other = "Breakout"
+
+[RecordingPageRecordingDuration]
+hash = "sha1-1370004da76fa4f3b7a5180fd5436065ef4c7d5b"
+other = "Dauer"
+
+[RecordingPageRecordingMeetingID]
+hash = "sha1-8a1315eaeb59e44132aa5c27e4f53e7ba92359f7"
+other = "Meeting kennung"
+
+[RecordingPageRecordingPlay]
+hash = "sha1-5d12bd53552cafc41ca6146c04870df2e1574e13"
+other = "Abspielen"
+
+[RecordingPageRecordingState-published]
+hash = "sha1-483bf2075c12023a5e849d12a42027be89c5e94b"
+other = "Veröffentlicht"
+
+[RecordingPageRecordingState-unpublished]
+hash = "sha1-fc6556a7ab9565ea063ccbb95f4445dc1b10fbf5"
+other = "Nicht veröffentlicht"
+
+[RecordingPageRecordingType]
+hash = "sha1-3deb7456519697ecf4eefc455516c969a3681bae"
+other = "Typ"
+
 [RecordingsHeader]
 hash = "sha1-38adb0a14125adb510c8b19c1d0b569422e3f564"
 other = "Aufzeichnungen"
+
+[RecordingsPageSearchBar]
+hash = "sha1-797682daa1520087c57acf003a4482ab02722de3"
+other = "Nach aufzeichnungen suchen..."
+
+[RecordingsPageTitle]
+hash = "sha1-3b3f4a4ffb2da1977f487e7723014cc9e80debfc"
+other = "Meeting Aufzeichnungen"
+
+[RecordingPageRecordingPlay]
+hash = "sha1-5d12bd53552cafc41ca6146c04870df2e1574e13"
+other = "Abspielen"
 
 [ReportHeader]
 hash = "sha1-9f5e0854a7e28ebf19364bb154d82f4122c6eddc"
@@ -317,6 +373,11 @@ other = "Sa"
 [Sep]
 hash = "sha1-fdd289e370bd5cc575f48a16947d05c144ec474b"
 other = "Sep"
+
+[ServerStatsMeetings]
+hash = "sha1-b23a193872fc22386b943b59124e30963e802c52"
+one = "Meeting"
+other = "Meetings"
 
 [StatsPageAttendeeCountTableHeader]
 hash = "sha1-a45a09624432a10add6932568409200bd3cc6fdd"
@@ -450,9 +511,18 @@ other = "Startdatum"
 hash = "sha1-68e57924420dd31edbfb8fce23f7d3ebbb2ae081"
 other = "Meeting Liste"
 
+[meetingListHeaderSeeRecordingsButton]
+hash = "sha1-9b2bb6931d160d3aab4d231656dc79a58375fe3c"
+other = "Siehe Aufzeichnungen"
+
 [meetingListHeaderSeeStatisticsButton]
 hash = "sha1-1e5040d90ba8b0b64ee15faedbf1950cb0a6a7f9"
 other = "Siehe Statistiken"
+
+[meetingListUserCountLabel]
+hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"
+one = "Benutzer"
+other = "Benutzer"
 
 [user-audio-muted]
 hash = "sha1-e1ce0a16ae7cef80eb65def56c1f0555380b3bdf"

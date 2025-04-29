@@ -29,7 +29,6 @@ body {
     background-color: #f5f7fa;
 }
 
-/* NEW: Updated body background for recordings page */
 body.recordings-page {
     background: linear-gradient(135deg, #f5f7fa 0%, #e0e7ff 100%);
     min-height: 100vh;
@@ -42,7 +41,6 @@ body.recordings-page {
     position: relative;
 }
 
-/* NEW: Wider container for recordings page */
 .container.recordings-container {
     max-width: 1400px;
 }
@@ -62,7 +60,6 @@ body.recordings-page {
     display: flex;
 }
 
-/* MODIFIED: Enhanced header for recordings page */
 .header.recordings-header {
     border-bottom: none;
     justify-content: space-between;
@@ -81,7 +78,6 @@ body.recordings-page {
     flex: 1;
 }
 
-/* NEW: Styling for recordings header h1 */
 .header.recordings-header h1 {
     font-size: 2rem;
     display: flex;
@@ -149,7 +145,6 @@ body.recordings-page {
     margin-bottom: 0.5rem;
 }
 
-/* NEW: Additional status badge styles for recordings */
 .status-published {
     background: #e8f5e9;
     color: #2e7d32;
@@ -244,7 +239,6 @@ body.recordings-page {
     transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-/* MODIFIED: Enhanced home button for recordings page */
 .home-button.recordings-home-button {
     border-radius: 8px;
     display: flex;
@@ -270,7 +264,6 @@ body.recordings-page {
     flex-wrap: wrap;
 }
 
-/* NEW: Search and filter section for recordings */
 .search-filter {
     background: white;
     border-radius: 12px;
@@ -602,7 +595,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     padding: 4rem 1rem;
 }
 
-/* MODIFIED: Enhanced not-found styling for recordings */
 .not-found-container.recordings-not-found {
     background: white;
     border-radius: 12px;
@@ -615,7 +607,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     margin-bottom: 1rem;
 }
 
-/* MODIFIED: Adjusted not-found h1 for recordings */
 .not-found-container.recordings-not-found h1 {
     font-size: 2.5rem;
 }
@@ -658,14 +649,12 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     gap: 1rem;
 }
 
-/* NEW: Recordings grid layout */
 .recordings-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 1.5rem;
 }
 
-/* NEW: Recording card styling */
 .recording-card {
     background: white;
     border-radius: 12px;
@@ -681,7 +670,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* NEW: Recording header */
 .recording-header {
     display: flex;
     justify-content: space-between;
@@ -696,7 +684,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     max-width: 70%;
 }
 
-/* NEW: Recording meta data */
 .recording-meta {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -728,7 +715,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     transition: background-color 0.3s, transform 0.2s;
 }
 
-/* MODIFIED: Enhanced recording link for recordings page */
 .recording-link.recordings-play-link {
     background: linear-gradient(90deg, #1976d2, #42a5f5);
     color: white;
@@ -744,12 +730,10 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     transform: translateY(-2px);
 }
 
-/* NEW: Recording link hover for recordings page */
 .recording-link.recordings-play-link:hover {
     background: linear-gradient(90deg, #1565c0, #1e88e5);
 }
 
-/* NEW: Recording actions container */
 .recording-actions {
     display: flex;
     flex-wrap: wrap;
@@ -757,7 +741,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     margin-bottom: 1rem;
 }
 
-/* NEW: Recording preview */
 .recording-preview {
     text-align: center;
 }
@@ -1001,24 +984,42 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     }
 }
 
-/* NEW: Animation styles for recordings page */
 .animate-fade-in {
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    animation: fadeIn 0.5s ease forwards;
+    animation-delay: calc(0.1s * var(--animation-order, 1));
 }
 
 .animate-slide-in {
     opacity: 0;
     transform: translateX(-20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    animation: slideIn 0.5s ease forwards;
+    animation-delay: calc(0.1s * var(--animation-order, 1));
 }
 
-.animate-fade-in.visible,
-.animate-slide-in.visible {
-    opacity: 1;
-    transform: translateY(0) translateX(0);
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 
 /* Responsive Design */
 @media (max-width: 1205px) {
@@ -1095,7 +1096,6 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         justify-content: center;
     }
 
-    /* NEW: Responsive adjustments for recordings page */
     .search-form {
         flex-direction: column;
         align-items: stretch;

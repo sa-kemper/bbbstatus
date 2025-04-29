@@ -19,7 +19,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"golang.org/x/text/language"
 	"html/template"
 	"io"
 	"net"
@@ -39,7 +38,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	// Genius move right there, not because it's hard but because I've not seen this documented at the time of writing.
 	t.templates.Funcs(template.FuncMap{
 		"t": func(text string) string {
-			localizer = i18n.NewLocalizer(Bundle, c.Request().Header.Get("Accept-Language"), language.English.String())
+			localizer = i18n.NewLocalizer(Bundle, c.Request().Header.Get("Accept-Language"))
 			return Translate(text)
 
 		},

@@ -15,9 +15,11 @@
 		<div class="card header">
 			<h1>{{t "meetingListHeader"}}</h1>
 			<a class="meeting-button meeting-button-details" href={{ reverse "statistics" }}>
+				<i class="fas fa-chart-line"></i>
                 {{t "meetingListHeaderSeeStatisticsButton"}}
 			</a>
 			<a class="meeting-button meeting-button-details" href={{ reverse "recordings" }} style="margin-left: 1rem;">
+			<i class="fas fa-video"></i>
             {{t "meetingListHeaderSeeRecordingsButton" }}
 			</a>
 		</div>

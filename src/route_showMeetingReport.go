@@ -61,7 +61,7 @@ func showMeetingReport(c echo.Context) error {
 		return c.Render(http.StatusNotFound, "notfound", nil)
 	}
 
-	report, err := GenerateWebReport(ctx, internalMeetingId)
+	report, err := GenerateWebReport(ctx, internalMeetingId, nil)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
 			return renderError(c, "ErrorParagraphApplicationTimeout")

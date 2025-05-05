@@ -19,6 +19,8 @@ package main
 import (
 	"bbbstatus/internal/BBBEvents"
 	"bbbstatus/internal/StatsAggregator"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -73,6 +75,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "InternalServerError", Other: "Internal Server Error"},
 		{ID: "NoFutureTimeAllowed", Other: "Selected time point lays in the future"},
 		{ID: "StatsPageGenError", Other: "Error generating statistics"},
+		{ID: "NoStatsAvailableYet", Other: "No statistics available yet"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -143,6 +146,10 @@ func statsPage(c echo.Context) (err error) {
 		confGet("DB_CONNECTION_STRING"),
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return renderError(c, "NoStatsAvailableYet")
+		}
+
 		fmt.Printf("Error getting earliest stat date: %v\n", err)
 		return renderError(c, "StatsPageGenError")
 	}

@@ -18,7 +18,6 @@ package main
 
 import (
 	"bbbstatus/internal/BBBEvents"
-	db "bbbstatus/internal/database"
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -43,8 +42,7 @@ func init() { // Add all messages that are related to this file into the localiz
 func showMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
-	var meetingExists bool
-	var meetingActive bool
+	var meetingExtists bool
 	var ctx = c.Request().Context()
 	localizer = i18n.NewLocalizer(Bundle, requestLanguage, language.English.String())
 
@@ -53,37 +51,26 @@ func showMeetingReport(c echo.Context) error {
 	if err != nil {
 		return fmt.Errorf("Unable to connect to database: %v\n", err)
 	}
-
-	dbQueries := db.New(conn)
-
 	//goland:noinspection ALL
 	defer conn.Close(ctx)
 
 	// Query and parse meeting using the row.next and row.scan methode of pgx
-	meetingExists, err = dbQueries.GetMeetingExistsByID(ctx, internalMeetingId)
-	if !meetingExists || err != nil {
-		if errors.Is(err, os.ErrDeadlineExceeded) {
-			fmt.Println("FATAL: database timeout!")
-		}
-		if !errors.Is(err, pgx.ErrNoRows) {
-			fmt.Println("error occurred while checking meeting existence", err)
-			return c.Render(http.StatusNotFound, "notfound", nil)
-		}
-		meetingExists = false
+	err = conn.QueryRow(ctx, "SELECT TRUE FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingId).Scan(&meetingExtists)
+	if !meetingExtists || err != nil {
+		fmt.Println(err)
+		return c.Render(http.StatusNotFound, "notfound", nil)
 	}
 
-	report, err := GenerateWebReport(ctx, internalMeetingId, nil)
+	report, err := GenerateWebReport(ctx, internalMeetingId)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
+			return renderError(c, "ErrorParagraphApplicationTimeout")
 			fmt.Println("FATAL: database timeout!")
 			return c.Render(http.StatusGatewayTimeout, "errorPage", frontendError{ErrorTitle: Translate("ErrorTitleApplicationTimeout"), ErrorParagraph: Translate("ErrorParagraphApplicationTimeout")})
 		}
-		fmt.Println("error occurred while generating report", err)
+		fmt.Println(err)
 		return err
 	}
 
-	result, err := dbQueries.GetMeetingActiveByID(ctx, internalMeetingId)
-	meetingActive = result.(bool)
-
-	return c.Render(http.StatusOK, "report", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": report, "MeetingActive": meetingActive})
+	return c.Render(http.StatusOK, "report", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": report})
 }

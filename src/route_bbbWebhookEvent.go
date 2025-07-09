@@ -134,7 +134,7 @@ func bbbWebHookEvent(c echo.Context) error {
 		// when the user joins, bbb-webhooks supplies the users real name. We therefore have to anonymise the user
 		if event.Data.ID == "user-joined" {
 			// exchange the users name with a random alias.
-			event.Data.Attributes.User.Name = namegen.GenerateUnique(confGet("SERVER_LANG"), userNames)
+			event.Data.Attributes.User.Name = namegen.GenerateUnique(confGet("SERVER_LANG"), &userNames)
 		}
 
 		// there might be edge cases, where bbb-webhooks sends the original name of the user, we need to make sure that those names never make it into the database.
@@ -172,7 +172,7 @@ func handleBBBWebhooksNameLeak(ctx context.Context, dbQueries *db.Queries, event
 			if namegen.IsGeneratedName(confGet("SERVER_LANG"), dbUserEntries[userIndex].Name) {
 				event.Data.Attributes.User.Name = dbUserEntries[userIndex].Name
 			} else {
-				event.Data.Attributes.User.Name = namegen.GenerateUnique(confGet("SERVER_LANG"), userNames)
+				event.Data.Attributes.User.Name = namegen.GenerateUnique(confGet("SERVER_LANG"), &userNames)
 				err = dbQueries.SetUserNameByID(ctx, db.SetUserNameByIDParams{
 					Name:           event.Data.Attributes.User.Name,
 					InternalUserID: event.Data.Attributes.User.InternalUserID,

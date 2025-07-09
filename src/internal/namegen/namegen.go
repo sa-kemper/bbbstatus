@@ -55,7 +55,7 @@ func Generate(lang string) (name string) {
 	return name
 }
 
-func GenerateUnique(lang string, existingNames []string) (name string) {
+func GenerateUnique(lang string, existingNames *[]string) (name string) {
 	var attemptCounter int
 
 	for {
@@ -72,7 +72,7 @@ func GenerateUnique(lang string, existingNames []string) (name string) {
 		if attemptCounter > 500 {
 			log.Fatal("failed to generate unique name")
 		}
-		if !slices.Contains(existingNames, generatedName) {
+		if !slices.Contains(*existingNames, generatedName) {
 			return generatedName
 		}
 	}

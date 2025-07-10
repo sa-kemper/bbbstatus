@@ -58,6 +58,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "meetingListUserCountLabel", One: "User", Other: "Users"},
 		{ID: "ServerStatsMeetings", One: "Meeting", Other: "Meetings"},
 		{ID: "meetingListHeaderSeeRecordingsButton", Other: "See Recordings"},
+		{ID: "meetingListReloadButton", Other: "Reload"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 }

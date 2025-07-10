@@ -539,7 +539,7 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
 }
 
 .action-button:hover {
-    width: 160px;
+    width: 180px;
     background: #f8f9fa;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }

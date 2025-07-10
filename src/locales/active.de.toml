@@ -238,6 +238,10 @@ other = "Zur Zusammenfassung"
 hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"
 other = "Benutzer"
 
+[MODERATOR]
+hash = "sha1-ad3b15c3a7bca16179ba5807b875d6e8269d5ae9"
+other = "Moderator"
+
 [Mon]
 hash = "sha1-24b2a0993d0cfa93c44282d6bba72bcf58b300d6"
 other = "Mo"
@@ -471,6 +475,10 @@ other = "Do"
 hash = "sha1-529541bb390c76152e313351d89de3cd30a1c4bd"
 other = "Di"
 
+[VIEWER]
+hash = "sha1-dbad9f126b33570e09839a2d60720898de1a512d"
+other = "Zuschauer"
+
 [Wed]
 hash = "sha1-23408b19b29e8e8495bb4b68733ada5f85fc2fd6"
 other = "Mi"
@@ -518,6 +526,10 @@ other = "Siehe Aufzeichnungen"
 [meetingListHeaderSeeStatisticsButton]
 hash = "sha1-1e5040d90ba8b0b64ee15faedbf1950cb0a6a7f9"
 other = "Siehe Statistiken"
+
+[meetingListReloadButton]
+hash = "sha1-cce7155371fc26686b89c7452337d8419692f31e"
+other = "Neu laden"
 
 [meetingListUserCountLabel]
 hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"

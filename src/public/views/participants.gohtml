@@ -23,7 +23,7 @@ limitations under the License.
                    href="{{ reverse "inspectReport" $.InternalMeetingID }}?{{.InternalUserID}}=on">
                     <div class="participant-info">
                         <h3>{{ .Name }}</h3>
-                        <span class="role-badge role-moderator">{{ .Role }}</span>
+                        <span class="role-badge {{if eq .Role "MODERATOR"}}role-moderator{{else}}role-viewer{{end}}">{{t .Role }}</span>
                     </div>
                 </a>
             {{ end }}

@@ -314,10 +314,6 @@ other = "Nach aufzeichnungen suchen..."
 hash = "sha1-3b3f4a4ffb2da1977f487e7723014cc9e80debfc"
 other = "Meeting Aufzeichnungen"
 
-[RecordingPageRecordingPlay]
-hash = "sha1-5d12bd53552cafc41ca6146c04870df2e1574e13"
-other = "Abspielen"
-
 [ReportHeader]
 hash = "sha1-9f5e0854a7e28ebf19364bb154d82f4122c6eddc"
 other = "Meeting-Protokoll"

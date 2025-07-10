@@ -25,6 +25,7 @@ import (
 	"math/rand"
 	"slices"
 	"strings"
+	"time"
 )
 
 //go:embed assets
@@ -60,6 +61,10 @@ func GenerateUnique(lang string, existingNames *[]string) (name string) {
 
 	for {
 		var generatedName string
+		if attemptCounter == 3 { // regenerate the randomness if the failed attempts stack up, but only do this once.
+			// why only once? because this might be a heavy operation.
+			rand.NewSource(time.Now().Unix())
+		}
 		if attemptCounter < 50 {
 			generatedName = Generate(lang)
 		} else {

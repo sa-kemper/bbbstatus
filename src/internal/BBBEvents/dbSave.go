@@ -55,7 +55,7 @@ func (b *BaseEvent) Save(ctx context.Context, dbQueries *db.Queries, conn *pgx.C
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
 				// bbb-webhooks messed up the queue order again
-
+				fmt.Println("WARNING: bbb-webhooks is sending webhooks in a invalid order, the only viable option atm is to clear the queue using the environment variable CLEAR_QUEUE set to \"true\".")
 			}
 		}
 

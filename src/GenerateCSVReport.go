@@ -218,14 +218,13 @@ func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, dbQueri
 			}
 		}
 
-		// we cannot use the same connection while the row is not closed.
-		event.User, err = dbQueries.GetUserNameById(ctx, message.InternalUserID)
+		eventUser, err := dbQueries.GetUserById(ctx, message.InternalUserID)
 		if err != nil {
 			fmt.Println("error obtaining user information of chat message")
 			fmt.Println(err)
 			event.User = chatMessageUserID
 		}
-
+		event.User = eventUser.Name
 		event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": event.User, "Message": chatMessageContent})
 		event.Action = Translate("CSVReportActionChatted")
 		timeline = append(timeline, event)
@@ -246,12 +245,12 @@ func FillCSVUserEvents(ctx context.Context, internalMeetingID string, dbQueries 
 			}
 		}
 		var event = CSVEvent{Time: dbEvent.EventTimestamp.Time}
-		event.User, err = dbQueries.GetUserNameById(ctx, dbEvent.InternalUserID)
+		eventUser, err := dbQueries.GetUserById(ctx, dbEvent.InternalUserID)
 		if err != nil {
 			fmt.Println("error obtaining user information of user event")
 			return timeline, err
 		}
-
+		event.User = eventUser.Name
 		event.TextRepresentation = TranslateAdvanced(dbEvent.EventType, map[string]string{"Username": event.User})
 		event.Action = Translate("CSVReportAction-" + dbEvent.EventType)
 		timeline = append(timeline, event)

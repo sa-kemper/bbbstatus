@@ -1,8 +1,3 @@
--- name: GetUserNameById :one
-SELECT name
-FROM users
-WHERE internal_user_id = $1;
-
 -- name: GetUserById :one
 SELECT *
 FROM users
@@ -51,11 +46,6 @@ WHERE internal_user_id IN (SELECT DISTINCT internal_user_id FROM user_events WHE
 SELECT *
 FROM users
 WHERE internal_user_id IN (SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1);
-
--- name: SetUserNameByID :exec
-UPDATE users
-set name = $1
-where internal_user_id = $2;
 
 -- name: GetUsersInMeetingByID :many
 SELECT *

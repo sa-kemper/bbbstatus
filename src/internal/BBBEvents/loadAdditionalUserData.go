@@ -33,11 +33,12 @@ func loadAdditionalUserData(ctx context.Context, user *User, dbQueries *db.Queri
 		return nil
 	}
 	if user.Name == "" && user.InternalUserID != "" {
-		user.Name, err = dbQueries.GetUserNameById(ctx, user.InternalUserID)
+		databaseUser, err := dbQueries.GetUserById(ctx, user.InternalUserID)
 		if err != nil {
 			fmt.Println("error occurred during loadAdditionalUserData: ", err)
 			return err
 		}
+		user.Name = databaseUser.Name
 	}
 	return nil
 }

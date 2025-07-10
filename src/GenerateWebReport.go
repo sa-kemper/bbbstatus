@@ -237,12 +237,13 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 				fmt.Println("error connecting to the database at least twice. ->", err)
 				return timeline, err
 			}
-			user.Name, err = dbQueries.GetUserNameById(ctx, user.InternalUserID)
+			pollUser, err := dbQueries.GetUserById(ctx, user.InternalUserID)
 			if err != nil {
 				fmt.Println("error obtaining user information of poll answer")
 				fmt.Println(err)
 				user.Name = user.InternalUserID
 			}
+			user.Name = pollUser.Name
 
 			err = conn2.QueryRow(ctx, "SELECT answers FROM polls WHERE poll_id = $1", pollID).Scan(&answersJSON)
 			if err != nil {
@@ -329,7 +330,6 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 	}
 	for _, message := range meetingMessages {
 		var event = Event{}
-		var userName string
 		if !message.SendTime.Valid {
 			fmt.Println("WARNING chat message has no sent time", message)
 			continue
@@ -351,12 +351,12 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 		}
 
 		// we cannot use the same connection while the row is not closed.
-		userName, err = dbQueries.GetUserNameById(ctx, message.InternalUserID)
+		messageUser, err := dbQueries.GetUserById(ctx, message.InternalUserID)
 		if err != nil {
 			fmt.Println("error obtaining user information of chat message")
 			fmt.Println(err)
 		}
-		event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": userName, "Message": message.MessageContent})
+		event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": messageUser.Name, "Message": message.MessageContent})
 		timeline = append(timeline, event)
 	}
 	return timeline, err
@@ -376,7 +376,7 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 			}
 		}
 
-		var userName, err = dbQueries.GetUserNameById(ctx, userEvent.InternalUserID) // obtain username for the text representation
+		eventUser, err := dbQueries.GetUserById(ctx, userEvent.InternalUserID) // obtain username for the text representation
 		if err != nil {
 			fmt.Println("WARNING obtaining user information of user event", userEvent)
 			continue
@@ -387,7 +387,7 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 			continue
 		}
 
-		var event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: TranslateAdvanced(userEvent.EventType, map[string]string{"Username": userName})}
+		var event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: TranslateAdvanced(userEvent.EventType, map[string]string{"Username": eventUser.Name})}
 		timeline = append(timeline, event)
 	}
 	return timeline, err

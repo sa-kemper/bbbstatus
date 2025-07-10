@@ -30,6 +30,7 @@ FROM users
 WHERE internal_user_id = (SELECT user_events.internal_user_id
                           FROM user_events
                           WHERE internal_meeting_id = $1
+                            AND user_events.event_id = 'user-presenter-assigned'
                           ORDER BY event_timestamp DESC
                           LIMIT 1)
 `
@@ -116,23 +117,12 @@ func (q *Queries) GetUserExistsByID(ctx context.Context, internalUserID string) 
 	return column_1, err
 }
 
-const getUserNameById = `-- name: GetUserNameById :one
-SELECT name
-FROM users
-WHERE internal_user_id = $1
-`
-
-func (q *Queries) GetUserNameById(ctx context.Context, internalUserID string) (string, error) {
-	row := q.db.QueryRow(ctx, getUserNameById, internalUserID)
-	var name string
-	err := row.Scan(&name)
-	return name, err
-}
-
 const getUsersInMeetingByID = `-- name: GetUsersInMeetingByID :many
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, dsgvo_name FROM users WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
-                                               FROM user_events
-                                               WHERE internal_meeting_id = $1)
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, dsgvo_name
+FROM users
+WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
+                           FROM user_events
+                           WHERE internal_meeting_id = $1)
 `
 
 func (q *Queries) GetUsersInMeetingByID(ctx context.Context, internalMeetingID string) ([]User, error) {
@@ -278,21 +268,5 @@ type LeaveUserByIDParams struct {
 
 func (q *Queries) LeaveUserByID(ctx context.Context, arg LeaveUserByIDParams) error {
 	_, err := q.db.Exec(ctx, leaveUserByID, arg.LeaveTimestamp, arg.InternalUserID)
-	return err
-}
-
-const setUserNameByID = `-- name: SetUserNameByID :exec
-UPDATE users
-set name = $1
-where internal_user_id = $2
-`
-
-type SetUserNameByIDParams struct {
-	Name           string
-	InternalUserID string
-}
-
-func (q *Queries) SetUserNameByID(ctx context.Context, arg SetUserNameByIDParams) error {
-	_, err := q.db.Exec(ctx, setUserNameByID, arg.Name, arg.InternalUserID)
 	return err
 }

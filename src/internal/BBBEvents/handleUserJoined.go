@@ -41,7 +41,7 @@ func handleUserJoined(ctx context.Context, dbQueries *db.Queries, user *User, me
 		}
 		userInRequestExists = false
 	}
-	fmt.Println("DEBUG: handleUserJoined -> user exists: ", userInRequestExists)
+	//fmt.Println("DEBUG: handleUserJoined -> user exists: ", userInRequestExists)
 
 	if !userInRequestExists {
 		usersInTheCurrentMeeting, err := dbQueries.GetUsersInMeetingByID(ctx, meeting.InternalMeetingID)

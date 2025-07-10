@@ -192,31 +192,11 @@ func showMeetings(c echo.Context) error {
 
 	for iterator, meeting := range meetings {
 		if meeting.Active {
-			servers := confGetServers(meeting.BbbHostname)
-			var server bbbServer
-			if len(servers) > 0 {
-				server = servers[0]
-			} else {
-				continue
-			}
-			apiTimeout := time.Duration(server.APITimeout) * time.Second
-			bbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apiTimeout}
-			if valid, err := bbbApi.ValidateApiSettings(ctx); err == nil || !valid {
-				if !valid {
-					fmt.Println(server.Hostname, "has no valid API settings")
-				}
-				if err != nil {
-					fmt.Println("error occurred validating API settings for server '"+server.Hostname+"': ", err)
-				}
-				continue
-			}
-
-			details, err := bbbApi.GetMeetingDetails(ctx, meeting.BBBEventsMeeting.ExternalMeetingID)
+			tmpInt, err := dbQueries.GetActiveUserCountInMeetingByID(ctx, meeting.BBBEventsMeeting.InternalMeetingID)
 			if err != nil {
-				fmt.Println("Error getting meeting details", err.Error())
-				meetings[iterator].UserCount = 0
+				fmt.Println("Error getting active user count:", err)
 			}
-			meetings[iterator].UserCount = details.ParticipantCount
+			meetings[iterator].UserCount = int(tmpInt)
 		} else {
 			usrCount, err := dbQueries.GetUserCountInMeetingByInternalID(ctx, meeting.BBBEventsMeeting.InternalMeetingID)
 			if err != nil {

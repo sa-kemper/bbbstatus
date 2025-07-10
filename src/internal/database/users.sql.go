@@ -11,6 +11,19 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getActiveUserCountInMeetingByID = `-- name: GetActiveUserCountInMeetingByID :one
+SELECT count(internal_user_id) FROM users WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
+                                               FROM user_events
+                                               WHERE internal_meeting_id = $1 AND leave_timestamp IS NULL)
+`
+
+func (q *Queries) GetActiveUserCountInMeetingByID(ctx context.Context, internalMeetingID string) (int64, error) {
+	row := q.db.QueryRow(ctx, getActiveUserCountInMeetingByID, internalMeetingID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getPresenterUserByMeetingID = `-- name: GetPresenterUserByMeetingID :one
 SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, dsgvo_name
 FROM users

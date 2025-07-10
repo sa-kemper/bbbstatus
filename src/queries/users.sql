@@ -63,3 +63,11 @@ FROM users
 WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
                            FROM user_events
                            WHERE internal_meeting_id = $1);
+
+-- name: GetActiveUserCountInMeetingByID :one
+SELECT count(internal_user_id)
+FROM users
+WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
+                           FROM user_events
+                           WHERE internal_meeting_id = $1
+                             AND leave_timestamp IS NULL);

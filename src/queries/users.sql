@@ -28,8 +28,8 @@ FROM users
 WHERE internal_user_id = $1;
 
 -- name: InsertUser :exec
-INSERT INTO users (internal_user_id, external_user_id, name, role, is_guest)
-VALUES ($1, $2, $3, $4, $5);
+INSERT INTO users (internal_user_id, external_user_id, name, dsgvo_name, role, is_guest)
+VALUES ($1, $2, $3, $4, $5, $6);
 
 -- name: GetUserCountBetweenDates :one
 SELECT COUNT(*)
@@ -55,3 +55,10 @@ WHERE internal_user_id IN (SELECT DISTINCT internal_user_id FROM user_events WHE
 UPDATE users
 set name = $1
 where internal_user_id = $2;
+
+-- name: GetUsersInMeetingByID :many
+SELECT *
+FROM users
+WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
+                           FROM user_events
+                           WHERE internal_meeting_id = $1);

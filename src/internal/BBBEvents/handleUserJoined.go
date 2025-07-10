@@ -18,6 +18,7 @@ package BBBEvents
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/internal/namegen"
 	"context"
 	"errors"
 	"fmt"
@@ -25,8 +26,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func handleUserJoined(ctx context.Context, dbQueries *db.Queries, user *User, meeting Meeting, b *BaseEvent) error {
-	var err error
+func handleUserJoined(ctx context.Context, dbQueries *db.Queries, user *User, meeting Meeting, b *BaseEvent) (err error) {
 	var userInRequestExists bool
 
 	if user == nil {
@@ -36,7 +36,7 @@ func handleUserJoined(ctx context.Context, dbQueries *db.Queries, user *User, me
 	userInRequestExists, err = dbQueries.GetUserExistsByID(ctx, user.InternalUserID)
 	if err != nil {
 		if !errors.Is(err, pgx.ErrNoRows) {
-			fmt.Println("error occured while checking if user exists: ", err)
+			fmt.Println("error occurred while checking if user exists: ", err)
 			return err
 		}
 		userInRequestExists = false
@@ -44,7 +44,20 @@ func handleUserJoined(ctx context.Context, dbQueries *db.Queries, user *User, me
 	fmt.Println("DEBUG: handleUserJoined -> user exists: ", userInRequestExists)
 
 	if !userInRequestExists {
-		err := dbQueries.InsertUser(ctx, db.InsertUserParams{InternalUserID: user.InternalUserID, ExternalUserID: user.ExternalUserID, Name: user.Name, Role: user.Role, IsGuest: pgtype.Bool{Bool: user.Guest, Valid: true}})
+		usersInTheCurrentMeeting, err := dbQueries.GetUsersInMeetingByID(ctx, meeting.InternalMeetingID)
+		if err != nil {
+			if !errors.Is(err, pgx.ErrNoRows) {
+				fmt.Println("error occurred while checking for users in the meeting: ", meeting.InternalMeetingID, err)
+			}
+		}
+
+		userNames := make([]string, len(usersInTheCurrentMeeting))
+		for i := 0; i < len(usersInTheCurrentMeeting); i++ {
+			userNames[i] = usersInTheCurrentMeeting[i].Name
+		}
+
+		dsgvoName := namegen.GenerateUnique(ctx.Value("SERVER_LANG").(string), &userNames)
+		err = dbQueries.InsertUser(ctx, db.InsertUserParams{InternalUserID: user.InternalUserID, ExternalUserID: user.ExternalUserID, Name: user.Name, DsgvoName: dsgvoName, Role: user.Role, IsGuest: pgtype.Bool{Bool: user.Guest, Valid: true}})
 		if err != nil {
 			fmt.Println(err)
 			return err

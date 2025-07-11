@@ -361,7 +361,7 @@ body.recordings-page {
     justify-content: flex-end;
 }
 
-input[type="date"] {
+input[type="date"], input[type="month"], input[type="week"] {
     padding: 0.5rem;
     border: 1px solid #e9ecef;
     border-radius: 4px;
@@ -373,20 +373,20 @@ input[type="date"] {
     cursor: pointer;
 }
 
-input[type="date"]:hover {
+input[type="date"]:hover, input[type="month"]:hover, input[type="week"]:hover {
     background: linear-gradient(90deg, #f9f9f9, #f1f3f6);
     border-color: #b0bec5;
     box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-input[type="date"]:focus {
+input[type="date"]:focus, input[type="month"]:focus, input[type="week"]:focus {
     outline: none;
     border-color: #42a5f5;
     background: linear-gradient(90deg, #ffffff, #e3f2fd);
     box-shadow: 0 0 4px rgba(66, 165, 245, 0.6);
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-webkit-calendar-picker-indicator, input[type="week"]::-webkit-calendar-picker-indicator {
     opacity: 1;
     cursor: pointer;
     transition: transform 0.3s ease;

@@ -1028,6 +1028,19 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     background-color: #4a8abf;
 }
 
+#gdpr-filter-form {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    grid-column-start: 1;
+    grid-column-end: 4;
+}
+
+#gdpr-filter-form input[type="submit"] {
+    position: absolute;
+    right: 4rem;
+}
+
 @keyframes grow {
     from {
         transform: scaleX(0);
@@ -1180,6 +1193,14 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
 
     #StatsPageTimeSelector {
         border: transparent;
+    }
+
+    #gdpr-filter-form, #gdpr-filter-form-wraper {
+        display: none;
+    }
+
+    input[type="submit"] {
+        display: none;
     }
 
     table {

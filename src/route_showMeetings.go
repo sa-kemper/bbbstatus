@@ -50,15 +50,15 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "MeetingRecordingEnabled", Other: "enabled"},
 		{ID: "MeetingRecordingDisabled", Other: "disabled"},
 		{ID: "MeetingNoMeetingsExist", Other: "no meetings exist"},
-		{ID: "meetingListHeader", Other: "meeting list"},
-		{ID: "meetingListFilterStartDate", Other: "start date"},
-		{ID: "meetingListFilterEndDate", Other: "end date"},
-		{ID: "meetingListFilterFilterButton", Other: "filter"},
-		{ID: "meetingListHeaderSeeStatisticsButton", Other: "see statistics"},
-		{ID: "meetingListUserCountLabel", One: "user", Other: "users"},
+		{ID: "MeetingListHeader", Other: "meeting list"},
+		{ID: "MeetingListFilterStartDate", Other: "start date"},
+		{ID: "MeetingListFilterEndDate", Other: "end date"},
+		{ID: "MeetingListFilterFilterButton", Other: "filter"},
+		{ID: "MeetingListHeaderSeeStatisticsButton", Other: "see statistics"},
+		{ID: "MeetingListUserCountLabel", One: "user", Other: "users"},
 		{ID: "ServerStatsMeetings", One: "meeting", Other: "meetings"},
-		{ID: "meetingListHeaderSeeRecordingsButton", Other: "see recordings"},
-		{ID: "meetingListReloadButton", Other: "reload"},
+		{ID: "MeetingListHeaderSeeRecordingsButton", Other: "see recordings"},
+		{ID: "MeetingListReloadButton", Other: "reload"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 }

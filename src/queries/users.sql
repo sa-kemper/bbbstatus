@@ -24,7 +24,7 @@ FROM users
 WHERE internal_user_id = $1;
 
 -- name: InsertUser :exec
-INSERT INTO users (internal_user_id, external_user_id, name, dsgvo_name, role, is_guest)
+INSERT INTO users (internal_user_id, external_user_id, name, gdpr_name, role, is_guest)
 VALUES ($1, $2, $3, $4, $5, $6);
 
 -- name: GetUserCountBetweenDates :one

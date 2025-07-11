@@ -46,6 +46,18 @@ limitations under the License.
 
         <!-- Meeting Details -->
         {{template "meetingdetails" .Report.Details}}
+
+        <div class="card" id="gdpr-filter-form-wraper">
+            <form id="gdpr-filter-form">
+                <span>{{t "MeetingReportMeetingDetailsGDPRCheckbox"}}</span>
+                <label class="switch" id="gdpr-label">
+                    <input type="checkbox" name="gdpr" {{ if .Gdpr  }}checked{{ end }}>
+                    <span class="slider"></span>
+                </label>
+                <input type="submit" class="search-button" value="{{t "MeetingReportMeetingDetailsGDPRFormSubmit"}}">
+            </form>
+        </div>
+
         <!-- Participants -->
         {{template "participants" .}}
 

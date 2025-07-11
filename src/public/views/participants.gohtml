@@ -20,7 +20,7 @@ limitations under the License.
             {{ with .Report.Participants }}
             {{ range . }}
                 <a class="participant-card"
-                   href="{{ reverse "inspectReport" $.InternalMeetingID }}?{{.InternalUserID}}=on">
+                   href="{{ reverse "inspectReport" $.InternalMeetingID }}?{{.InternalUserID}}=on{{ if $.Gdpr }}&gdpr=on{{ end }}">
                     <div class="participant-info">
                         <h3>{{ .Name }}</h3>
                         <span class="role-badge {{if eq .Role "MODERATOR"}}role-moderator{{else}}role-viewer{{end}}">{{t .Role }}</span>

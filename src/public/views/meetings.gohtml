@@ -13,14 +13,14 @@
 	<body>
 	<div class="container">
 		<div class="card header">
-			<h1>{{t "meetingListHeader"}}</h1>
+			<h1>{{t "MeetingListHeader"}}</h1>
 			<a class="meeting-button meeting-button-details" href={{ reverse "statistics" }}>
 				<i class="fas fa-chart-line"></i>
-                {{t "meetingListHeaderSeeStatisticsButton"}}
+				{{t "MeetingListHeaderSeeStatisticsButton"}}
 			</a>
 			<a class="meeting-button meeting-button-details" href={{ reverse "recordings" }} style="margin-left: 1rem;">
 			<i class="fas fa-video"></i>
-            {{t "meetingListHeaderSeeRecordingsButton" }}
+			{{t "MeetingListHeaderSeeRecordingsButton" }}
 			</a>
 		</div>
 
@@ -32,11 +32,11 @@
 		<div class="card">
 			<form class="filters" method="GET" action="{{ reverse "meetings" }}">
 				<div class="filter-group">
-					<label for="start-date">{{t "meetingListFilterStartDate"}}</label>
+					<label for="start-date">{{t "MeetingListFilterStartDate"}}</label>
 					<input type="date" id="start-date" name="start-date" value="{{.Request.StartDate}}">
 				</div>
 				<div class="filter-group">
-					<label for="end-date">{{t "meetingListFilterEndDate"}}</label>
+					<label for="end-date">{{t "MeetingListFilterEndDate"}}</label>
 					<input type="date" id="end-date" name="end-date" value="{{.Request.EndDate}}">
 				</div>
 				<div class="server-filter-card">
@@ -49,29 +49,25 @@
 									   id="server-filter-{{.Hostname}}" name="server-filter-bbb.0gb.de">
 								<label for="server-filter-{{.Hostname}}" class="server-filter-label">{{.Hostname}}
 									({{.Users}}
-                                    {{t "meetingListUserCountLabel"}})</label>
+									{{t "MeetingListUserCountLabel"}})</label>
 							</li>
                         {{ end }}
 					</ul>
 					<input type="submit" class="meeting-button" id="server-filter-submit"
-						   value="{{t "meetingListFilterFilterButton"}}">
+						   value="{{t "MeetingListFilterFilterButton"}}">
 				</div>
 
 				<div class=" filter-group filter-action" id="filter-group-submit-div">
 					<input type="submit" class="meeting-button" id="filter-group-submit-input"
-						   value="{{t "meetingListFilterFilterButton"}}">
+						   value="{{t "MeetingListFilterFilterButton"}}">
 				</div>
-
-
 			</form>
-
 		</div>
-
 
 		<div class="reload-container" onclick="location.reload()">
 			<a href="{{reverse "meetings" }}?ts={{ timestamp }}" class="reload-button">
 				<i class="fa-solid fa-rotate-right"></i>
-				{{t "meetingListReloadButton"}}
+				{{t "MeetingListReloadButton"}}
 			</a>
 		</div>
 
@@ -88,11 +84,7 @@
 							<div class="detail-item">
 								<span class="detail-label">{{t "MeetingCreated"}}</span>
 								<span class="detail-value">{{ .BBBEventsMeeting.CreateDate }}</span>
-
-
 							</div>
-
-
 							<div class="detail-item">
 								<a class="meeting-button meeting-button-to-report"
 								   href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}">

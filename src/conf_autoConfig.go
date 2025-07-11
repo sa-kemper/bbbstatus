@@ -42,7 +42,6 @@ type baseConfig struct {
 	Port               string `toml:"PORT"`
 	ServeStaticContent bool   `toml:"SERVE_STATIC_CONTENT"`
 	TrustedProxies     string `toml:"TRUSTED_PROXIES"`
-	DSGVO              bool   `toml:"DSGVO"`
 	ServerLang         string `toml:"SERVER_LANG"`
 }
 
@@ -276,18 +275,6 @@ func confGet(key string) string {
 		if val, exists := os.LookupEnv(key); exists {
 			return strings.TrimSpace(strings.ToLower(val))
 		}
-		return "false"
-	case "DSGVO":
-		// if user identifying information should be saved.
-		// if enabled, the users name is replaced with a anonymised version.
-		if val, exists := os.LookupEnv(key); exists {
-			return strings.ToLower(val)
-		}
-
-		if adminConf.BaseConfig.DSGVO {
-			return "true"
-		}
-
 		return "false"
 	case "SERVER_LANG":
 		if val, exists := os.LookupEnv(key); exists {

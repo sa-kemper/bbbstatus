@@ -56,8 +56,8 @@ func handleUserJoined(ctx context.Context, dbQueries *db.Queries, user *User, me
 			userNames[i] = usersInTheCurrentMeeting[i].Name
 		}
 
-		dsgvoName := namegen.GenerateUnique(ctx.Value("SERVER_LANG").(string), &userNames)
-		err = dbQueries.InsertUser(ctx, db.InsertUserParams{InternalUserID: user.InternalUserID, ExternalUserID: user.ExternalUserID, Name: user.Name, DsgvoName: dsgvoName, Role: user.Role, IsGuest: pgtype.Bool{Bool: user.Guest, Valid: true}})
+		GdprName := namegen.GenerateUnique(ctx.Value("SERVER_LANG").(string), &userNames)
+		err = dbQueries.InsertUser(ctx, db.InsertUserParams{InternalUserID: user.InternalUserID, ExternalUserID: user.ExternalUserID, Name: user.Name, GdprName: GdprName, Role: user.Role, IsGuest: pgtype.Bool{Bool: user.Guest, Valid: true}})
 		if err != nil {
 			fmt.Println(err)
 			return err

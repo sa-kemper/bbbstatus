@@ -34,7 +34,14 @@
 		<div class="card">
 			<h2>{{t "ReportParticipantsHeader"}}</h2>
 			<form class="participants-list">
-                {{ with .Report.Participants }}
+				<div id="gdpr-filter-form">
+					<span>{{t "MeetingReportMeetingDetailsGDPRCheckbox"}}</span>
+					<label class="switch" id="gdpr-label">
+						<input type="checkbox" name="gdpr" {{ if .Gdpr  }}checked{{ end }}>
+						<span class="slider"></span>
+					</label>
+				</div>
+				{{ with .Report.Participants }}
                     {{ range . }}
 						<div>
 							<input type="checkbox" class="participant-checkbox" name="{{.InternalUserID}}"
@@ -44,8 +51,8 @@
 								<span class="role-badge role-moderator">{{ .Role }}</span>
 							</label>
 						</div>
-                    {{ end }}
-                {{ end }}
+					{{ end }}
+				{{ end }}
 				<input type="submit" class="meeting-button participant-filter-submit" value="filter">
 			</form>
 		</div>

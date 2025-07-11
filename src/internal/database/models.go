@@ -174,7 +174,7 @@ type User struct {
 	IsGuest        pgtype.Bool
 	JoinTimestamp  pgtype.Timestamp
 	LeaveTimestamp pgtype.Timestamp
-	DsgvoName      string
+	GdprName       string
 }
 
 type UserEvent struct {

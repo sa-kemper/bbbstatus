@@ -18,6 +18,7 @@ package main
 
 import (
 	"bbbstatus/internal/BBBEvents"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -34,6 +35,8 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "ErrorParagraphApplicationTimeout", Other: "bbbstatus reached a timeout, please try again."},
 		{ID: "MODERATOR", Other: "moderator"},
 		{ID: "VIEWER", Other: "viewer"},
+		{ID: "MeetingReportMeetingDetailsGDPRCheckbox", Other: "view report GDPR compliant"},
+		{ID: "MeetingReportMeetingDetailsGDPRFormSubmit", Other: "change"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -63,7 +66,7 @@ func showMeetingReport(c echo.Context) error {
 		return c.Render(http.StatusNotFound, "notfound", nil)
 	}
 
-	report, err := GenerateWebReport(ctx, internalMeetingId, nil)
+	report, err := GenerateWebReport(context.WithValue(ctx, "gdpr", c.QueryParam("gdpr") == "on"), internalMeetingId, nil)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
 			return renderError(c, "ErrorParagraphApplicationTimeout")
@@ -74,5 +77,5 @@ func showMeetingReport(c echo.Context) error {
 		return err
 	}
 
-	return c.Render(http.StatusOK, "report", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": report})
+	return c.Render(http.StatusOK, "report", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": report, "Gdpr": c.QueryParam("gdpr") == "on"})
 }

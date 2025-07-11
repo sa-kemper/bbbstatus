@@ -312,7 +312,11 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 			question = string([]byte(pollId)[0:5])
 		}
 
-		event.TextRepresentation = TranslateAdvanced("ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
+		if ctx.Value("gdpr").(bool) {
+			event.TextRepresentation = TranslateAdvanced("ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
+		} else {
+			event.TextRepresentation = TranslateAdvanced("ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
+		}
 		timeline = append(timeline, event)
 		//goland:noinspection ALL
 		conn2.Close(ctx)
@@ -356,7 +360,11 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 			fmt.Println("error obtaining user information of chat message")
 			fmt.Println(err)
 		}
-		event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": messageUser.Name, "Message": message.MessageContent})
+		if ctx.Value("gdpr").(bool) {
+			event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": messageUser.GdprName, "Message": message.MessageContent})
+		} else {
+			event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": messageUser.Name, "Message": message.MessageContent})
+		}
 		timeline = append(timeline, event)
 	}
 	return timeline, err
@@ -386,8 +394,12 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 			fmt.Println("WARNING user event has no sent time", userEvent)
 			continue
 		}
-
-		var event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: TranslateAdvanced(userEvent.EventType, map[string]string{"Username": eventUser.Name})}
+		var event Event
+		if ctx.Value("gdpr").(bool) {
+			event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: TranslateAdvanced(userEvent.EventType, map[string]string{"Username": eventUser.GdprName})}
+		} else {
+			event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: TranslateAdvanced(userEvent.EventType, map[string]string{"Username": eventUser.Name})}
+		}
 		timeline = append(timeline, event)
 	}
 	return timeline, err
@@ -405,7 +417,11 @@ func FillMeetingParticipants(ctx context.Context, internalMeetingID string, dbQu
 			fmt.Println("Error occurred adding user to participants list:", err)
 			continue
 		}
-		participants = append(participants, BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.Name, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool})
+		if ctx.Value("gdpr").(bool) {
+			participants = append(participants, BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.GdprName, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool})
+		} else {
+			participants = append(participants, BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.Name, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool})
+		}
 	}
 
 	return participants, err

@@ -12,9 +12,12 @@ import (
 )
 
 const getActiveUserCountInMeetingByID = `-- name: GetActiveUserCountInMeetingByID :one
-SELECT count(internal_user_id) FROM users WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
-                                               FROM user_events
-                                               WHERE internal_meeting_id = $1 AND leave_timestamp IS NULL)
+SELECT count(internal_user_id)
+FROM users
+WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
+                           FROM user_events
+                           WHERE internal_meeting_id = $1
+                             AND leave_timestamp IS NULL)
 `
 
 func (q *Queries) GetActiveUserCountInMeetingByID(ctx context.Context, internalMeetingID string) (int64, error) {
@@ -25,7 +28,7 @@ func (q *Queries) GetActiveUserCountInMeetingByID(ctx context.Context, internalM
 }
 
 const getPresenterUserByMeetingID = `-- name: GetPresenterUserByMeetingID :one
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, dsgvo_name
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, gdpr_name
 FROM users
 WHERE internal_user_id = (SELECT user_events.internal_user_id
                           FROM user_events
@@ -46,13 +49,13 @@ func (q *Queries) GetPresenterUserByMeetingID(ctx context.Context, internalMeeti
 		&i.IsGuest,
 		&i.JoinTimestamp,
 		&i.LeaveTimestamp,
-		&i.DsgvoName,
+		&i.GdprName,
 	)
 	return i, err
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, dsgvo_name
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, gdpr_name
 FROM users
 WHERE internal_user_id = $1
 `
@@ -68,7 +71,7 @@ func (q *Queries) GetUserById(ctx context.Context, internalUserID string) (User,
 		&i.IsGuest,
 		&i.JoinTimestamp,
 		&i.LeaveTimestamp,
-		&i.DsgvoName,
+		&i.GdprName,
 	)
 	return i, err
 }
@@ -118,7 +121,7 @@ func (q *Queries) GetUserExistsByID(ctx context.Context, internalUserID string) 
 }
 
 const getUsersInMeetingByID = `-- name: GetUsersInMeetingByID :many
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, dsgvo_name
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, gdpr_name
 FROM users
 WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
                            FROM user_events
@@ -142,7 +145,7 @@ func (q *Queries) GetUsersInMeetingByID(ctx context.Context, internalMeetingID s
 			&i.IsGuest,
 			&i.JoinTimestamp,
 			&i.LeaveTimestamp,
-			&i.DsgvoName,
+			&i.GdprName,
 		); err != nil {
 			return nil, err
 		}
@@ -155,7 +158,7 @@ func (q *Queries) GetUsersInMeetingByID(ctx context.Context, internalMeetingID s
 }
 
 const getUsersInMeetingByInternalID = `-- name: GetUsersInMeetingByInternalID :many
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, dsgvo_name
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, gdpr_name
 FROM users
 WHERE internal_user_id IN (SELECT DISTINCT internal_user_id FROM user_events WHERE internal_meeting_id = $1)
 `
@@ -177,7 +180,7 @@ func (q *Queries) GetUsersInMeetingByInternalID(ctx context.Context, internalMee
 			&i.IsGuest,
 			&i.JoinTimestamp,
 			&i.LeaveTimestamp,
-			&i.DsgvoName,
+			&i.GdprName,
 		); err != nil {
 			return nil, err
 		}
@@ -190,7 +193,7 @@ func (q *Queries) GetUsersInMeetingByInternalID(ctx context.Context, internalMee
 }
 
 const getUsersWhoJoinedBetween = `-- name: GetUsersWhoJoinedBetween :many
-SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, dsgvo_name
+SELECT internal_user_id, external_user_id, name, role, is_guest, join_timestamp, leave_timestamp, gdpr_name
 FROM users
 WHERE join_timestamp BETWEEN $1 AND $2
 `
@@ -217,7 +220,7 @@ func (q *Queries) GetUsersWhoJoinedBetween(ctx context.Context, arg GetUsersWhoJ
 			&i.IsGuest,
 			&i.JoinTimestamp,
 			&i.LeaveTimestamp,
-			&i.DsgvoName,
+			&i.GdprName,
 		); err != nil {
 			return nil, err
 		}
@@ -230,7 +233,7 @@ func (q *Queries) GetUsersWhoJoinedBetween(ctx context.Context, arg GetUsersWhoJ
 }
 
 const insertUser = `-- name: InsertUser :exec
-INSERT INTO users (internal_user_id, external_user_id, name, dsgvo_name, role, is_guest)
+INSERT INTO users (internal_user_id, external_user_id, name, gdpr_name, role, is_guest)
 VALUES ($1, $2, $3, $4, $5, $6)
 `
 
@@ -238,7 +241,7 @@ type InsertUserParams struct {
 	InternalUserID string
 	ExternalUserID string
 	Name           string
-	DsgvoName      string
+	GdprName       string
 	Role           string
 	IsGuest        pgtype.Bool
 }
@@ -248,7 +251,7 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
 		arg.InternalUserID,
 		arg.ExternalUserID,
 		arg.Name,
-		arg.DsgvoName,
+		arg.GdprName,
 		arg.Role,
 		arg.IsGuest,
 	)

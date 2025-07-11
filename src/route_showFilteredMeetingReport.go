@@ -19,6 +19,7 @@ package main
 import (
 	"bbbstatus/internal/BBBAPI"
 	db "bbbstatus/internal/database"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -32,9 +33,9 @@ import (
 	"time"
 )
 
-func showFilteredMeetingReport(context echo.Context) error {
+func showFilteredMeetingReport(echoContext echo.Context) error {
 	if localizer == nil {
-		localizer = i18n.NewLocalizer(Bundle, context.Request().Header.Get("Accept-Language"), language.English.String())
+		localizer = i18n.NewLocalizer(Bundle, echoContext.Request().Header.Get("Accept-Language"), language.English.String())
 	}
 	type customUserType struct {
 		InternalUserID string
@@ -52,17 +53,17 @@ func showFilteredMeetingReport(context echo.Context) error {
 		LeaveTimestamp *time.Time
 		IsFilteredFor  bool
 	}
-	var internalMeetingId = context.Param("id")
+	var internalMeetingId = echoContext.Param("id")
 	var customParticipants []customUserType
 	var filteredForUserIds []string
 	var filterParamsString string
 	var meetingActive bool
 
-	// use the context provided by the user request in order to respect the browsers / servers / admins settings.
-	var ctx = context.Request().Context()
+	// use the echoContext provided by the user request in order to respect the browsers / servers / admins settings.
+	var ctx = echoContext.Request().Context()
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
-		_ = context.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
+		_ = echoContext.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
 		return err
 	}
 	defer conn.Close(ctx)
@@ -74,20 +75,20 @@ func showFilteredMeetingReport(context echo.Context) error {
 	participants, err := dbQueries.GetUsersInMeetingByInternalID(ctx, internalMeetingId)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return context.Render(http.StatusNotFound, "notfound", nil)
+			return echoContext.Render(http.StatusNotFound, "notfound", nil)
 		}
-		_ = context.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
+		_ = echoContext.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
 		return err
 	}
 
 	for _, participant := range participants {
-		if context.QueryParam(participant.InternalUserID) == "on" {
+		if echoContext.QueryParam(participant.InternalUserID) == "on" {
 			filteredForUserIds = append(filteredForUserIds, participant.InternalUserID)
 			filterParamsString += fmt.Sprintf("%s=on&", participant.InternalUserID)
 		}
 	}
 
-	report, err := GenerateWebReport(ctx, internalMeetingId, &filteredForUserIds)
+	report, err := GenerateWebReport(context.WithValue(ctx, "gdpr", echoContext.QueryParam("gdpr") == "on"), internalMeetingId, &filteredForUserIds)
 	if err != nil {
 		fmt.Println("error occurred when generating report", err)
 		return err
@@ -122,5 +123,5 @@ func showFilteredMeetingReport(context echo.Context) error {
 		Timeline     []Event
 		Recordings   []BBBAPI.Recording
 	}{Details: report.Details, Participants: customParticipants, Timeline: report.Timeline, Recordings: report.Recordings}
-	return context.Render(http.StatusOK, "inspectReport", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": filteredReport, "FilteredUsersParam": template.URL(strings.TrimRight(filterParamsString, "&")), "MeetingActive": meetingActive})
+	return echoContext.Render(http.StatusOK, "inspectReport", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": filteredReport, "FilteredUsersParam": template.URL(strings.TrimRight(filterParamsString, "&")), "MeetingActive": meetingActive, "Gdpr": echoContext.QueryParam("gdpr") == "on"})
 }

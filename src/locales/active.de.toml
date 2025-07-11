@@ -1,5 +1,5 @@
 [404PageNotFoundHeader]
-hash = "sha1-223a56a6d5f134d9b2f6ec9a91065f0538c1fb93"
+hash = "sha1-190c700698adc348941f3aef2556de960a4c477a"
 other = "404 - Seite nicht gefunden"
 
 [Apr]
@@ -11,111 +11,111 @@ hash = "sha1-75629af51d7c7f120dbb5b462013bfa48af33285"
 other = "Aug"
 
 [BackToMeetingsButton]
-hash = "sha1-a00619a52130bf71a69db12a9b4cda996d3d91cc"
+hash = "sha1-9ce676e933940d0b13239c4db78960eb43bef230"
 other = "zurück zur Übersicht"
 
 [CSVMeetingAction-meeting-created]
-hash = "sha1-740fe1de219024332094840763a1fea397c1b8a4"
+hash = "sha1-2d270a2a9076c8b3b6fbf37030f6ccb9e23da44d"
 other = "Meeting erstellt"
 
 [CSVMeetingAction-meeting-ended]
-hash = "sha1-86fd1d773fe75aa1c6a04682bae1556ef8a9b582"
+hash = "sha1-2d9f69d2585a19376a0da1e0c87287229c72b547"
 other = "Meeting beendet"
 
 [CSVMeetingAction-meeting-recording-started]
-hash = "sha1-bde81afa928840be70c67638434105d89efb658e"
+hash = "sha1-90d18a9ae1312849abda21fe386eb3aae362bcb9"
 other = "Aufzeichnungs start"
 
 [CSVMeetingAction-meeting-recording-stopped]
-hash = "sha1-460b7c299f9e8ffead1efb400e3169cdbb5d399a"
+hash = "sha1-0580ccf01cb16547420b48eda94bd6166e220bf8"
 other = "Aufzeichnungs stop"
 
 [CSVMeetingEvent-meeting-created]
-hash = "sha1-740fe1de219024332094840763a1fea397c1b8a4"
+hash = "sha1-2d270a2a9076c8b3b6fbf37030f6ccb9e23da44d"
 other = "Meeting start"
 
 [CSVMeetingEvent-meeting-ended]
-hash = "sha1-86fd1d773fe75aa1c6a04682bae1556ef8a9b582"
+hash = "sha1-2d9f69d2585a19376a0da1e0c87287229c72b547"
 other = "Meeting ende"
 
 [CSVMeetingEvent-meeting-recording-started]
-hash = "sha1-3059a09fc54d90a32f8d68efaaa50b7f6782c911"
+hash = "sha1-bf5bf86dedbb55c832b76f3ffd34fa3bdb19eb90"
 other = "Die Aufzeichnung der Sitzung wurde gestartet"
 
 [CSVMeetingEvent-meeting-recording-stopped]
-hash = "sha1-683f3e6d204f8d12b2949fa0e544d5b723675916"
+hash = "sha1-d7a4010774e3a9849d4cf60ad39ceef7cc0aac94"
 other = "Die Aufzeichnung der Sitzung wurde gestoppt"
 
 [CSVReportAction-meeting-screenshare-started]
-hash = "sha1-d0d8670190908582bda8e7dd4a015f217ef85324"
+hash = "sha1-aa58c7bafe2530ef5140050b55eb82783e0a9a27"
 other = "Startete Screensharing"
 
 [CSVReportAction-meeting-screenshare-stopped]
-hash = "sha1-4205ea68674df33cc2072e18f17463c50618db88"
+hash = "sha1-b9a8c45da46d6f74d15113d57d370737d0f165bb"
 other = "Stoppte Screensharing"
 
 [CSVReportAction-user-audio-muted]
-hash = "sha1-b9e78ced88a4641f8289a36049516182b46cf836"
+hash = "sha1-e4b074a036fcdaa716be36f4e93f268ffe1befb9"
 other = "stummgestellt"
 
 [CSVReportAction-user-audio-unmuted]
-hash = "sha1-200c77d6ca2c90a47464e551fe5a8afbce011bf9"
+hash = "sha1-68f9b071f880de68268e9932b4c402d6f9d4dcab"
 other = "Stummschaltung aufgehoben"
 
 [CSVReportAction-user-audio-voice-disabled]
-hash = "sha1-4d43c6d085dfe285d5d6fd41d753a663e015e2ad"
+hash = "sha1-8c12f20b4991c15aa57a6be20cede76e06ef56c8"
 other = "Audio verlassen"
 
 [CSVReportAction-user-audio-voice-enabled]
-hash = "sha1-55f34686d117b51a2183329e08648d28e1a72927"
+hash = "sha1-00155f47c4590612145d80ece8b991e8edd49ce0"
 other = "Audio beigetreten"
 
 [CSVReportAction-user-cam-broadcast-end]
-hash = "sha1-7de996c6aaa1251bd7b1461046266beb9037aa40"
+hash = "sha1-8e2385f15d3396546ea9b9613e865f9437d33729"
 other = "Webcam deaktiviert"
 
 [CSVReportAction-user-cam-broadcast-start]
-hash = "sha1-b98ce5b0481c0362c77d049daf659b9f5167db39"
+hash = "sha1-6acb2e3962221ee64cd45098dec2c9afae788ca1"
 other = "Webcam aktiviert"
 
 [CSVReportAction-user-emoji-changed]
-hash = "sha1-917930c36e749d8b57146cf70e53507521b52a3a"
+hash = "sha1-baac64de911dddaec6ac9e1551740b3f94d7e02b"
 other = "Emoji gewechselt"
 
 [CSVReportAction-user-joined]
-hash = "sha1-ce89dcae47faf59faf7ebbb406e464d83d0fd11b"
+hash = "sha1-87c6186bca07206a00ce070dcaf265a204efbbc4"
 other = "Meeting beigetreten"
 
 [CSVReportAction-user-left]
-hash = "sha1-9ba99b296aa613a047440e07f210d285b204a3a3"
+hash = "sha1-2083c4676b146dac69e8e8a4828bc29bca6b3be3"
 other = "Meeting verlassen"
 
 [CSVReportAction-user-presenter-assigned]
-hash = "sha1-0509ddf4668f2cec839f8698f772dc5958bafa83"
+hash = "sha1-1cd7e573a74387bfde6805b59fd0f7cd9ca161d0"
 other = "Präsentator geworden"
 
 [CSVReportAction-user-presenter-unassigned]
-hash = "sha1-0a237c9d42bab331e835fddc0fe9816d6fdc2d90"
+hash = "sha1-96a7e592d14e2b1030d546f7708013861cd6c7c3"
 other = "kein Präsentator mehr"
 
 [CSVReportActionChatted]
-hash = "sha1-abd97d51fdfa66d4b3247cb1d70ceda6d53fc641"
+hash = "sha1-f37112987f8a71bc2b2f98045d1dccb8684a7ae0"
 other = "Sendete Nachricht"
 
 [CSVReportConfig-action]
-hash = "sha1-97c89a4d6630adeb18fa12ba9976a31413fe293e"
+hash = "sha1-34eb4c4ef005207e8b8f916b9f1fffacccd6945e"
 other = "Aktion"
 
 [CSVReportConfig-textrepresentation]
-hash = "sha1-726109d45a569803c8d0cd0bb99c70bc4bbb5c50"
+hash = "sha1-4ffd230be0926f0196cc325d6353d692bbfcb556"
 other = "Text-Darstellung"
 
 [CSVReportConfig-time]
-hash = "sha1-6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b"
+hash = "sha1-714eea0f4c980736bde0065fe73f573487f08e3a"
 other = "Zeit"
 
 [CSVReportConfig-user]
-hash = "sha1-9f8a2389a20ca0752aa9e95093515517e90e194c"
+hash = "sha1-12dea96fec20593566ab75692c9949596833adc9"
 other = "Benutzer"
 
 [CW]
@@ -135,11 +135,11 @@ hash = "sha1-e09bfd4ae4b3758578549646e86cb8478ca2b569"
 other = "Zeitüberschreitung beim Bearbeiten der Anfrage, bitte versuchen Sie es erneut."
 
 [ErrorTitleApplicationTimeout]
-hash = "sha1-d4c45de0fe64ac43c72a798c67faaadadfaa1b90"
+hash = "sha1-56d3c9490be2608ac36f5a4805bfec2f21f7f982"
 other = "Zeitüberschreitung"
 
 [EventTimelineHeader]
-hash = "sha1-45d97e8b0133f6ad1bc5c0ef26f67fb2e25a9895"
+hash = "sha1-4e6dc384ca536b01cf218e5b5340b9b495699d33"
 other = "Event Timeline"
 
 [Feb]
@@ -151,7 +151,7 @@ hash = "sha1-bbd6e32ee1326237814b697269b4368033d50d2f"
 other = "Fr"
 
 [InternalServerError]
-hash = "sha1-ffa5578af85cd8c29d2df2242dc504e3b2ba687d"
+hash = "sha1-9761539a1c87f25bf8e9122abfdcc6f9479fe5d0"
 other = "Interner Serverfehler"
 
 [Jan]
@@ -167,7 +167,7 @@ hash = "sha1-6d90df3be4d0d43b08e3fb47f55e09b5b06dae3e"
 other = "Jun"
 
 [MODERATOR]
-hash = "sha1-ad3b15c3a7bca16179ba5807b875d6e8269d5ae9"
+hash = "sha1-79f52b5b92498b00cb18284f1dcb466bd40ad559"
 other = "Moderator"
 
 [Mar]
@@ -179,71 +179,112 @@ hash = "sha1-c94f479833c5d401cffdfa7afe6c9c2d56448019"
 other = "Mai"
 
 [MeetingActive]
-hash = "sha1-a733b809d2f1233496ab516eed0f3ef75cf3791a"
+hash = "sha1-2bb6b986c5d6fb26dd9dd1054b545ce022371b0c"
 other = "Aktiv"
 
 [MeetingCreateTime]
-hash = "sha1-da27e4b5e998c43c50b1672e50886be19f8730ac"
+hash = "sha1-c0195fa7c77c3e62216e8284ace1bd8135084583"
 other = "Erstellungs-Zeitpunkt"
 
 [MeetingCreated]
-hash = "sha1-accf40c89baa4fa88e6a7ff11e1f805beecafd3f"
+hash = "sha1-21c50805b553b7a40e48394a5d77d442587ddee2"
 other = "Erstellt"
 
 [MeetingDuration]
-hash = "sha1-1370004da76fa4f3b7a5180fd5436065ef4c7d5b"
+hash = "sha1-5d3f344b5bd21e9500c69ca575a3286c85b28f1c"
 other = "Dauer"
 
 [MeetingEnded]
-hash = "sha1-90303d8df23e3832c1582952684b4dbaa58e069c"
+hash = "sha1-ba92ed73c97b30bcc4639724ab6aa8ae87f92601"
 other = "Beendet"
 
 [MeetingEvent-meeting-created]
-hash = "sha1-740fe1de219024332094840763a1fea397c1b8a4"
+hash = "sha1-2d270a2a9076c8b3b6fbf37030f6ccb9e23da44d"
 other = "Meeting start"
 
 [MeetingEvent-meeting-ended]
-hash = "sha1-86fd1d773fe75aa1c6a04682bae1556ef8a9b582"
+hash = "sha1-2d9f69d2585a19376a0da1e0c87287229c72b547"
 other = "Meeting ende"
 
 [MeetingEvent-meeting-recording-started]
-hash = "sha1-41a106c82058a0cbeadab46541e23443b2d90afb"
+hash = "sha1-e1139c8cfb01c0de5c85216e61c5076bb3c970aa"
 other = "Die Aufzeichnung der Sitzung wurde gestartet"
 
 [MeetingEvent-meeting-recording-stopped]
-hash = "sha1-f39520d5be0f2e5b5a9227206be078af14bb6ec0"
+hash = "sha1-c338a5f698192d1369640c9bf4a7393f19237c55"
 other = "Die Aufzeichnung der Sitzung wurde gestoppt"
 
 [MeetingExternalID]
-hash = "sha1-40dc448a962e5fe46d99f57ab5bbb9ad1da10770"
+hash = "sha1-d83cfbb878a543c948fdf15e721e8a59482aadc4"
 other = "Interne ID"
 
+[MeetingListFilterEndDate]
+hash = "sha1-269c8b374312ec6d721499b184df007340e16294"
+other = "Enddatum"
+
+[MeetingListFilterFilterButton]
+hash = "sha1-4bb4ca75941b7bbc5bc6a12be44b22fc9c8d234e"
+other = "Filter"
+
+[MeetingListFilterStartDate]
+hash = "sha1-87269431ee45c3e09809fb92a9fd328d2f581ba2"
+other = "Startdatum"
+
+[MeetingListHeader]
+hash = "sha1-2c4e04f93ec30463cce1cabc9c6effbd0c72a77e"
+other = "Meeting Liste"
+
+[MeetingListHeaderSeeRecordingsButton]
+hash = "sha1-d1a7b9156fe61500903e75984a2e1b15f9fa223d"
+other = "Siehe Aufzeichnungen"
+
+[MeetingListHeaderSeeStatisticsButton]
+hash = "sha1-6966d5d75363b331591d3ea9374ddfc5dd3f5a63"
+other = "Siehe Statistiken"
+
+[MeetingListReloadButton]
+hash = "sha1-d6e6e576541fa2152f6fc490b0e99e20c953988c"
+other = "Neu laden"
+
+[MeetingListUserCountLabel]
+hash = "sha1-5b7dcd14a4faa2cdd54cf6eb8d4bc35da31914a1"
+one = "Benutzer"
+other = "Benutzer"
+
 [MeetingNoMeetingsExist]
-hash = "sha1-6c91094f705185eae005c75e7355e7bc29c050a9"
+hash = "sha1-b7f9f815ef15242e72fe4ac974629e16231ccd4a"
 other = "Es existieren keine Meetings"
 
 [MeetingOpenDetails]
-hash = "sha1-5c866a7a5cf51596a6727857f360018c706e1512"
+hash = "sha1-9941c679b4e1455c27eb7da7bb3a3638c5d6f6e8"
 other = "Zeige Details"
 
 [MeetingRecordingDisabled]
-hash = "sha1-f4f4473df8cb59f0a369aebee3d1509adc0151c6"
+hash = "sha1-07596f183f5e91b1778d5e47b2752b8d42aa763d"
 other = "Aufzeichnungen sind deaktiviert"
 
 [MeetingRecordingEnabled]
-hash = "sha1-df174a3f2faa31814e06540acda7af8825403fac"
+hash = "sha1-3ea3f9802accf8817bacd6f3df46a73b93ccddec"
 other = "Aufzeichnungen sind möglich"
 
 [MeetingRecordingStatusHeader]
-hash = "sha1-9b98e1a0008e6dc21c64e9b98854c5b018cd0f46"
+hash = "sha1-5d7c6eae5b5bc57597ed6604693be92a23d11ab0"
 other = "Aufzeichnungen"
 
+[MeetingReportMeetingDetailsGDPRCheckbox]
+hash = "sha1-3566e58a44435e22bd995c8024bc9afaf9c0d024"
+other = "Zusammenfassung DSGVO konform anzeigen"
+
+[MeetingReportMeetingDetailsGDPRFormSubmit]
+hash = "sha1-7550b672e162c224c309bdea5d48ca975081a904"
+other = "Ändern"
+
 [MeetingToReport]
-hash = "sha1-114c4dd2498e790e45bdba42832d78da0edbe889"
+hash = "sha1-4b2b543f65ea206d485d82fbefd353a5cda3accc"
 other = "Zur Zusammenfassung"
 
 [MeetingUserCount]
-hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"
+hash = "sha1-5b7dcd14a4faa2cdd54cf6eb8d4bc35da31914a1"
 other = "Benutzer"
 
 [Mon]
@@ -255,11 +296,11 @@ hash = "sha1-082bc378cd60e17a38d99898b21955299c5b60c8"
 other = "Monat"
 
 [NoFutureTimeAllowed]
-hash = "sha1-0eb0028950e6865653819639a7d9a2a7b951fe0b"
+hash = "sha1-2c6d0290d466b201e069647c25ef1a94dc374e21"
 other = "Der gewählte Zeitpunkt liegt in der Zukunft"
 
 [NoStatsAvailableYet]
-hash = "sha1-356c43ef4bf389934b43b02f61cce0dad21ada23"
+hash = "sha1-70410d5350526366c9da34ca111d8f4ed9a984f6"
 other = "Noch keine Statistiken verfügbar"
 
 [Nov]
@@ -271,107 +312,107 @@ hash = "sha1-51327aef9866e85ef5b5b2294a28494d2715ae59"
 other = "Okt"
 
 [PageNotFoundErrorMessage]
-hash = "sha1-0514d1aa241c1f9d5ea11c534d4aa508b533268a"
+hash = "sha1-957838027c7d25715d8937a0368f60c219c14d7c"
 other = "Die aufgerufene seite konnte nicht gefunden werden"
 
 [RecordingPageNoRecordingsFound]
-hash = "sha1-64a52d0ca3ce5d32810fa0fc94fff03fac26f95c"
+hash = "sha1-46e93b8834e474550b4d08d61ffe964b4167c841"
 other = "Keine aufzeichnugnen gefunden"
 
 [RecordingPageNoRecordingsFoundHint]
-hash = "sha1-bf2f8f34d4d81d7c48fe0badf16ddf33075b141b"
+hash = "sha1-6db932685ae828404b8664b15e6fc7c81e696c3f"
 other = "Versuchen Sie, Ihre Suche oder Filter anzupassen, um Aufnahmen zu finden."
 
 [RecordingPageRecordingBreakout]
-hash = "sha1-48d6857f6b2869d031f463b13aa34df47e18c548"
+hash = "sha1-ef6896ab2d5a3c6e8ba7ee46ba3e48c29057ad74"
 other = "Breakout"
 
 [RecordingPageRecordingDuration]
-hash = "sha1-1370004da76fa4f3b7a5180fd5436065ef4c7d5b"
+hash = "sha1-5d3f344b5bd21e9500c69ca575a3286c85b28f1c"
 other = "Dauer"
 
 [RecordingPageRecordingMeetingID]
-hash = "sha1-8a1315eaeb59e44132aa5c27e4f53e7ba92359f7"
+hash = "sha1-66b4f59101bbee2a30aa32722a700bddf921c1ee"
 other = "Meeting kennung"
 
 [RecordingPageRecordingPlay]
-hash = "sha1-5d12bd53552cafc41ca6146c04870df2e1574e13"
+hash = "sha1-516626bf8a5006ecce1803eeb6a747182000d4f8"
 other = "Abspielen"
 
 [RecordingPageRecordingState-published]
-hash = "sha1-483bf2075c12023a5e849d12a42027be89c5e94b"
+hash = "sha1-c2807535f28e44fe6c7375dcf90518115529a8fa"
 other = "Veröffentlicht"
 
 [RecordingPageRecordingState-unpublished]
-hash = "sha1-fc6556a7ab9565ea063ccbb95f4445dc1b10fbf5"
+hash = "sha1-6f140c02b5c9b12588d158ba2a71b971bf469908"
 other = "Nicht veröffentlicht"
 
 [RecordingPageRecordingType]
-hash = "sha1-3deb7456519697ecf4eefc455516c969a3681bae"
+hash = "sha1-d0a3e7f81a9885e99049d1cae0336d269d5e47a9"
 other = "Typ"
 
 [RecordingsHeader]
-hash = "sha1-38adb0a14125adb510c8b19c1d0b569422e3f564"
+hash = "sha1-92032ce5069af219bede3f481f8b33d6e449584c"
 other = "Aufzeichnungen"
 
 [RecordingsPageSearchBar]
-hash = "sha1-797682daa1520087c57acf003a4482ab02722de3"
+hash = "sha1-e5197ca68e3de50b474ff36dd50105d22c545a2f"
 other = "Nach aufzeichnungen suchen..."
 
 [RecordingsPageTitle]
-hash = "sha1-3b3f4a4ffb2da1977f487e7723014cc9e80debfc"
+hash = "sha1-6f4d12b02354f849029873e3c0f7ce913bd90d1a"
 other = "Meeting Aufzeichnungen"
 
 [ReportHeader]
-hash = "sha1-9f5e0854a7e28ebf19364bb154d82f4122c6eddc"
+hash = "sha1-482ab47cf98d783b2fc13354ff319439841c4003"
 other = "Meeting-Protokoll"
 
 [ReportMeetingDetailBBBHostname]
-hash = "sha1-0b35e13daab63a0ae172592f7b8a20dbe2298b4b"
+hash = "sha1-bad08523f49e17bd5f75688500ce088dc58bd9b2"
 other = "BBB Hostname"
 
 [ReportMeetingDetailCreationDate]
-hash = "sha1-a9d459cebdee4eefdd15be1b89bd130c7498a4bf"
+hash = "sha1-36390b6820587b6133e4eb8d269636ebea4401cc"
 other = "Erstell-Datum"
 
 [ReportMeetingDetailInternalMeetingID]
-hash = "sha1-d21523173a90654fd1e4b40c4d6e20559d00126f"
+hash = "sha1-d568d5c8875bbb9d9d4fbbc3996eaf0a6d6acfbe"
 other = "Interne Meeting ID"
 
 [ReportMeetingDetailMeetingName]
-hash = "sha1-9ee349ddc5c5ffb61d276ce5a3568e5d66305427"
+hash = "sha1-8c641f050b1873fe6e9c05d491f985a8e9aaeb2c"
 other = "Meeting Name"
 
 [ReportMeetingDetailsHeader]
-hash = "sha1-14e998e82ac4c8446e5698f47ccc5502beb6cd4c"
+hash = "sha1-28531cb622c03449c66bf2adf47fceffe001cd3d"
 other = "Meeting Details"
 
 [ReportMessageEventRepresentation]
-hash = "sha1-bf3a1a74bdad9232d5f7de6c8c3b6f538c3f52e7"
+hash = "sha1-47ab764b1f4916e11302fd0669a48ce7ecdd2e61"
 other = "Benutzer '{{.Username}}' sendete eine nachricht: {{.Message}}"
 
 [ReportOpenInExcelButton]
-hash = "sha1-ad069dee8ef02d00e414f5ce890ba63cdf53baa7"
+hash = "sha1-1d2cedb85ac86da21ecb4f8a2aa212e600adef71"
 other = "In Excel öffnen"
 
 [ReportParticipantsHeader]
-hash = "sha1-cd56e0839d06af74923cd6ad99d6fc9e7dab8e3a"
+hash = "sha1-a94a46cccee07af75404c6af57d5303af43fe3a6"
 other = "Teilnehmer"
 
 [ReportPollResponseEventRepresentation]
-hash = "sha1-2dc51991622edb14df2388c00ed2f6b2dff4f171"
+hash = "sha1-d23bb1bafde6a6eb5ebb62569557e523b46ac149"
 other = "Benutzer '{{.Username}}' stimmte in der umfrage {{.PollQuestion}} mit {{.PollAnswer}}"
 
 [ReportPollStartedEventRepresentation]
-hash = "sha1-4f4279a08c7a2eaf9e6210b1f3c4d56c3dd2a37a"
+hash = "sha1-9b37336a66d3b36f529881a1319ed6d31dcda0bb"
 other = "Benutzer '{{.Username}}' Startete eine abstimmung '{{.PollQuestion}}', mit den optionen: {{.PollOptions}}"
 
 [ReportPrintReportButton]
-hash = "sha1-20dad9f57e19663cc2dde35a2d1ab894a273897d"
+hash = "sha1-45c7c5e73a2443b3a116615a91dbb50b1084918d"
 other = "Auswertung drucken"
 
 [ReturnToIndexLinkText]
-hash = "sha1-cc93f34f921a9b60c004893a42230ba323335950"
+hash = "sha1-2b75f30e44d799fe23547d74d222ec2c1acf5f6a"
 other = "Zur Übersicht"
 
 [Sat]
@@ -383,80 +424,80 @@ hash = "sha1-fdd289e370bd5cc575f48a16947d05c144ec474b"
 other = "Sep"
 
 [ServerStatsMeetings]
-hash = "sha1-b23a193872fc22386b943b59124e30963e802c52"
+hash = "sha1-27c4470db25a39ab137d1d38558f4e2a255e5ef6"
 one = "Meeting"
 other = "Meetings"
 
 [StatsPageAttendeeCountTableHeader]
-hash = "sha1-a45a09624432a10add6932568409200bd3cc6fdd"
+hash = "sha1-078705a379b72b2a630f668f1306c032f04256c6"
 other = "Teilnehmer"
 
 [StatsPageAttendeesInToolTip]
-hash = "sha1-b65477d35ae0f49f733183304dbf8ec997f859fa"
-other = "Teilnehmer am"
+hash = "sha1-cd964735999da6e07f0411d564f97ca30047961a"
+other = "Teilnehmer am "
 
 [StatsPageCSVTime]
-hash = "sha1-6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b"
+hash = "sha1-714eea0f4c980736bde0065fe73f573487f08e3a"
 other = "Zeitpunkt"
 
 [StatsPageConferenceAttendeeCountHeader]
-hash = "sha1-1206d91d2a711eb546b6e1279b2b33610c27f171"
+hash = "sha1-6ef4eed70332266338a137ed2eb46b7a76b1bcaa"
 other = "Konferenz-Teilnehmer"
 
 [StatsPageConferenceCountHeader]
-hash = "sha1-c5eedd0e192f7f298c4d0d010a5f013b566385cf"
+hash = "sha1-b5cd9a6ed73d9b97f6dc17a2196d6d84af194ecd"
 other = "Konferenz-Anzahl"
 
 [StatsPageConferenceTotalMeetingHoursHeader]
-hash = "sha1-8a6530ecbb69b21a92e5a19cb0f7430913032b47"
+hash = "sha1-376eefb12eea7eea1242623190f3fda8378970b3"
 other = "Gesamtdauer der Konferenzen"
 
 [StatsPageConferenceUsageHoursToolTip]
-hash = "sha1-62d09f1039cbc33b6296b2fb9489ed2aa1c13890"
+hash = "sha1-3fb8ede374c3ce0dcdeeac5d18144005d25fedce"
 other = "Gesamtzahl der Konferenzen am"
 
 [StatsPageConferenceUserHoursHeader]
-hash = "sha1-14111d2848fc0f423269b124cc858ad376af23ea"
+hash = "sha1-456f25117f9f4e4073d2572728b5555af62607be"
 other = "Gesammtdauer der Konferenzteilnahmen"
 
 [StatsPageConferenceUserHoursToolTip]
-hash = "sha1-f5cc0236e434da93480ae23636d503c260689f15"
+hash = "sha1-d1c0299f761e22cd56d6b733f36f1dd7feac34f6"
 other = "Gesammtdauer der Konferenzteilnahmen am"
 
 [StatsPageConferencesInToolTip]
-hash = "sha1-b600a53a1940fffecfb8b08956a8fd1111cc7044"
-other = "Konferenzen in"
+hash = "sha1-8fec5faafc0ed1f79cf97152dd334ed62f12aef0"
+other = "Konferenzen am"
 
 [StatsPageConferencesTableHeader]
-hash = "sha1-92ee4e6a83562ab2c6cdda0cc8936062a4959568"
+hash = "sha1-c79b0bb514a32a4746d65aeed9fe47f0116f9eac"
 other = "Konferenzen"
 
 [StatsPageConferencesUserHoursTableHeader]
-hash = "sha1-14111d2848fc0f423269b124cc858ad376af23ea"
+hash = "sha1-456f25117f9f4e4073d2572728b5555af62607be"
 other = "Gesammtdauer der Konferenzteilnahmen"
 
 [StatsPageGenError]
-hash = "sha1-288c15948054bad5e446387a1aa2eec59798ca1e"
+hash = "sha1-96440b5408a51f28c13ad5be6f62cf2c7bacb033"
 other = "Fehler bei der Erstellung von Statistiken"
 
 [StatsPageSelectScopeTime]
-hash = "sha1-9285ecba420a18464a93f38aa63fec311cea342b"
+hash = "sha1-2d6d8f2de76fc506ae05bd39498f1b2e8cac6b05"
 other = "Startzeit wählen"
 
 [StatsPageSelectScopeTimePrintLabel]
-hash = "sha1-0386ebcfc074ce69f1c7b84e2436472376f2f6fa"
+hash = "sha1-d18eab1f1bdcc26b53e4d14cebed83fa860c93c8"
 other = "Datum\t"
 
 [StatsPageStatisticsHeader]
-hash = "sha1-2086b21f8f49274138c38d476bee317a84a8aecc"
+hash = "sha1-3d18b2ea89fa5357cf6423b4e6985b46fa10195e"
 other = "Statistiken"
 
 [StatsPageStatisticsOverviewHeader]
-hash = "sha1-33a0579b2722e4f1b7fc70a41a1f2ff5f80bc6fd"
+hash = "sha1-c4b3fc412cd3e1647d5a2585914d1b5b60622b15"
 other = "Statistik Überblick"
 
 [StatsPageTotalMeetingHoursTableHeader]
-hash = "sha1-ddd6f2fb1d80999b48f16b64bcc4dc892c236d6c"
+hash = "sha1-196c4871606b5f635eb3fceb4b2b469d14baf4f6"
 other = "Gesamtdauer der konferenzen"
 
 [Sun]
@@ -464,11 +505,11 @@ hash = "sha1-48c98cab7866e606328c99289ed24e339393b5ab"
 other = "So"
 
 [SystemMessage]
-hash = "sha1-80ef4ac783caef7ac8a830239d74e77ac72ec089"
+hash = "sha1-47497093b10e7cdb90984693196c48b258f336e5"
 other = "System Nachricht"
 
 [SystemSentMessage]
-hash = "sha1-ce1687380bb7cccd6380fecbbd9e2b64f2b89d82"
+hash = "sha1-407e8e75a74a3bc9475d63292ed727e2a2bbe38c"
 other = "Das System sendete die Nachricht: '{{.Message}}'"
 
 [Thu]
@@ -480,7 +521,7 @@ hash = "sha1-529541bb390c76152e313351d89de3cd30a1c4bd"
 other = "Di"
 
 [VIEWER]
-hash = "sha1-dbad9f126b33570e09839a2d60720898de1a512d"
+hash = "sha1-40b4f25b1fd956b576d880db2b41182e0444bd1d"
 other = "Zuschauer"
 
 [Wed]
@@ -507,38 +548,9 @@ other = "Der Benutzer '{{.Username}}' Startete seine bildschirm übertragung"
 hash = "sha1-f5b0000263add05996d897844c0faaf2adf718c8"
 other = "Benutzer '{{.Username}}' Stopte seine bildschirm übertragung"
 
-[meetingListFilterEndDate]
-hash = "sha1-84b1478125890bad1cc4b36d6d3781773b3fde5a"
-other = "Enddatum"
-
-[meetingListFilterFilterButton]
-hash = "sha1-d7decf1aa22b02ae8abf9a96849ee423eee838e4"
-other = "Filter"
-
-[meetingListFilterStartDate]
-hash = "sha1-9d7ab1a557965be0eae6205c2d860c45a3eafc11"
-other = "Startdatum"
-
 [meetingListHeader]
-hash = "sha1-68e57924420dd31edbfb8fce23f7d3ebbb2ae081"
+hash = "sha1-2c4e04f93ec30463cce1cabc9c6effbd0c72a77e"
 other = "Meeting Liste"
-
-[meetingListHeaderSeeRecordingsButton]
-hash = "sha1-9b2bb6931d160d3aab4d231656dc79a58375fe3c"
-other = "Siehe Aufzeichnungen"
-
-[meetingListHeaderSeeStatisticsButton]
-hash = "sha1-1e5040d90ba8b0b64ee15faedbf1950cb0a6a7f9"
-other = "Siehe Statistiken"
-
-[meetingListReloadButton]
-hash = "sha1-cce7155371fc26686b89c7452337d8419692f31e"
-other = "Neu laden"
-
-[meetingListUserCountLabel]
-hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"
-one = "Benutzer"
-other = "Benutzer"
 
 [user-audio-muted]
 hash = "sha1-e1ce0a16ae7cef80eb65def56c1f0555380b3bdf"

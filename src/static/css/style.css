@@ -1041,6 +1041,10 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     right: 4rem;
 }
 
+.charts-css.bar tbody tr td {
+    border-radius: 0.2rem;
+}
+
 @keyframes grow {
     from {
         transform: scaleX(0);

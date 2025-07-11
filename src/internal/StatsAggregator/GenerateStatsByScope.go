@@ -116,14 +116,14 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 		stats.MaxUserCount[index] = int(userCount)
 		stats.ConferenceUsageHours[index] = int(conferenceUsageHours.Hours())
 		stats.ConferenceUsersUsageHours[index] = int(userUsageHours.Hours())
-		// used for normalizing the graph
-		stats.HighestConferenceCount = findMaxInMap(stats.ConferenceCount)
-		stats.HighestMaxUserCount = findMaxInMap(stats.MaxUserCount)
-		stats.HighestConferenceUsageHours = findMaxInMap(stats.ConferenceUsageHours)
 		for _, tf := range timeFrames {
 			stats.TimeFrames = append(stats.TimeFrames, tf)
 		}
 	}
+	// used for normalizing the graph
+	stats.HighestConferenceCount = findMaxInMap(stats.ConferenceCount)
+	stats.HighestMaxUserCount = findMaxInMap(stats.MaxUserCount)
+	stats.HighestConferenceUsageHours = findMaxInMap(stats.ConferenceUsageHours)
 
 	return stats, err
 }

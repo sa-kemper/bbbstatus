@@ -94,7 +94,7 @@
                         <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceCount . }} / {{ $.Statistics.HighestConferenceCount }})">
                             <span class="data">{{ valFromIndex $.Statistics.ConferenceCount . }}</span>
                             <span
-                                    class="tooltip"> {{t "StatsPageConferencesInToolTip"}} {{ . }}: {{ valFromIndex $.Statistics.ConferenceCount . }} </span>
+                                    class="tooltip"> {{t "StatsPageConferencesInToolTip"}} {{t . }}: {{ valFromIndex $.Statistics.ConferenceCount . }} </span>
                         </td>
                     </tr>
                 {{ end }}
@@ -116,7 +116,7 @@
                         <th scope="row">{{t . }}</th>
                         <td style="--size: calc({{ valFromIndex $.Statistics.MaxUserCount . }} / {{ $.Statistics.HighestMaxUserCount }})">
                             <span class="data">{{ valFromIndex $.Statistics.MaxUserCount . }} </span> <span
-                                    class="tooltip"> {{t "StatsPageAttendeesInToolTip"}} {{ . }}: {{ valFromIndex $.Statistics.MaxUserCount . }} </span>
+                                    class="tooltip"> {{t "StatsPageAttendeesInToolTip"}} {{t . }}: {{ valFromIndex $.Statistics.MaxUserCount . }} </span>
                         </td>
                     </tr>
                 {{ end }}
@@ -138,7 +138,7 @@
                         <th scope="row">{{t . }}</th>
                         <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceUsageHours . }} / {{ $.Statistics.HighestConferenceUsageHours }})">
                             <span class="data">{{ valFromIndex $.Statistics.ConferenceUsageHours . }}</span> <span
-                                    class="tooltip"> {{t "StatsPageConferenceUsageHoursToolTip"}} {{ . }}: {{ valFromIndex $.Statistics.ConferenceUsageHours . }} </span>
+                                    class="tooltip"> {{t "StatsPageConferenceUsageHoursToolTip"}} {{t . }}: {{ valFromIndex $.Statistics.ConferenceUsageHours . }} </span>
                         </td>
                     </tr>
                 {{ end }}
@@ -159,8 +159,8 @@
                     <tr>
                         <th scope="row">{{t . }}</th>
                         <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceCount . }} / {{ $.Statistics.HighestConferenceCount }})">
-                            <span class="data">{{ valFromIndex $.Statistics.ConferenceCount . }}</span> <span
-                                    class="tooltip"> {{t "StatsPageConferenceUserHoursToolTip"}} {{ . }}: {{ valFromIndex $.Statistics.ConferenceCount . }} </span>
+                            <span class="data">{{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }}</span> <span
+                                    class="tooltip"> {{t "StatsPageConferenceUserHoursToolTip"}} {{t . }}: {{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }} </span>
                         </td>
                     </tr>
                 {{ end }}

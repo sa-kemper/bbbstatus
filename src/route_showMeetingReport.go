@@ -30,10 +30,10 @@ import (
 
 func init() { // Add all messages that are related to this file into the localization bundle
 	var msgs = []i18n.Message{
-		{ID: "ErrorTitleApplicationTimeout", Other: "Timeout"},
+		{ID: "ErrorTitleApplicationTimeout", Other: "timeout"},
 		{ID: "ErrorParagraphApplicationTimeout", Other: "bbbstatus reached a timeout, please try again."},
-		{ID: "MODERATOR", Other: "Moderator"},
-		{ID: "VIEWER", Other: "Viewer"},
+		{ID: "MODERATOR", Other: "moderator"},
+		{ID: "VIEWER", Other: "viewer"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.

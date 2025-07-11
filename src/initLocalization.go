@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/BBBEvents"
 	"embed"
 	"fmt"
 	"github.com/BurntSushi/toml"
@@ -29,6 +30,16 @@ import (
 var defaultLocaleFile embed.FS
 var Bundle *i18n.Bundle
 var localizer *i18n.Localizer
+
+func init() { // Add all messages that are related to this file into the localization bundle
+	var msgs = []i18n.Message{
+		{ID: "CurrentISO639", Other: "en"},
+	}
+	FrontendTextMessages = append(FrontendTextMessages, msgs...)
+	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
+		FrontendTextMessages = append(FrontendTextMessages, m)
+	}
+}
 
 func initI18n() {
 	Bundle = i18n.NewBundle(language.English)

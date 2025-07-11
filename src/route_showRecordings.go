@@ -32,17 +32,17 @@ import (
 
 func init() {
 	var msgs = []i18n.Message{
-		{ID: "RecordingsPageTitle", Other: "Meeting Recordings"},
-		{ID: "RecordingsPageSearchBar", Other: "Search for recording"},
-		{ID: "RecordingPageRecordingState-published", Other: "Published"},
-		{ID: "RecordingPageRecordingState-unpublished", Other: "Unpublished"},
-		{ID: "RecordingPageRecordingMeetingID", Other: "Meeting ID"},
-		{ID: "RecordingPageRecordingDuration", Other: "Duration"},
-		{ID: "RecordingPageRecordingType", Other: "Type"},
-		{ID: "RecordingPageRecordingBreakout", Other: "Breakout"},
-		{ID: "RecordingPageNoRecordingsFound", Other: "No recordings found"},
-		{ID: "RecordingPageNoRecordingsFoundHint", Other: "Try adjusting your search or filters to find recordings"},
-		{ID: "RecordingPageRecordingPlay", Other: "Play"},
+		{ID: "RecordingsPageTitle", Other: "meeting recordings"},
+		{ID: "RecordingsPageSearchBar", Other: "search for recording"},
+		{ID: "RecordingPageRecordingState-published", Other: "published"},
+		{ID: "RecordingPageRecordingState-unpublished", Other: "unpublished"},
+		{ID: "RecordingPageRecordingMeetingID", Other: "meeting ID"},
+		{ID: "RecordingPageRecordingDuration", Other: "duration"},
+		{ID: "RecordingPageRecordingType", Other: "type"},
+		{ID: "RecordingPageRecordingBreakout", Other: "breakout"},
+		{ID: "RecordingPageNoRecordingsFound", Other: "no recordings found"},
+		{ID: "RecordingPageNoRecordingsFoundHint", Other: "try adjusting your search or filters to find recordings"},
+		{ID: "RecordingPageRecordingPlay", Other: "play"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 }

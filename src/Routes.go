@@ -24,10 +24,10 @@ import (
 
 func init() { // Add all messages that are related to this file into the localization bundle
 	var msgs = []i18n.Message{
-		{ID: "404PageNotFoundHeader", Other: "404 - Page Not Found"},
-		{ID: "PageNotFoundErrorMessage", Other: "Oops! The page you were looking for cannot be found."},
-		{ID: "ReturnToIndexLinkText", Other: "Go to Homepage"},
-		{ID: "404PageNotFoundHeader", Other: "404 - Page Not Found"},
+		{ID: "404PageNotFoundHeader", Other: "404 - page not found"},
+		{ID: "PageNotFoundErrorMessage", Other: "Oops! the page you were looking for cannot be found."},
+		{ID: "ReturnToIndexLinkText", Other: "go to Homepage"},
+		{ID: "404PageNotFoundHeader", Other: "404 - page not found"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 }

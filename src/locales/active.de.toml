@@ -122,6 +122,10 @@ other = "Benutzer"
 hash = "sha1-81d24cc01ffe84a8b639a3189c84d25955cc34ae"
 other = "KW"
 
+[CurrentISO639]
+hash = "sha1-094b0fe0e302854af1311afab85b5203ba457a3b"
+other = "de"
+
 [Dec]
 hash = "sha1-997f59bc99b2a57280179c3ce09ba8ab57cbdf44"
 other = "Dez"
@@ -161,6 +165,10 @@ other = "Jul"
 [Jun]
 hash = "sha1-6d90df3be4d0d43b08e3fb47f55e09b5b06dae3e"
 other = "Jun"
+
+[MODERATOR]
+hash = "sha1-ad3b15c3a7bca16179ba5807b875d6e8269d5ae9"
+other = "Moderator"
 
 [Mar]
 hash = "sha1-c4ba0822462e0c373aadd5360a69f205c2a7d036"
@@ -237,10 +245,6 @@ other = "Zur Zusammenfassung"
 [MeetingUserCount]
 hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"
 other = "Benutzer"
-
-[MODERATOR]
-hash = "sha1-ad3b15c3a7bca16179ba5807b875d6e8269d5ae9"
-other = "Moderator"
 
 [Mon]
 hash = "sha1-24b2a0993d0cfa93c44282d6bba72bcf58b300d6"

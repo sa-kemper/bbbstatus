@@ -158,7 +158,7 @@
                 {{ range .StatsOrder }}
                     <tr>
                         <th scope="row">{{t . }}</th>
-                        <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceCount . }} / {{ $.Statistics.HighestConferenceCount }})">
+                        <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }} / {{ $.Statistics.ConferenceUsersUsageHours }})">
                             <span class="data">{{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }}</span> <span
                                     class="tooltip"> {{t "StatsPageConferenceUserHoursToolTip"}} {{t . }}: {{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }} </span>
                         </td>

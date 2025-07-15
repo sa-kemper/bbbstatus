@@ -46,10 +46,9 @@
 							<li>
 								<input class="server-filter-checkbox"
 									   type="checkbox" {{if .FilteredFor }} checked {{end}}
-									   id="server-filter-{{.Hostname}}" name="server-filter-bbb.0gb.de">
+									   id="server-filter-{{.Hostname}}" name="server-filter-{{.Hostname}}">
 								<label for="server-filter-{{.Hostname}}" class="server-filter-label">{{.Hostname}}
-									({{.Users}}
-									{{t "MeetingListUserCountLabel"}})</label>
+									({{.Users}} {{t "MeetingListUserCountLabel"}})</label>
 							</li>
                         {{ end }}
 					</ul>

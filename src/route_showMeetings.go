@@ -131,16 +131,17 @@ func showMeetings(c echo.Context) error {
 			Meetings:   len(serverMeetings),
 		})
 
-		selectedServers = append(selectedServers, server)
-
 		userCount, err := BbbApi.GetServerUserCount(ctx)
 		if err != nil {
 			fmt.Println("Error getting user count:", err)
 			continue
 		}
 		currentServer := ServerFilter{Hostname: server.Hostname, Users: userCount}
-		if c.FormValue("server-filter-"+server.Hostname) != "" {
+
+		if c.QueryParam("server-filter-"+server.Hostname) != "" {
 			currentServer.FilteredFor = true
+			selectedServers = append(selectedServers, server)
+			isFilteredRequest = true
 		}
 		showMeetingsServerFiltered = append(showMeetingsServerFiltered, currentServer)
 	}
@@ -165,7 +166,6 @@ func showMeetings(c echo.Context) error {
 	}
 	dbQueries := db.New(conn)
 
-	//goland:noinspection ALL
 	defer conn.Close(ctx)
 	var meetings []MeetingListMeetingWrapper
 	if isFilteredRequest {
@@ -254,6 +254,9 @@ func HandleFilteredRequest(ctx context.Context, dbQueries *db.Queries, startDate
 	if len(filteredServers) > 0 {
 		var filteredSlice []MeetingListMeetingWrapper
 		var allowedHostnames []string
+		for _, server := range filteredServers {
+			allowedHostnames = append(allowedHostnames, server.Hostname)
+		}
 
 		for _, meeting := range meetingClone {
 			if slices.Contains(allowedHostnames, meeting.BbbHostname) {
@@ -261,6 +264,7 @@ func HandleFilteredRequest(ctx context.Context, dbQueries *db.Queries, startDate
 			}
 			continue
 		}
+		return &filteredSlice, nil
 
 	}
 

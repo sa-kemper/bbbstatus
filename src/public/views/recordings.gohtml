@@ -26,15 +26,15 @@
 						   value="{{.Request.Query}}">
 				</div>
 				<div class="filter-group">
-					<label for="start-date">{{t "meetingListFilterStartDate"}}</label>
+					<label for="start-date">{{t "MeetingListFilterStartDate"}}</label>
 					<input type="date" name="start-date" id="start-date" value="{{.Request.StartDate}}">
 				</div>
 				<div class="filter-group">
-					<label for="end-date">{{t "meetingListFilterEndDate"}}</label>
+					<label for="end-date">{{t "MeetingListFilterEndDate"}}</label>
 					<input type="date" name="end-date" id="end-date" value="{{.Request.EndDate}}">
 				</div>
 				<button type="submit" class="search-button"><i
-							class="fas fa-filter"></i> {{t "meetingListFilterFilterButton"}}</button>
+							class="fas fa-filter"></i> {{t "MeetingListFilterFilterButton"}}</button>
 			</form>
 		</div>
 
@@ -58,7 +58,7 @@
 							<span class="meta-value">{{.Participants}}</span>
 						</div>
 						<div class="meta-item">
-							<span class="meta-label">{{t "meetingListFilterStartDate"}}:</span>
+							<span class="meta-label">{{t "MeetingListFilterStartDate"}}:</span>
 							<span class="meta-value">{{formatDate .StartDate}}</span>
 						</div>
 						<div class="meta-item">

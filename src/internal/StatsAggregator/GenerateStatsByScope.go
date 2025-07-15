@@ -124,6 +124,7 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 	stats.HighestConferenceCount = findMaxInMap(stats.ConferenceCount)
 	stats.HighestMaxUserCount = findMaxInMap(stats.MaxUserCount)
 	stats.HighestConferenceUsageHours = findMaxInMap(stats.ConferenceUsageHours)
+	stats.HighestConferenceUsersUsageHours = findMaxInMap(stats.ConferenceUsersUsageHours)
 
 	return stats, err
 }

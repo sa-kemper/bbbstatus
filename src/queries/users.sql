@@ -9,7 +9,7 @@ FROM users
 WHERE internal_user_id = (SELECT user_events.internal_user_id
                           FROM user_events
                           WHERE internal_meeting_id = $1
-                            AND user_events.event_id = 'user-presenter-assigned'
+                            AND user_events.event_type = 'user-presenter-assigned'
                           ORDER BY event_timestamp DESC
                           LIMIT 1);
 

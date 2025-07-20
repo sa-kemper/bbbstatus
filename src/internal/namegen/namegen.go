@@ -30,6 +30,7 @@ import (
 
 //go:embed assets
 var assets embed.FS
+var rng *rand.Rand
 
 func Generate(lang string) (name string) {
 	adjectives, err := assets.ReadFile(fmt.Sprintf("assets/adjective_%s.txt", lang))
@@ -50,27 +51,28 @@ func Generate(lang string) (name string) {
 	adjArray := strings.Split(string(adjectives), "\n")
 	aniArray := strings.Split(string(animals), "\n")
 
-	name += adjArray[rand.Intn(len(aniArray)-1)]
-	name += aniArray[rand.Intn(len(aniArray)-1)]
+	name += adjArray[rng.Intn(len(aniArray)-1)]
+	name += aniArray[rng.Intn(len(aniArray)-1)]
 
 	return name
 }
 
 func GenerateUnique(lang string, existingNames *[]string) (name string) {
 	var attemptCounter int
+	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	for {
 		var generatedName string
 		if attemptCounter == 3 { // regenerate the randomness if the failed attempts stack up, but only do this once.
 			// why only once? because this might be a heavy operation.
-			rand.NewSource(time.Now().Unix())
+			rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 		}
 		if attemptCounter < 50 {
 			generatedName = Generate(lang)
 		} else {
 			charset := "abcdefghijklmnopqrstuvwxyz"
 			for i := 0; i < 6; i++ {
-				generatedName += string(charset[rand.Intn(len(charset)-1)])
+				generatedName += string(charset[rng.Intn(len(charset)-1)])
 			}
 		}
 

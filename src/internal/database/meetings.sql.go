@@ -27,6 +27,28 @@ func (q *Queries) EndMeetingAtTimestampByID(ctx context.Context, arg EndMeetingA
 	return err
 }
 
+const getFirstMeetingDate = `-- name: GetFirstMeetingDate :one
+SELECT max(meetings.create_time) from meetings
+`
+
+func (q *Queries) GetFirstMeetingDate(ctx context.Context) (interface{}, error) {
+	row := q.db.QueryRow(ctx, getFirstMeetingDate)
+	var max interface{}
+	err := row.Scan(&max)
+	return max, err
+}
+
+const getLastMeetingDate = `-- name: GetLastMeetingDate :one
+SELECT min(meetings.meeting_ended) from meetings
+`
+
+func (q *Queries) GetLastMeetingDate(ctx context.Context) (interface{}, error) {
+	row := q.db.QueryRow(ctx, getLastMeetingDate)
+	var min interface{}
+	err := row.Scan(&min)
+	return min, err
+}
+
 const getMeetingActiveByID = `-- name: GetMeetingActiveByID :one
 SELECT COALESCE(
                EXISTS (SELECT 1

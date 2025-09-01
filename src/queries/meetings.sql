@@ -1,3 +1,10 @@
+-- name: GetFirstMeetingDate :one
+SELECT min(meetings.create_time)
+from meetings;
+-- name: GetLastMeetingDate :one
+SELECT max(meetings.meeting_ended)
+from meetings;
+
 -- name: GetMeetingById :one
 SELECT *
 FROM meetings

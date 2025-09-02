@@ -22,16 +22,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/labstack/echo/v4"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"golang.org/x/text/language"
 	"net/http"
 	"os"
 	"slices"
 	"sort"
 	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/labstack/echo/v4"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"golang.org/x/text/language"
 )
 
 func init() { // Add all messages that are related to this file into the localization bundle

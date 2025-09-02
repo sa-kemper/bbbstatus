@@ -22,12 +22,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/labstack/echo/v4"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 func init() { // Add all messages that are related to this file into the localization bundle
@@ -76,6 +77,7 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "NoFutureTimeAllowed", Other: "selected time point lays in the future"},
 		{ID: "StatsPageGenError", Other: "error generating statistics"},
 		{ID: "NoStatsAvailableYet", Other: "no statistics available yet"},
+		{ID: "Summary", Other: "summary"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.

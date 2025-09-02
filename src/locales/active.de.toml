@@ -502,11 +502,11 @@ other = "Gesamtzahl der Konferenzen am"
 
 [StatsPageConferenceUserHoursHeader]
 hash = "sha1-456f25117f9f4e4073d2572728b5555af62607be"
-other = "Gesammtdauer der Konferenzteilnahmen"
+other = "Gesamtdauer der Konferenzteilnahmen"
 
 [StatsPageConferenceUserHoursToolTip]
 hash = "sha1-d1c0299f761e22cd56d6b733f36f1dd7feac34f6"
-other = "Gesammtdauer der Konferenzteilnahmen am"
+other = "Gesamtdauer der Konferenzteilnahmen am"
 
 [StatsPageConferencesInToolTip]
 hash = "sha1-8fec5faafc0ed1f79cf97152dd334ed62f12aef0"
@@ -518,7 +518,7 @@ other = "Konferenzen"
 
 [StatsPageConferencesUserHoursTableHeader]
 hash = "sha1-456f25117f9f4e4073d2572728b5555af62607be"
-other = "Gesammtdauer der Konferenzteilnahmen"
+other = "Gesamtdauer der Konferenzteilnahmen"
 
 [StatsPageGenError]
 hash = "sha1-96440b5408a51f28c13ad5be6f62cf2c7bacb033"

@@ -17,9 +17,10 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"net/http"
 )
 
 func init() { // Add all messages that are related to this file into the localization bundle
@@ -48,6 +49,8 @@ var routes = []route{
 	{Name: "inspectedReportCsv", Method: "GET", Path: "/report/:id/inspect/csv", HandlerFunc: downloadFilteredMeetingReport},
 	{Name: "webhookEvent", Method: "POST", Path: "/event", HandlerFunc: bbbWebHookEvent},
 	{Name: "statistics", Method: "GET", Path: "/statistics", HandlerFunc: statsPage},
+	{Name: "summary", Method: "GET", Path: "/summary", HandlerFunc: summaryPage},
+	{Name: "summaryCsv", Method: "GET", Path: "/summary/csv", HandlerFunc: summaryCSVHandler},
 	{Name: "statisticsCsv", Method: "GET", Path: "/statistics/csv", HandlerFunc: statsPageCSV},
 	{Name: "index", Method: "GET", Path: "/", HandlerFunc: func(context echo.Context) error {
 		return context.Redirect(http.StatusMovedPermanently, context.Echo().Reverse("meetings"))

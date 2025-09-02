@@ -23,13 +23,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"os"
 	"slices"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 type CSVEvent struct {
@@ -57,10 +58,10 @@ func init() {
 		{ID: "CSVReportAction-user-audio-unmuted", Other: "unmuted"},
 		{ID: "CSVReportAction-user-cam-broadcast-start", Other: "started a webcam broadcast"},
 		{ID: "CSVReportAction-user-cam-broadcast-end", Other: "ended a webcam broadcast"},
-		{ID: "CSVReportAction-meeting-screenshare-started", Other: "started a screenshare"},
-		{ID: "CSVReportAction-meeting-screenshare-stopped", Other: "stopped a screenshare"},
+		{ID: "CSVReportAction-meeting-screenshare-started", Other: "started screensharing"},
+		{ID: "CSVReportAction-meeting-screenshare-stopped", Other: "stopped a screensharing"},
 		{ID: "CSVReportAction-user-emoji-changed", Other: "raised his hand"},
-		{ID: "SystemMessage", Other: "system message"},
+		{ID: "SystemMessage", Other: "System message"},
 		{ID: "CSVMeetingEvent-meeting-created", Other: "meeting created"},
 		{ID: "CSVMeetingEvent-meeting-ended", Other: "meeting ended"},
 		{ID: "CSVMeetingEvent-meeting-recording-started", Other: "the meeting recording started"},

@@ -33,9 +33,9 @@ import (
 
 func init() { // Add all messages that are related to this file into the localization bundle
 	var msgs = []i18n.Message{
-		{ID: "Week", Other: "Week"},
-		{ID: "Month", Other: "Month"},
-		{ID: "Year", Other: "Year"},
+		{ID: "Week", Other: "week"},
+		{ID: "Month", Other: "month"},
+		{ID: "Year", Other: "year"},
 		{ID: "Mon", Other: "Mon"},
 		{ID: "Tue", Other: "Tue"},
 		{ID: "Wed", Other: "Wed"},
@@ -74,8 +74,8 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "StatsPageSelectScopeTimePrintLabel", Other: "date\t"},
 		{ID: "StatsPageCSVTime", Other: "time"},
 		{ID: "InternalServerError", Other: "internal Server Error"},
-		{ID: "NoFutureTimeAllowed", Other: "selected time point lays in the future"},
-		{ID: "StatsPageGenError", Other: "error generating statistics"},
+		{ID: "NoFutureTimeAllowed", Other: "selected time is in the future"},
+		{ID: "StatsPageGenError", Other: "Error generating statistics"},
 		{ID: "NoStatsAvailableYet", Other: "no statistics available yet"},
 		{ID: "Summary", Other: "summary"},
 	}

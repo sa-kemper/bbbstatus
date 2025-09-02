@@ -24,12 +24,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"os"
 	"slices"
 	"sort"
 	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 type Detail struct {
@@ -57,22 +58,22 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "ReportHeader", Other: "meeting report"},
 		{ID: "ReportMeetingDetailsHeader", Other: "meeting details"},
 		{ID: "ReportParticipantsHeader", Other: "participants"},
-		{ID: "ReportPollResponseEventRepresentation", Other: "the user '{{.Username}}' responded to a poll {{.PollQuestion}} with {{.PollAnswer}}"},
-		{ID: "ReportPollStartedEventRepresentation", Other: "the user '{{.Username}}' started a poll '{{.PollQuestion}}', with options: {{.PollOptions}}"},
-		{ID: "ReportMessageEventRepresentation", Other: "the user '{{.Username}}' sent a message: {{.Message}}"},
+		{ID: "ReportPollResponseEventRepresentation", Other: "User '{{.Username}}' responded to a poll {{.PollQuestion}} with {{.PollAnswer}}"},
+		{ID: "ReportPollStartedEventRepresentation", Other: "User '{{.Username}}' started a poll '{{.PollQuestion}}', with options: {{.PollOptions}}"},
+		{ID: "ReportMessageEventRepresentation", Other: "User '{{.Username}}' sent a message: {{.Message}}"},
 		{ID: "ReportPrintReportButton", Other: "print report"},
-		{ID: "ReportOpenInExcelButton", Other: "open in excel"},
+		{ID: "ReportOpenInExcelButton", Other: "open in Excel"},
 		{ID: "ReportMeetingDetailInternalMeetingID", Other: "internal meeting ID"},
 		{ID: "ReportMeetingDetailBBBHostname", Other: "BBB hostname"},
 		{ID: "ReportMeetingDetailCreationDate", Other: "creation date"},
 		{ID: "meetingListHeader", Other: "meeting list"},
 		{ID: "BackToMeetingsButton", Other: "back to meetings"},
 		{ID: "RecordingsHeader", Other: "recordings"},
-		{ID: "SystemSentMessage", Other: "system Sent the message: '{{.Message}}'"},
+		{ID: "SystemSentMessage", Other: "System Sent the message: '{{.Message}}'"},
 		{ID: "MeetingEvent-meeting-created", Other: "meeting created"},
 		{ID: "MeetingEvent-meeting-ended", Other: "meeting ended"},
-		{ID: "MeetingEvent-meeting-recording-started", Other: "meeting recording started"},
-		{ID: "MeetingEvent-meeting-recording-stopped", Other: "meeting recording stopped"},
+		{ID: "MeetingEvent-meeting-recording-started", Other: "Meeting Recording Started"},
+		{ID: "MeetingEvent-meeting-recording-stopped", Other: "Meeting Recording Stoped"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.

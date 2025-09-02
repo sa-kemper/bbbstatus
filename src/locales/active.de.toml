@@ -6,9 +6,17 @@ other = "404 - Seite nicht gefunden"
 hash = "sha1-befde54a108cb9dc6ad6e0ebd28720531a6855e6"
 other = "Apr"
 
+[April]
+hash = "sha1-a0393902db1f516ef5f95f6830938558a88fb23c"
+other = "April"
+
 [Aug]
 hash = "sha1-75629af51d7c7f120dbb5b462013bfa48af33285"
 other = "Aug"
+
+[August]
+hash = "sha1-69d97c5797dc7d211aaa4e9229db5c8466d4edef"
+other = "August"
 
 [BackToMeetingsButton]
 hash = "sha1-9ce676e933940d0b13239c4db78960eb43bef230"
@@ -130,6 +138,10 @@ other = "de"
 hash = "sha1-997f59bc99b2a57280179c3ce09ba8ab57cbdf44"
 other = "Dez"
 
+[December]
+hash = "sha1-65640c6577c9c72497525e656127b5bd1deb6f85"
+other = "Dezember"
+
 [ErrorParagraphApplicationTimeout]
 hash = "sha1-e09bfd4ae4b3758578549646e86cb8478ca2b569"
 other = "Zeitüberschreitung beim Bearbeiten der Anfrage, bitte versuchen Sie es erneut."
@@ -146,6 +158,10 @@ other = "Event Timeline"
 hash = "sha1-dc8415ccfe52505f1d0a74025c76b3c26c88c59d"
 other = "Feb"
 
+[February]
+hash = "sha1-5c3a35ef85f22d508f90171bdcb2e6d820731d20"
+other = "Febuar"
+
 [Fri]
 hash = "sha1-bbd6e32ee1326237814b697269b4368033d50d2f"
 other = "Fr"
@@ -158,13 +174,25 @@ other = "Interner Serverfehler"
 hash = "sha1-efed3690ea2243f5f1ac77cbb0987e5335440258"
 other = "Jan"
 
+[January]
+hash = "sha1-7a22d73d336abd6281d4dd71080220a230cb79de"
+other = "Januar"
+
 [Jul]
 hash = "sha1-b737558468d75ca55b2d9185c0b55eacaea627a0"
 other = "Jul"
 
+[July]
+hash = "sha1-df97a42549e5c0e1753b985126565531cc9f3c56"
+other = "July"
+
 [Jun]
 hash = "sha1-6d90df3be4d0d43b08e3fb47f55e09b5b06dae3e"
 other = "Jun"
+
+[June]
+hash = "sha1-a9db906761699b31567727716eaa6fd19ae5f5d5"
+other = "Juni"
 
 [MODERATOR]
 hash = "sha1-79f52b5b92498b00cb18284f1dcb466bd40ad559"
@@ -173,6 +201,10 @@ other = "Moderator"
 [Mar]
 hash = "sha1-c4ba0822462e0c373aadd5360a69f205c2a7d036"
 other = "Mrz"
+
+[March]
+hash = "sha1-433632ea5cd64cd163c3a390d5e531d33da3c5e5"
+other = "Merz"
 
 [May]
 hash = "sha1-c94f479833c5d401cffdfa7afe6c9c2d56448019"
@@ -307,9 +339,17 @@ other = "Noch keine Statistiken verfügbar"
 hash = "sha1-bb9bfefd5391f52be54267e2a938a126661b0ff7"
 other = "Nov"
 
+[November]
+hash = "sha1-3c5bf776f5efcaa22d6e0fd4839db7d2b83e52be"
+other = "November"
+
 [Oct]
 hash = "sha1-51327aef9866e85ef5b5b2294a28494d2715ae59"
 other = "Okt"
+
+[October]
+hash = "sha1-87206ae2363483496c099f8c3aac5b4a8ae2a66a"
+other = "Oktober"
 
 [PageNotFoundErrorMessage]
 hash = "sha1-957838027c7d25715d8937a0368f60c219c14d7c"
@@ -423,6 +463,10 @@ other = "Sa"
 hash = "sha1-fdd289e370bd5cc575f48a16947d05c144ec474b"
 other = "Sep"
 
+[September]
+hash = "sha1-1c542e79c9b4257e640ccf72974d61fd590a5c26"
+other = "September"
+
 [ServerStatsMeetings]
 hash = "sha1-27c4470db25a39ab137d1d38558f4e2a255e5ef6"
 one = "Meeting"
@@ -480,6 +524,22 @@ other = "Gesammtdauer der Konferenzteilnahmen"
 hash = "sha1-96440b5408a51f28c13ad5be6f62cf2c7bacb033"
 other = "Fehler bei der Erstellung von Statistiken"
 
+[StatsPageSelectScopeStartTime]
+hash = "sha1-2d6d8f2de76fc506ae05bd39498f1b2e8cac6b05"
+other = "Startzeit auswählen"
+
+[StatsPageSelectScopeStartTimePrint]
+hash = "sha1-88d8206d586abe4c8e35c8e9adcc649d07c99a1e"
+other = "Startzeit"
+
+[StatsPageSelectScopeStopTime]
+hash = "sha1-c549df2e479e628e8dc4165d16c31e88383f6a64"
+other = "Stoppzeit auswählen"
+
+[StatsPageSelectScopeStopTimePrint]
+hash = "sha1-1d11a6b3cf6b485ed16f73b275d3f4557d8878e3"
+other = "Stoppzeit"
+
 [StatsPageSelectScopeTime]
 hash = "sha1-2d6d8f2de76fc506ae05bd39498f1b2e8cac6b05"
 other = "Startzeit wählen"
@@ -500,6 +560,22 @@ other = "Statistik Überblick"
 hash = "sha1-196c4871606b5f635eb3fceb4b2b469d14baf4f6"
 other = "Gesamtdauer der konferenzen"
 
+[Summary]
+hash = "sha1-12b71c3e0fe5f7c0b8d17cc03186e281412da4a8"
+other = "Zusammenfassung"
+
+[SummaryDuration]
+hash = "sha1-1370004da76fa4f3b7a5180fd5436065ef4c7d5b"
+other = "Dauer"
+
+[SummaryMeetingName]
+hash = "sha1-9ee349ddc5c5ffb61d276ce5a3568e5d66305427"
+other = "Meeting name"
+
+[SummaryUserCount]
+hash = "sha1-d8dd546a500dd7cb6aa690d885cd02c487515a53"
+other = "Anzahl der Benutzer"
+
 [Sun]
 hash = "sha1-48c98cab7866e606328c99289ed24e339393b5ab"
 other = "So"
@@ -515,6 +591,10 @@ other = "Das System sendete die Nachricht: '{{.Message}}'"
 [Thu]
 hash = "sha1-3593ccd96f6c0fad4e362d18ac37226707f2ea46"
 other = "Do"
+
+[Time]
+hash = "sha1-6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b"
+other = "Zeit"
 
 [Tue]
 hash = "sha1-529541bb390c76152e313351d89de3cd30a1c4bd"

@@ -19,15 +19,16 @@ package main
 import (
 	"embed"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
 	"html/template"
 	"net"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 )
 
 var echof *echo.Echo
@@ -47,11 +48,12 @@ func initEchoFramework() {
 		"t": func(text string) string {
 			return text
 		},
-		"reverse":      func(string, ...interface{}) string { return "x" },
-		"formatTime":   func(t time.Time) string { return t.Format("15:04:05") },
-		"formatDate":   func(t time.Time) string { return t.Format("2006.01.02 - 15:04") },
-		"valFromIndex": func(m map[string]int, s string) int { return m[s] },
-		"timestamp":    func() string { return strconv.Itoa(int(time.Now().Unix())) },
+		"reverse":        func(string, ...interface{}) string { return "x" },
+		"formatTime":     func(t time.Time) string { return t.Format("15:04:05") },
+		"formatDate":     func(t time.Time) string { return t.Format("2006.01.02 - 15:04") },
+		"formatDuration": func(t time.Duration) string { return t.String() },
+		"valFromIndex":   func(m map[string]int, s string) int { return m[s] },
+		"timestamp":      func() string { return strconv.Itoa(int(time.Now().Unix())) },
 	}
 
 	if _, err := os.Stat(gohtmlTemplateOverwriteFolder); err == nil {

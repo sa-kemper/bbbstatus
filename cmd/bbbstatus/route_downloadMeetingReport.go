@@ -18,6 +18,7 @@ package main
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/locales"
 	"errors"
 	"fmt"
 	"net/http"
@@ -36,7 +37,7 @@ func downloadMeetingReport(c echo.Context) error {
 		if errors.Is(err, os.ErrDeadlineExceeded) { // this function may execute for a considerable amount of time. It's not completely unreasonable to assume that it may exceed time limits.
 			fmt.Println("Generate CSV Report Timed out.")
 		}
-		return c.Render(http.StatusInternalServerError, "error", frontendError{ErrorTitle: Translate("ErrorTitleApplicationTimeout"), ErrorParagraph: Translate("ErrorParagraphApplicationTimeout")})
+		return c.Render(http.StatusInternalServerError, "error", frontendError{ErrorTitle: locales.TranslateFromEchoContext(c, "ErrorTitleApplicationTimeout"), ErrorParagraph: locales.TranslateFromEchoContext(c, "ErrorParagraphApplicationTimeout")})
 	}
 
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))

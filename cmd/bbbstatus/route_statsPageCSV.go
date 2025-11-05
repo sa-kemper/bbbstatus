@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/locales"
 	"bbbstatus/pkg/StatsAggregator"
 	"fmt"
 	"net/http"
@@ -49,11 +50,11 @@ func statsPageCSV(c echo.Context) (err error) {
 		_ = renderError(c, "Error occurred generating cvs")
 		return err
 	}
-	result += Translate("StatsPageCSVTime") + ","
-	result += Translate("StatsPageConferenceCountHeader") + ","
-	result += Translate("StatsPageConferenceAttendeeCountHeader") + ","
-	result += Translate("StatsPageTotalMeetingHoursTableHeader") + ","
-	result += Translate("StatsPageConferenceUserHoursHeader") + ",\n"
+	result += locales.TranslateFromEchoContext(c, "StatsPageCSVTime") + ","
+	result += locales.TranslateFromEchoContext(c, "StatsPageConferenceCountHeader") + ","
+	result += locales.TranslateFromEchoContext(c, "StatsPageConferenceAttendeeCountHeader") + ","
+	result += locales.TranslateFromEchoContext(c, "StatsPageTotalMeetingHoursTableHeader") + ","
+	result += locales.TranslateFromEchoContext(c, "StatsPageConferenceUserHoursHeader") + ",\n"
 
 	switch scope {
 	case "week":
@@ -69,7 +70,7 @@ func statsPageCSV(c echo.Context) (err error) {
 	}
 
 	for _, index := range StatsOrder {
-		result += Translate(index) + ","
+		result += locales.TranslateFromEchoContext(c, index) + ","
 		result += strconv.Itoa(stats.ConferenceCount[index]) + ","
 		result += strconv.Itoa(stats.MaxUserCount[index]) + ","
 		result += strconv.Itoa(stats.ConferenceUsageHours[index]) + ","

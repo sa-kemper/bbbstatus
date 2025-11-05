@@ -2,9 +2,11 @@ package main
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/locales"
 	"fmt"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -97,13 +99,14 @@ func summaryCSVHandler(c echo.Context) error {
 	for _, month := range MonthMap {
 		Months = append(Months, *month)
 	}
-	var csv = fmt.Sprintf("%s,%s,%s,%s,%s\n", Translate("Month"), Translate("Time"), Translate("SummaryMeetingName"), Translate("SummaryUserCount"), Translate("SummaryDuration"))
+	var csv = strings.Join([]string{locales.TranslateFromEchoContext(c, "Month"), locales.TranslateFromEchoContext(c, "Time"), locales.TranslateFromEchoContext(c, "SummaryMeetingName"), locales.TranslateFromEchoContext(c, "SummaryUserCount"), locales.TranslateFromEchoContext(c, "SummaryDuration")}, ",") + "\n"
 	// Sort the data for output
 	sort.Slice(Months, func(i, j int) bool {
 		iTime, _ := time.Parse("January", Months[i].Name)
 		jTime, _ := time.Parse("January", Months[j].Name)
 		return iTime.Before(jTime)
 	})
+
 	for iterator, month := range Months {
 		sort.Slice(Months[iterator].Items, func(i, j int) bool {
 			return Months[iterator].Items[i].Date.Before(Months[iterator].Items[j].Date)

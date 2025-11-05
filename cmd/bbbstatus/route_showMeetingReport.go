@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBEvents"
 	"context"
 	"errors"
@@ -70,9 +71,8 @@ func showMeetingReport(c echo.Context) error {
 	report, err := GenerateWebReport(context.WithValue(ctx, "gdpr", c.QueryParam("gdpr") == "on"), internalMeetingId, nil)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
-			return renderError(c, "ErrorParagraphApplicationTimeout")
 			fmt.Println("FATAL: database timeout!")
-			return c.Render(http.StatusGatewayTimeout, "errorPage", frontendError{ErrorTitle: Translate("ErrorTitleApplicationTimeout"), ErrorParagraph: Translate("ErrorParagraphApplicationTimeout")})
+			return c.Render(http.StatusGatewayTimeout, "errorPage", frontendError{ErrorTitle: locales.TranslateFromEchoContext(c, "ErrorTitleApplicationTimeout"), ErrorParagraph: locales.TranslateFromEchoContext(c, "ErrorParagraphApplicationTimeout")})
 		}
 		fmt.Println(err)
 		return err

@@ -18,6 +18,7 @@ package main
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBAPI"
 	"bbbstatus/pkg/BBBEvents"
 	"context"
@@ -123,8 +124,10 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 			//fmt.Println("DEBUG API SERVER FINDING: '" + server.Hostname + "' != '" + meeting.BbbHostname + "'")
 		}
 	}
-	//fmt.Println("DEBUG: meetingAPI: ", meetingServerAPI)
-	details = FillMeetingDetails(details, meeting)
+	details = append(details, Detail{locales.TranslateFromCTX(ctx, "ReportMeetingDetailMeetingName"), meeting.Name})
+	details = append(details, Detail{locales.TranslateFromCTX(ctx, "ReportMeetingDetailInternalMeetingID"), meeting.InternalMeetingID})
+	details = append(details, Detail{locales.TranslateFromCTX(ctx, "ReportMeetingDetailBBBHostname"), meeting.Bbbhostname})
+	details = append(details, Detail{locales.TranslateFromCTX(ctx, "ReportMeetingDetailCreationDate"), meeting.CreateTime.Time.Format("02.01.2006")})
 
 	participants, err = FillMeetingParticipants(ctx, internalMeetingID, dbQueries)
 	if err != nil {
@@ -201,7 +204,7 @@ func FillMeetingEvents(ctx context.Context, id string, dbQueries *db.Queries) ([
 		}
 		timeline = append(timeline, Event{
 			Time:               event.EventTimestamp.Time,
-			TextRepresentation: Translate("MeetingEvent-" + event.EventType),
+			TextRepresentation: locales.TranslateFromCTX(ctx, "MeetingEvent-"+event.EventType),
 		})
 	}
 	return timeline, nil
@@ -430,9 +433,6 @@ func FillMeetingParticipants(ctx context.Context, internalMeetingID string, dbQu
 
 func FillMeetingDetails(details []Detail, meeting db.Meeting) []Detail {
 	// Load Details
-	details = append(details, Detail{Translate("ReportMeetingDetailMeetingName"), meeting.Name})
-	details = append(details, Detail{Translate("ReportMeetingDetailInternalMeetingID"), meeting.InternalMeetingID})
-	details = append(details, Detail{Translate("ReportMeetingDetailBBBHostname"), meeting.Bbbhostname})
-	details = append(details, Detail{Translate("ReportMeetingDetailCreationDate"), meeting.CreateTime.Time.Format("02.01.2006")})
+
 	return details
 }

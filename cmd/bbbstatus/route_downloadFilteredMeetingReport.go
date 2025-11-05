@@ -18,7 +18,7 @@ package main
 
 import (
 	db "bbbstatus/internal/database"
-	"context"
+	"bbbstatus/locales"
 	"errors"
 	"fmt"
 	"net/http"
@@ -27,12 +27,10 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"golang.org/x/text/language"
 )
 
 func downloadFilteredMeetingReport(c echo.Context) (err error) {
-	var ctx = context.WithValue(c.Request().Context(), "Translator", i18n.NewLocalizer(Bundle, c.Request().Header.Get("Accept-Language"), language.English.String()))
+	var ctx = c.Request().Context()
 	var internalMeetingId = c.Param("id")
 	var report []byte
 
@@ -70,7 +68,7 @@ func downloadFilteredMeetingReport(c echo.Context) (err error) {
 		if errors.Is(err, os.ErrDeadlineExceeded) { // this function may execute for a considerable amount of time. It's not completely unreasonable to assume that it may exceed time limits.
 			fmt.Println("Generate CSV Report Timed out.")
 		}
-		return c.Render(http.StatusInternalServerError, "error", frontendError{ErrorTitle: Translate("ErrorTitleApplicationTimeout"), ErrorParagraph: Translate("ErrorParagraphApplicationTimeout")})
+		return c.Render(http.StatusInternalServerError, "error", frontendError{ErrorTitle: locales.TranslateFromEchoContext(c, "ErrorTitleApplicationTimeout"), ErrorParagraph: locales.TranslateFromEchoContext(c, "ErrorParagraphApplicationTimeout")})
 	}
 
 	meeting, err := dbQueries.GetMeetingById(ctx, internalMeetingId)

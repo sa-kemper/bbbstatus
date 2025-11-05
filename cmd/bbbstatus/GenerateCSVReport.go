@@ -102,7 +102,7 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string, filteredUs
 		value = strings.TrimSpace(value)
 		value = strings.ReplaceAll(value, " ", "")
 		value = strings.ToLower(value)
-		result += Translate("CSVReportConfig-"+value) + ","
+		result += locales.TranslateFromCTX(ctx, "CSVReportConfig-"+value) + ","
 	}
 
 	messageTimeline, err := fillCSVMessageEvents(ctx, internalMeetingID, dbQueries, filteredUserIds)
@@ -164,7 +164,7 @@ func FillCsvMeetingEvents(ctx context.Context, internalMeetingId string, dbQueri
 		return nil, err
 	}
 	for _, dbEvent := range meetingEvents {
-		var event = CSVEvent{Time: dbEvent.EventTimestamp.Time, User: "SYSTEM", TextRepresentation: Translate("CSVMeetingAction-" + dbEvent.EventType)}
+		var event = CSVEvent{Time: dbEvent.EventTimestamp.Time, User: "SYSTEM", TextRepresentation: locales.TranslateFromCTX(ctx, "CSVMeetingAction-"+dbEvent.EventType)}
 		timeline = append(timeline, event)
 	}
 
@@ -228,7 +228,7 @@ func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, dbQueri
 		}
 		event.User = eventUser.Name
 		event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": event.User, "Message": chatMessageContent})
-		event.Action = Translate("CSVReportActionChatted")
+		event.Action = locales.TranslateFromCTX(ctx, "CSVReportActionChatted")
 		timeline = append(timeline, event)
 	}
 	return timeline, err
@@ -254,7 +254,7 @@ func FillCSVUserEvents(ctx context.Context, internalMeetingID string, dbQueries 
 		}
 		event.User = eventUser.Name
 		event.TextRepresentation = TranslateAdvanced(dbEvent.EventType, map[string]string{"Username": event.User})
-		event.Action = Translate("CSVReportAction-" + dbEvent.EventType)
+		event.Action = locales.TranslateFromCTX(ctx, "CSVReportAction-"+dbEvent.EventType)
 		timeline = append(timeline, event)
 	}
 	return timeline, err
@@ -303,7 +303,7 @@ func FillCsvPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.
 		}
 
 		event.TextRepresentation = TranslateAdvanced("ReportPollStartedEventRepresentation", map[string]string{"Username": event.User, "PollQuestion": question, "PollOptions": answersTextRepresentation})
-		event.Action = Translate("CSVReportActionPollStarted")
+		event.Action = locales.TranslateFromCTX(ctx, "CSVReportActionPollStarted")
 		timeline = append(timeline, event)
 		//goland:noinspection ALL
 		conn2.Close(ctx)
@@ -366,7 +366,7 @@ func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *
 				poll.Question = string([]byte(pollID)[0:5])
 			}
 			event.TextRepresentation = TranslateAdvanced("ReportPollResponseEventRepresentation", map[string]string{"username": user.Name, "pollQuestion": poll.Question, "pollAnswer": poll.Answers[poll.AnswerIds[0]].Key})
-			event.Action = Translate("CSVReportActionPollResponse")
+			event.Action = locales.TranslateFromCTX(ctx, "CSVReportActionPollResponse")
 			event.User = user.Name
 			timeline = append(timeline, event)
 			//goland:noinspection ALL

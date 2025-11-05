@@ -33,6 +33,9 @@ var assets embed.FS
 var rng *rand.Rand
 
 func Generate(lang string) (name string) {
+	if rng == nil {
+		rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+	}
 	adjectives, err := assets.ReadFile(fmt.Sprintf("assets/adjective_%s.txt", lang))
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {

@@ -19,6 +19,7 @@ package main
 import (
 	db "bbbstatus/internal/database"
 	"bbbstatus/pkg/BBBAPI"
+	"context"
 	"fmt"
 	"net/http"
 	"slices"
@@ -48,12 +49,12 @@ func init() {
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 }
 
-func showRecordings(context echo.Context) (err error) {
-	var ctx = context.Request().Context()
+func showRecordings(c echo.Context) (err error) {
+	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
 	servers := confGetServers("")
-	userQuery := context.QueryParam("query")
-	userStartDate := context.FormValue("start-date")
-	userEndDate := context.FormValue("end-date")
+	userQuery := c.QueryParam("query")
+	userStartDate := c.FormValue("start-date")
+	userEndDate := c.FormValue("end-date")
 
 	// Get ALL Recordings
 	globalRecordings := make([]BBBAPI.Recording, 0)
@@ -119,7 +120,7 @@ func showRecordings(context echo.Context) (err error) {
 	if userQuery != "" {
 		conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 		if err != nil {
-			_ = context.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
+			_ = c.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
 			return err
 		}
 		defer conn.Close(ctx)
@@ -130,7 +131,7 @@ func showRecordings(context echo.Context) (err error) {
 		for _, recording := range globalRecordings {
 			participants, err := dbQueries.GetUsersInMeetingByInternalID(ctx, recording.InternalMeetingID)
 			if err != nil {
-				_ = context.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": err.Error()})
+				_ = c.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": err.Error()})
 			}
 			var participantNames = make([]string, len(participants))
 			for iterator, participant := range participants {
@@ -158,7 +159,7 @@ func showRecordings(context echo.Context) (err error) {
 		return globalRecordings[i].StartDate.After(globalRecordings[j].StartDate)
 	})
 
-	err = context.Render(
+	err = c.Render(
 		http.StatusOK,
 		"recordings",
 		map[string]interface{}{

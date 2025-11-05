@@ -19,6 +19,7 @@ package main
 import (
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -30,7 +31,7 @@ import (
 )
 
 func downloadFilteredMeetingReport(c echo.Context) (err error) {
-	var ctx = c.Request().Context()
+	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
 	var internalMeetingId = c.Param("id")
 	var report []byte
 

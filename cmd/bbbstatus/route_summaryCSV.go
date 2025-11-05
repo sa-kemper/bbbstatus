@@ -3,6 +3,7 @@ package main
 import (
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
+	"context"
 	"fmt"
 	"net/http"
 	"sort"
@@ -14,7 +15,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func summaryCSVHandler(c echo.Context) error {
+func summaryCSVHandler(c echo.Context) (err error) {
 	type SummaryItem struct {
 		Date        time.Time
 		MeetingName string
@@ -25,7 +26,7 @@ func summaryCSVHandler(c echo.Context) error {
 		Name  string
 		Items []*SummaryItem
 	}
-	var ctx = c.Request().Context()
+	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
 	var conn *pgx.Conn
 
 	conn, err = pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))

@@ -18,6 +18,7 @@ package main
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBAPI"
 	"context"
 	"errors"
@@ -35,8 +36,8 @@ import (
 )
 
 func showFilteredMeetingReport(echoContext echo.Context) error {
-	if localizer == nil {
-		localizer = i18n.NewLocalizer(Bundle, echoContext.Request().Header.Get("Accept-Language"), language.English.String())
+	if locales.Localizer == nil {
+		locales.Localizer = i18n.NewLocalizer(locales.Bundle, echoContext.Request().Header.Get("Accept-Language"), language.English.String())
 	}
 	type customUserType struct {
 		InternalUserID string
@@ -61,7 +62,7 @@ func showFilteredMeetingReport(echoContext echo.Context) error {
 	var meetingActive bool
 
 	// use the echoContext provided by the user request in order to respect the browsers / servers / admins settings.
-	var ctx = echoContext.Request().Context()
+	var ctx = context.WithValue(echoContext.Request().Context(), "Translator", echoContext.Get("Translator"))
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
 		_ = echoContext.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})

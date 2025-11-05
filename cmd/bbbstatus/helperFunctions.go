@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bbbstatus/locales"
 	"html/template"
 	"io"
 	"net"
@@ -12,7 +13,7 @@ import (
 
 // Render is a function hook to provide function calls inside html templates, such as Translate
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	currentLocalizer := i18n.NewLocalizer(Bundle, c.Request().Header.Get("Accept-Language"))
+	currentLocalizer := i18n.NewLocalizer(locales.Bundle, c.Request().Header.Get("Accept-Language"))
 	t.templates.Funcs(template.FuncMap{
 		"t": func(text string) string {
 			msg, err := currentLocalizer.LocalizeMessage(&i18n.Message{ID: text})
@@ -42,5 +43,5 @@ func getIpFromContext(c echo.Context) net.IP {
 
 // TranslateAdvanced is a simple locales function that supports text templating
 func TranslateAdvanced(text string, data map[string]string) string {
-	return localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: text, TemplateData: data})
+	return locales.Localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: text, TemplateData: data})
 }

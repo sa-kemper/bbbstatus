@@ -17,8 +17,8 @@
 package main
 
 import (
+	"bbbstatus/locales"
 	"bbbstatus/web"
-	"embed"
 	"fmt"
 	"html/template"
 	"net"
@@ -81,6 +81,7 @@ func initEchoFramework() {
 	echof.Renderer = Templates
 	echof.Use(middleware.Logger())
 	echof.Use(middleware.Recover())
+	echof.Use(locales.AddTranslatorToContext)
 	echof.Logger.SetLevel(log.INFO)
 
 	// setup trusted proxies in order to trust x-forwarded-for.

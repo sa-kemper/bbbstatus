@@ -16,24 +16,22 @@
 package main
 
 import (
+	"bbbstatus/locales"
 	"fmt"
 	"html/template"
 	"log"
-	"math/rand"
-	"time"
 
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 var FrontendTextMessages []i18n.Message
-var err error
 
 type Template struct {
 	templates *template.Template
 }
 
 func main() {
+	var err error
 	err = initDatabase()
 	if err != nil {
 		fmt.Println("[!] Error connecting to database, this is required for the operation of bbbstatus [!]")
@@ -41,13 +39,9 @@ func main() {
 		return
 	}
 
-	initI18n()          // initialize the localisation
-	initEchoFramework() // initialize the "framework"
-	initRoutes()        // start routing
-
-	// regenerate randomness pool on startup.
-	rand.NewSource(time.Now().Unix())
+	locales.InitI18n(FrontendTextMessages) // initialize the localisation
+	initEchoFramework()                    // initialize the "framework"
+	initRoutes()                           // start routing
 
 	echof.Logger.Fatal(echof.Start(confGet("HOST") + ":" + confGet("PORT")))
-	echof.Pre(middleware.HTTPSNonWWWRedirect())
 }

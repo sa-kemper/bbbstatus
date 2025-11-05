@@ -19,7 +19,6 @@ package main
 import (
 	"bbbstatus/Database"
 	"database/sql"
-	"embed"
 	_ "embed"
 	"fmt"
 

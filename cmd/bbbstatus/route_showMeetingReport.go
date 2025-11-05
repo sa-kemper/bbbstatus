@@ -50,8 +50,8 @@ func showMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
 	var meetingExtists bool
-	var ctx = c.Request().Context()
-	localizer = i18n.NewLocalizer(Bundle, requestLanguage, language.English.String())
+	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
+	locales.Localizer = i18n.NewLocalizer(locales.Bundle, requestLanguage, language.English.String())
 
 	// Connect to the db using
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))

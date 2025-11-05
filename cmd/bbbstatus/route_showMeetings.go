@@ -17,6 +17,7 @@ package main
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBAPI"
 	"bbbstatus/pkg/BBBEvents"
 	"context"
@@ -74,7 +75,7 @@ type MeetingListMeetingWrapper struct {
 }
 
 // e.Get("/meetings/", showMeetings)
-func showMeetings(c echo.Context) error {
+func showMeetings(c echo.Context) (err error) {
 	type ServerFilter struct {
 		Hostname    string
 		Users       int
@@ -91,8 +92,8 @@ func showMeetings(c echo.Context) error {
 	var isFilteredRequest bool
 	var startDate, endDate time.Time
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
-	var ctx = c.Request().Context()
-	localizer = i18n.NewLocalizer(Bundle, requestLanguage, language.English.String())
+	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
+	locales.Localizer = i18n.NewLocalizer(locales.Bundle, requestLanguage, language.English.String())
 
 	// handle filtered request
 	startDateParam := c.FormValue("start-date")

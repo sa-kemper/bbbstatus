@@ -3,6 +3,7 @@ package main
 import (
 	db "bbbstatus/internal/database"
 	"bbbstatus/pkg/BBBEvents"
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -55,7 +56,7 @@ func summaryPage(c echo.Context) (err error) {
 		Name  string
 		Items []*SummaryItem
 	}
-	var ctx = c.Request().Context()
+	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
 	var conn *pgx.Conn
 
 	conn, err = pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))

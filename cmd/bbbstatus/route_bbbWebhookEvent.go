@@ -52,7 +52,7 @@ Note:
 - The function assumes that the `BBBEvents.BaseEvent` struct has a `Save` method that handles the persistence of the event data to the database.
 - The function does not handle any errors that may occur during the database connection or the `Save` operation. It simply logs the errors and returns them.
 */
-func bbbWebHookEvent(c echo.Context) error {
+func bbbWebHookEvent(c echo.Context) (err error) {
 	// Debug deployments
 	if confGet("CLEAR_QUEUE") == "true" {
 		return c.String(http.StatusOK, "Event was dropped.")

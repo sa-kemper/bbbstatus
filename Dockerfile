@@ -20,18 +20,18 @@ RUN apk update
 RUN apk add --upgrade --no-cache ca-certificates && update-ca-certificates
 RUN adduser -D -g '' www
 WORKDIR /bbbstatus
-COPY ../../go.mod go.sum ./
+COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY ../../src ./
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s" -o /bbbstatus/bbbstatus /bbbstatus/cmd/bbbstatus
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s" -o /bbbstatus/bin.elf
 FROM scratch
 WORKDIR /app
 COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs/
-COPY --from=builder /bbbstatus/bin.elf /app/bin
+COPY --from=builder /bbbstatus/bbbstatus /app/bbbstatus
 COPY --from=builder /etc/passwd /etc/passwd
 
 USER www
-ENTRYPOINT ["/app/bin"]
+ENTRYPOINT ["/app/bbbstatus"]

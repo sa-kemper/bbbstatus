@@ -21,8 +21,17 @@ var Bundle *i18n.Bundle
 // TranslateFromCTX makes translating for individual requests thread safe.
 func TranslateFromCTX(ctx context.Context, messageID string) string {
 	translatorFromCtx := ctx.Value("Translator")
-	translator := translatorFromCtx.(i18n.Localizer)
-	translatedMessage, err := translator.LocalizeMessage(&i18n.Message{ID: messageID})
+	if translatorFromCtx == nil {
+		fmt.Println("translator is nil")
+		return "ERROR"
+	}
+	translator, ok := translatorFromCtx.(*i18n.Localizer)
+	if !ok {
+		fmt.Println("translatorFromCtx is not i18n.Localizer")
+		return "ERROR"
+	}
+	msg := i18n.Message{ID: messageID}
+	translatedMessage, err := translator.LocalizeMessage(&msg)
 	if err != nil {
 		println("Could not translate message: " + messageID)
 	}
@@ -93,4 +102,19 @@ func InitI18n(frontendTextMessages []i18n.Message) {
 			}
 		}
 	}
+}
+
+// TranslateAdvanced is a simple locales function that supports text templating
+func TranslateAdvanced(ctx context.Context, text string, data map[string]string) string {
+	translatorFromCtx := ctx.Value("Translator")
+	if translatorFromCtx == nil {
+		fmt.Println("translator is nil")
+		return "ERROR"
+	}
+	translator, ok := translatorFromCtx.(*i18n.Localizer)
+	if !ok {
+		fmt.Println("translatorFromCtx is not i18n.Localizer")
+		return "ERROR"
+	}
+	return translator.MustLocalize(&i18n.LocalizeConfig{MessageID: text, TemplateData: data})
 }

@@ -262,7 +262,7 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 			if poll.Question == "" { // use a shortened version of the poll id if the question is empty.
 				poll.Question = string([]byte(pollID)[0:5])
 			}
-			event.TextRepresentation = TranslateAdvanced("ReportPollResponseEventRepresentation", map[string]string{"username": user.Name, "pollQuestion": poll.Question, "pollAnswer": poll.Answers[poll.AnswerIds[0]].Key})
+			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportPollResponseEventRepresentation", map[string]string{"username": user.Name, "pollQuestion": poll.Question, "pollAnswer": poll.Answers[poll.AnswerIds[0]].Key})
 			timeline = append(timeline, event)
 			//goland:noinspection ALL
 			conn2.Close(ctx)
@@ -317,9 +317,9 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 		}
 
 		if ctx.Value("gdpr").(bool) {
-			event.TextRepresentation = TranslateAdvanced("ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
+			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
 		} else {
-			event.TextRepresentation = TranslateAdvanced("ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
+			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
 		}
 		timeline = append(timeline, event)
 		//goland:noinspection ALL
@@ -347,7 +347,7 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 
 		// Handle system message.
 		if message.InternalUserID == "SYSTEM" {
-			event.TextRepresentation = TranslateAdvanced("SystemSentMessage", map[string]string{"Message": message.MessageContent})
+			event.TextRepresentation = locales.TranslateAdvanced(ctx, "SystemSentMessage", map[string]string{"Message": message.MessageContent})
 			timeline = append(timeline, event)
 			continue
 		}
@@ -365,9 +365,9 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 			fmt.Println(err)
 		}
 		if ctx.Value("gdpr").(bool) {
-			event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": messageUser.GdprName, "Message": message.MessageContent})
+			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportMessageEventRepresentation", map[string]string{"Username": messageUser.GdprName, "Message": message.MessageContent})
 		} else {
-			event.TextRepresentation = TranslateAdvanced("ReportMessageEventRepresentation", map[string]string{"Username": messageUser.Name, "Message": message.MessageContent})
+			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportMessageEventRepresentation", map[string]string{"Username": messageUser.Name, "Message": message.MessageContent})
 		}
 		timeline = append(timeline, event)
 	}
@@ -400,9 +400,9 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 		}
 		var event Event
 		if ctx.Value("gdpr").(bool) {
-			event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: TranslateAdvanced(userEvent.EventType, map[string]string{"Username": eventUser.GdprName})}
+			event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: locales.TranslateAdvanced(ctx, userEvent.EventType, map[string]string{"Username": eventUser.GdprName})}
 		} else {
-			event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: TranslateAdvanced(userEvent.EventType, map[string]string{"Username": eventUser.Name})}
+			event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: locales.TranslateAdvanced(ctx, userEvent.EventType, map[string]string{"Username": eventUser.Name})}
 		}
 		timeline = append(timeline, event)
 	}

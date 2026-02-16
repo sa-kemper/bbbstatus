@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io"
 	"net"
+	"regexp"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -16,6 +17,14 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	currentLocalizer := i18n.NewLocalizer(locales.Bundle, c.Request().Header.Get("Accept-Language"))
 	t.templates.Funcs(template.FuncMap{
 		"t": func(text string) string {
+			if matched, err := regexp.MatchString(`CW(\d+)`, text); matched && err == nil {
+				msg, err := currentLocalizer.LocalizeMessage(&i18n.Message{ID: "CW"})
+				if err != nil {
+					println("[ERROR] Cannot translate Calendar week:", text)
+				}
+				return msg + strings.TrimLeft(text, "CW")
+			}
+
 			msg, err := currentLocalizer.LocalizeMessage(&i18n.Message{ID: text})
 			if err != nil {
 				println("[ERROR] Cannot translate text:", text)
@@ -41,7 +50,6 @@ func getIpFromContext(c echo.Context) net.IP {
 	return net.ParseIP(contextIp)
 }
 
-// TranslateAdvanced is a simple locales function that supports text templating
-func TranslateAdvanced(text string, data map[string]string) string {
-	return locales.Localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: text, TemplateData: data})
+func LogOnError(msg string, err error) {
+
 }

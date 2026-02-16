@@ -32,10 +32,11 @@ import (
 )
 
 type config struct {
-	BaseConfig     baseConfig
-	ReportConfig   reportConfig
-	DatabaseConfig dbConfig
-	BBBServers     []bbbServer
+	BaseConfig       baseConfig
+	ReportConfig     reportConfig
+	DatabaseConfig   dbConfig
+	BBBServers       []bbbServer
+	ScaleLiteServers []ScaleliteServer
 }
 
 type baseConfig struct {
@@ -62,6 +63,14 @@ type bbbServer struct {
 	FriendlyName string `toml:"FRIENDLY_NAME"` // not required
 }
 
+type ScaleliteServer struct {
+	Hostname     string `toml:"HOSTNAME"`
+	ApiPort      string `toml:"API_PORT"`
+	SharedSecret string `toml:"SHARED_SECRET"`
+	APITimeout   int    `toml:"API_TIMEOUT"`
+	FriendlyName string `toml:"FRIENDLY_NAME"`
+}
+
 func (s bbbServer) isEqual(other bbbServer) bool {
 	return s.Hostname == other.Hostname &&
 		s.ApiPort == other.ApiPort &&
@@ -81,6 +90,7 @@ var defaultConfiguration = config{
 
 var adminConf config
 var runtimeBbbServers []bbbServer // runtimeBbbServers is used to change configured bbbServer's at runtime (api key change, user settings, etc.) without mutating the original adminConf.
+var runtimeScaleliteServers []ScaleliteServer
 
 func init() {
 	var configFileConf config
@@ -116,6 +126,10 @@ func init() {
 		panic("No bbb servers configured.")
 	} else {
 		ValidateConfiguredBBBServers()
+	}
+	if len(adminConf.ScaleLiteServers) > 1 {
+		//fmt.Println("DEBUG: Scale lite servers configured.")
+		ValidateConfiguredScaleLiteServers()
 	}
 }
 
@@ -199,6 +213,46 @@ func ValidateConfiguredBBBServers() {
 		err = dbQueries.SetRecordingsCountForHostname(context.TODO(), db.SetRecordingsCountForHostnameParams{Hostname: api.Hostname, RecordingsCount: int32(len(recordings.Recording))})
 
 		runtimeBbbServers = append(runtimeBbbServers, server)
+		fmt.Printf("the server %s is configured with the api key '%s'", server.Hostname, server.SharedSecret)
+	}
+}
+
+func ValidateConfiguredScaleLiteServers() {
+	// Validate the read BBBServers config by checking for API access
+	for _, server := range adminConf.ScaleLiteServers {
+		if server.SharedSecret == "nil" { // database default for nil value.
+			continue
+		}
+		APITimeout := time.Duration(server.APITimeout) * time.Second
+		var api BBBAPI.API
+		if APITimeout != 0 {
+			api = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &APITimeout}
+		} else {
+			api = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret}
+		}
+		valid, err := api.ValidateApiSettings(context.Background())
+		if !valid {
+			fmt.Println(server.Hostname + ": Invalid API settings")
+			fmt.Println("Error occurred validating the API settings: ", err)
+		}
+
+		// Set recordings count in the database, this makes it easier to render the meetings template
+		conn, err := pgx.Connect(context.Background(), confGet("DB_CONNECTION_STRING"))
+		if err != nil {
+			fmt.Println("error ValidateConfiguredScaleliteServers -> connecting to database:", err)
+			return
+		}
+		defer conn.Close(context.Background())
+		dbQueries := db.New(conn)
+
+		recordings, err := api.GetRecordings(context.TODO(),
+			BBBAPI.GetRecordingsParameters{}, db.Meeting{})
+		if err != nil {
+			log.Fatal("Error occurred getting recordings: ", err)
+		}
+
+		err = dbQueries.SetRecordingsCountForHostname(context.TODO(), db.SetRecordingsCountForHostnameParams{Hostname: api.Hostname, RecordingsCount: int32(len(recordings.Recording))})
+
 		fmt.Printf("the server %s is configured with the api key '%s'", server.Hostname, server.SharedSecret)
 	}
 }

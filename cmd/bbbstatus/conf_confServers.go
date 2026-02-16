@@ -32,7 +32,18 @@ func confGetBBBServers(query string) (matches []bbbServer) {
 			matches = append(matches, server)
 		}
 	}
-	//fmt.Println("DEBUG confGetServers -> len=", len(matches), "matches=", matches)
+	//fmt.Println("DEBUG confGetBBBServers -> len=", len(matches), "matches=", matches)
+	return
+}
+
+// confGetScaleLiteServers is a helper function to query the currently configured bbbServer's
+func confGetScaleLiteServers(query string) (matches []ScaleliteServer) {
+	query = strings.TrimSpace(query)
+	for _, server := range adminConf.ScaleLiteServers {
+		if strings.Contains(server.Hostname, query) {
+			matches = append(matches, server)
+		}
+	}
 	//fmt.Println("DEBUG confGetBBBServers -> len=", len(matches), "matches=", matches)
 	return
 }

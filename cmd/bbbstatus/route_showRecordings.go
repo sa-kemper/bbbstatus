@@ -51,28 +51,49 @@ func init() {
 
 func showRecordings(c echo.Context) (err error) {
 	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
-	servers := confGetServers("")
+	var scaleLiteServers = confGetScaleLiteServers("")
+	var bbbServers = confGetBBBServers("")
 	userQuery := c.QueryParam("query")
 	userStartDate := c.FormValue("start-date")
 	userEndDate := c.FormValue("end-date")
 
 	// Get ALL Recordings
 	globalRecordings := make([]BBBAPI.Recording, 0)
-	for _, server := range servers {
-		timeout := time.Duration(server.APITimeout) * time.Second
-		api := BBBAPI.API{
-			Hostname:     server.Hostname,
-			Port:         server.ApiPort,
-			SharedSecret: server.SharedSecret,
-			Timeout:      &timeout,
+	if len(scaleLiteServers) > 0 {
+		//fmt.Println("DEBUG: Scale lite servers are used to obtain recordings.")
+		for _, server := range scaleLiteServers {
+			timeout := time.Duration(server.APITimeout) * time.Second
+			api := BBBAPI.API{
+				Hostname:     server.Hostname,
+				Port:         server.ApiPort,
+				SharedSecret: server.SharedSecret,
+				Timeout:      &timeout,
+			}
+			recordings, err := api.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{}, db.Meeting{})
+			if err != nil {
+				fmt.Println("error occurred while getting recordings: ", err)
+				return err
+			}
+			globalRecordings = slices.Insert(globalRecordings, len(globalRecordings), recordings.Recording...)
 		}
-		recordings, err := api.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{}, db.Meeting{})
-		if err != nil {
-			fmt.Println("error occurred while getting recordings: ", err)
-			return err
+	} else {
+		for _, server := range bbbServers {
+			timeout := time.Duration(server.APITimeout) * time.Second
+			api := BBBAPI.API{
+				Hostname:     server.Hostname,
+				Port:         server.ApiPort,
+				SharedSecret: server.SharedSecret,
+				Timeout:      &timeout,
+			}
+			recordings, err := api.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{}, db.Meeting{})
+			if err != nil {
+				fmt.Println("error occurred while getting recordings: ", err)
+				return err
+			}
+			globalRecordings = slices.Insert(globalRecordings, len(globalRecordings), recordings.Recording...)
 		}
-		globalRecordings = slices.Insert(globalRecordings, len(globalRecordings), recordings.Recording...)
 	}
+
 	//convert all meetings into a custom format that allows us to render time in the template.
 	for iterator, recording := range globalRecordings {
 		if recording.StartDate.IsZero() {

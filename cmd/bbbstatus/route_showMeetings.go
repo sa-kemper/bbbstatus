@@ -89,7 +89,6 @@ func showMeetings(c echo.Context) (err error) {
 			Meetings   int
 		}
 	}
-	var isFilteredRequest bool
 	var startDate, endDate time.Time
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
 	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
@@ -102,7 +101,7 @@ func showMeetings(c echo.Context) (err error) {
 	var selectedServers []bbbServer
 	var showMeetingsServerFiltered []ServerFilter
 
-	for _, server := range confGetServers("") {
+	for _, server := range confGetBBBServers("") {
 		apiTimeout := time.Duration(server.APITimeout) * time.Second
 		BbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apiTimeout}
 		if valid, err := BbbApi.ValidateApiSettings(ctx); err != nil || !valid {
@@ -143,7 +142,6 @@ func showMeetings(c echo.Context) (err error) {
 		if c.QueryParam("server-filter-"+server.Hostname) != "" {
 			currentServer.FilteredFor = true
 			selectedServers = append(selectedServers, server)
-			isFilteredRequest = true
 		}
 		showMeetingsServerFiltered = append(showMeetingsServerFiltered, currentServer)
 	}
@@ -155,12 +153,21 @@ func showMeetings(c echo.Context) (err error) {
 		}
 	}
 
-	if startDateParam != "" || endDateParam != "" || len(selectedServers) > 0 {
-		isFilteredRequest = true
+	startDate, err = time.Parse("2006-01-02", startDateParam)
+	if err != nil {
+		fmt.Println("Error parsing start date:", err)
+	}
+	endDate, err = time.Parse("2006-01-02", endDateParam)
+	if err != nil {
+		fmt.Println("Error parsing end date:", err)
 	}
 
-	startDate, err = time.Parse("2006-01-02", startDateParam)
-	endDate, err = time.Parse("2006-01-02", endDateParam)
+	if endDate.IsZero() {
+		endDate = time.Now()
+	}
+	if startDate.IsZero() {
+		startDate = endDate.AddDate(0, -1, 0)
+	}
 
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
@@ -170,28 +177,13 @@ func showMeetings(c echo.Context) (err error) {
 
 	defer conn.Close(ctx)
 	var meetings []MeetingListMeetingWrapper
-	if isFilteredRequest {
-		filteredMeetings, err := HandleFilteredRequest(ctx, dbQueries, startDate, endDate, selectedServers, &meetings)
-		if err != nil {
-			fmt.Println("error handeling filtered request:", err)
-			return err
-		}
-		meetings = *filteredMeetings
-	} else {
-		dbMeetings, err := dbQueries.GetMeetings(ctx)
-		if err != nil {
-			if errors.Is(err, os.ErrDeadlineExceeded) {
-				fmt.Println("FATAL: Database timed out")
-			}
-			fmt.Println("Error getting meetings", err.Error())
-			return err
-		}
-		for _, m := range dbMeetings {
-			rm := BBBEvents.ConvertDBToBBBMeeting(m)
-			meetings = append(meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Valid})
-			// fmt.Println("DEBUG: m.MeetingEnded valid =", m.MeetingEnded.Valid, "m.MeetingEnded.time=", m.MeetingEnded.Time.Format(time.RFC3339), "time.Now() =", time.Now(), "m.MeetingEnded.Time.Before(time.Now()) =", m.MeetingEnded.Time.Before(time.Now()))
-		}
+
+	filteredMeetings, err := HandleFilteredRequest(ctx, dbQueries, startDate, endDate, selectedServers, &meetings)
+	if err != nil {
+		fmt.Println("error handling filtered request:", err)
+		return err
 	}
+	meetings = *filteredMeetings
 
 	for iterator, meeting := range meetings {
 		if meeting.Active {
@@ -217,7 +209,7 @@ func showMeetings(c echo.Context) (err error) {
 		StartDate    string
 		EndDate      string
 		ServerFilter []ServerFilter
-	}{StartDate: startDateParam, EndDate: endDateParam, ServerFilter: showMeetingsServerFiltered}, "Meetings": meetings, "ServerStats": serverStats})
+	}{StartDate: startDate.Format("2006-01-02"), EndDate: endDate.Format("2006-01-02"), ServerFilter: showMeetingsServerFiltered}, "Meetings": meetings, "ServerStats": serverStats})
 	if err != nil {
 		fmt.Println(err)
 	}

@@ -100,9 +100,9 @@ func bbbWebHookEvent(c echo.Context) (err error) {
 	dbQueries := db.New(conn)
 
 	// Simple host based webhook safety, not really great but better than nothing at all.
-	bbbServers := confGetServers(event.Data.Attributes.Meeting.BbbHostname)
+	bbbServers := confGetBBBServers(event.Data.Attributes.Meeting.BbbHostname)
 	if len(bbbServers) < 1 {
-		//fmt.Println("List of valid hosts: ", confGetServers(""))
+		//fmt.Println("List of valid hosts: ", confGetBBBServers(""))
 		//fmt.Println("Failed to authenticate host: '" + event.Data.Attributes.Meeting.BbbHostname + "'")
 		return c.String(http.StatusUnauthorized, "Unauthorized")
 	} else {

@@ -106,7 +106,8 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 		return Report{}, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
 	}
 
-	servers := confGetServers(meeting.Bbbhostname)
+	ScaleliteServers := confGetScaleLiteServers("")
+	servers := confGetBBBServers(meeting.Bbbhostname)
 	var server bbbServer
 
 	if len(servers) < 1 {
@@ -134,18 +135,35 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 		return Report{}, err
 	}
 
-	if meetingServerAPI.Hostname != "" && meetingServerAPI.SharedSecret != "" {
-		//fmt.Println("DEBUG: meetingServerAPI is valid enough ^^ ", meetingServerAPI)
-		getRecordingsResponse, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID}, meeting)
-		if err != nil {
-			if errors.Is(err, os.ErrDeadlineExceeded) {
-				fmt.Println("FATAL: BBB API Timeout for host:", meetingServerAPI.Hostname)
+	// Get recordings for this meeting
+	if len(ScaleliteServers) > 0 {
+		for _, scaleServer := range ScaleliteServers {
+			apitimeout := time.Duration(scaleServer.APITimeout) * time.Second
+			meetingServerAPI = BBBAPI.API{Hostname: scaleServer.Hostname, Port: scaleServer.ApiPort, SharedSecret: scaleServer.SharedSecret, Timeout: &apitimeout}
+			getRecordingsResponse, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID}, meeting)
+			if err != nil {
+				if errors.Is(err, os.ErrDeadlineExceeded) {
+					fmt.Println("FATAL: BBB API Timeout for host:", meetingServerAPI.Hostname)
+				}
+				//fmt.Println("DEBUG: Error occurred whilst geting recordings. ", err)
+				return Report{}, err
 			}
-			//fmt.Println("DEBUG: Error occurred whilst geting recordings. ", err)
-			return Report{}, err
+			recordings = append(recordings, getRecordingsResponse.Recording...)
 		}
-		recordings = getRecordingsResponse.Recording
-		//fmt.Println("DEBUG: recordings: ", recordings)
+	} else {
+		if meetingServerAPI.Hostname != "" && meetingServerAPI.SharedSecret != "" {
+			//fmt.Println("DEBUG: meetingServerAPI is valid enough ^^ ", meetingServerAPI)
+			getRecordingsResponse, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID}, meeting)
+			if err != nil {
+				if errors.Is(err, os.ErrDeadlineExceeded) {
+					fmt.Println("FATAL: BBB API Timeout for host:", meetingServerAPI.Hostname)
+				}
+				//fmt.Println("DEBUG: Error occurred whilst geting recordings. ", err)
+				return Report{}, err
+			}
+			recordings = getRecordingsResponse.Recording
+			//fmt.Println("DEBUG: recordings: ", recordings)
+		}
 	}
 
 	userEvents, err := FillMeetingUserEvents(ctx, internalMeetingID, dbQueries, filteredForUserIds)

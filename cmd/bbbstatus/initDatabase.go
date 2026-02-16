@@ -44,12 +44,14 @@ func initDatabase() error {
 	if err != nil {
 		panic(fmt.Errorf("Unable to connect to database: %v\n", err))
 	}
-	goose.SetBaseFS(postgresInitialUp)
+	goose.SetBaseFS(Database.PostgresInitialUp)
+	files, err := Database.PostgresInitialUp.ReadDir(".") // Something wired happens here, we just use the provided dir name from this call
+	var folder = files[0].Name()
 
-	if err := goose.Up(db, "Database/PostgreSQL-Migrations"); err != nil { //
+	if err := goose.Up(db, folder); err != nil { //
 		panic(err)
 	}
-	if err := goose.Version(db, "Database/PostgreSQL-Migrations"); err != nil {
+	if err := goose.Version(db, files[0].Name()); err != nil {
 		panic(err)
 	}
 	return nil

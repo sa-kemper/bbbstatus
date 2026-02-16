@@ -91,8 +91,8 @@ func summaryPage(c echo.Context) (err error) {
 	}
 
 	MeetingSlice, err := dbQueries.GetMeetingsBetweenDates(ctx, db.GetMeetingsBetweenDatesParams{
-		CreateTime:   pgtype.Timestamp{Time: userInputStopTime, Valid: true},
-		CreateTime_2: pgtype.Timestamp{Time: userInputStartTime, Valid: true},
+		CreateTime:   pgtype.Timestamp{Time: userInputStartTime, Valid: true},
+		CreateTime_2: pgtype.Timestamp{Time: userInputStopTime, Valid: true},
 	})
 	if err != nil {
 		fmt.Println("error occurred whilst fetching meeting between dates", err.Error())

@@ -85,6 +85,7 @@ var runtimeBbbServers []bbbServer // runtimeBbbServers is used to change configu
 func init() {
 	var configFileConf config
 	var content, err = os.ReadFile("config.toml")
+	//fmt.Println("DEBUG: configuration file content: ", string(content))
 
 	if err != nil { // error reading the config
 		// TODO: handle the error differently depending on why the file couldn't be read.
@@ -181,12 +182,12 @@ func ValidateConfiguredBBBServers() {
 		}
 
 		// Set recordings count in the database, this makes it easier to render the meetings template
-		conn, err := pgx.Connect(context.TODO(), confGet("DB_CONNECTION_STRING"))
+		conn, err := pgx.Connect(context.Background(), confGet("DB_CONNECTION_STRING"))
 		if err != nil {
 			fmt.Println("error ValidateConfiguredBBBServers -> connecting to database:", err)
 			return
 		}
-		defer conn.Close(context.TODO())
+		defer conn.Close(context.Background())
 		dbQueries := db.New(conn)
 
 		recordings, err := api.GetRecordings(context.TODO(),

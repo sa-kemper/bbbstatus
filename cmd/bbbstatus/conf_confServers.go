@@ -24,8 +24,8 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// confGetServers is a helper function to query the currently configured bbbServer's
-func confGetServers(query string) (matches []bbbServer) {
+// confGetBBBServers is a helper function to query the currently configured bbbServer's
+func confGetBBBServers(query string) (matches []bbbServer) {
 	query = strings.TrimSpace(query)
 	for _, server := range runtimeBbbServers {
 		if strings.Contains(server.Hostname, query) {
@@ -33,6 +33,7 @@ func confGetServers(query string) (matches []bbbServer) {
 		}
 	}
 	//fmt.Println("DEBUG confGetServers -> len=", len(matches), "matches=", matches)
+	//fmt.Println("DEBUG confGetBBBServers -> len=", len(matches), "matches=", matches)
 	return
 }
 

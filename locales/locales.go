@@ -79,7 +79,7 @@ func InitI18n(frontendTextMessages []i18n.Message) {
 		}
 	} else {
 		// Walk the embedded locales and load each of them.
-		files, err := LocaleFiles.ReadDir("locales")
+		files, err := LocaleFiles.ReadDir(".")
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "Unable to read locales: %v\n", err)
 		}
@@ -87,7 +87,7 @@ func InitI18n(frontendTextMessages []i18n.Message) {
 			if file.IsDir() {
 				continue
 			}
-			_, err = Bundle.LoadMessageFileFS(LocaleFiles, "locales/"+file.Name())
+			_, err = Bundle.LoadMessageFileFS(LocaleFiles, file.Name())
 			if err != nil {
 				_, _ = fmt.Fprintf(os.Stderr, "Unable to load embedded message file: %v\n", err)
 			}

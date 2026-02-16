@@ -31,6 +31,6 @@ var UserEventTextRepresentation = map[string]i18n.Message{
 	EventUserCamBroadcastEnd:       {ID: "user-cam-broadcast-end", Other: "The user '{{.Username}}' ended a webcam broadcast"},
 	EventMeetingScreenshareStarted: {ID: "meeting-screenshare-started", Other: "User '{{.Username}}' started a screenshare"},
 	EventMeetingScreenshareStopped: {ID: "meeting-screenshare-stopped", Other: "User '{{.Username}}' stopped a screenshare"},
-	EventUserEmojiChanged:          {ID: "chat-group-message-sent", Other: "User '{{.Username}}' has changed his emoji"},
-	EventUserRaiseHandChanged:      {ID: "user-emoji-changed", Other: "User '{{.Username}}' raised his hand"},
+	EventUserEmojiChanged:          {ID: "user-emoji-changed", Other: "User '{{.Username}}' has changed his emoji"},
+	EventUserRaiseHandChanged:      {ID: "user-raise-hand-changed", Other: "User '{{.Username}}' raised his hand"},
 }

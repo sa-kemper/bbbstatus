@@ -67,11 +67,15 @@ func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters,
 	}
 	response, err := client.Do(request)
 	if err != nil {
+		//fmt.Println("DEBUG error getting recordings:", err)
 		return Recordings{}, err
 	}
 
+	///fmt.Println("DEBUG GetRecordings response:", response.Status)
+
 	defer response.Body.Close()
 	responseBytes, err := io.ReadAll(response.Body)
+	//fmt.Println("DEBUG Response bytes from get reqcordings:" + string(responseBytes))
 	if err != nil {
 		return Recordings{}, err
 	}
@@ -82,6 +86,7 @@ func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters,
 		return Recordings{}, err
 	}
 	var cleanedRecordings []Recording
+	//fmt.Println("DEBUG GetRecordings len(apiResponse):", len(apiResponse.Recordings.Recording))
 	for _, recording := range apiResponse.Recordings.Recording {
 		if recording.InternalMeetingID == meeting.InternalMeetingID || meeting.InternalMeetingID == "" {
 			cleanedRecordings = append(cleanedRecordings, recording)
@@ -94,7 +99,7 @@ func (a *API) GetRecordings(ctx context.Context, params GetRecordingsParameters,
 			cleanedRecordings[recordIndex].Playback.Format[formatIndex].Url = strings.TrimSpace(format.Url)
 		}
 	}
-
+	//fmt.Println("DEBUG GetRecordings result:", len(cleanedRecordings))
 	return Recordings{cleanedRecordings}, nil
 }
 

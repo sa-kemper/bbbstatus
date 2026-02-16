@@ -110,7 +110,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 	var server bbbServer
 
 	if len(servers) < 1 {
-		panic("Unable to find BBBServer for meeting " + internalMeetingID)
+		return Report{}, fmt.Errorf("Unable to find server with hostname %s\n", meeting.Bbbhostname)
 	} else {
 		server = servers[0]
 		if server.Hostname == meeting.Bbbhostname {

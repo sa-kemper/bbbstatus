@@ -31,8 +31,7 @@ type Template struct {
 }
 
 func main() {
-	var err error
-	err = initDatabase()
+	var err = initDatabase()
 	if err != nil {
 		fmt.Println("[!] Error connecting to database, this is required for the operation of bbbstatus [!]")
 		log.Fatalln(err)

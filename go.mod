@@ -1,6 +1,6 @@
 module bbbstatus
 
-go 1.25.2
+go 1.25.6
 
 require (
 	github.com/BurntSushi/toml v1.5.0

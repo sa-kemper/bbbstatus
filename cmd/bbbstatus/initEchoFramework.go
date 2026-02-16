@@ -61,7 +61,7 @@ func initEchoFramework() {
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "Unable to read overwrite folder: %v\n", err)
 			Templates = &Template{
-				templates: template.Must(template.New("").Funcs(funcMap).ParseFS(defaultGohtmlTemplates, "public/views/*.gohtml")),
+				templates: template.Must(template.New("").Funcs(funcMap).ParseFS(defaultGohtmlTemplates, "views/*.gohtml")),
 			}
 		} else {
 			// Template Setup with translation function
@@ -71,7 +71,7 @@ func initEchoFramework() {
 		}
 	} else {
 		Templates = &Template{
-			templates: template.Must(template.New("").Funcs(funcMap).ParseFS(defaultGohtmlTemplates, "public/views/*.gohtml")),
+			templates: template.Must(template.New("").Funcs(funcMap).ParseFS(defaultGohtmlTemplates, "views/*.gohtml")),
 		}
 	}
 

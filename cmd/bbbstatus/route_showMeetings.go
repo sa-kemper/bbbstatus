@@ -102,8 +102,7 @@ func showMeetings(c echo.Context) (err error) {
 	var showMeetingsServerFiltered []ServerFilter
 
 	for _, server := range confGetBBBServers("") {
-		apiTimeout := time.Duration(server.APITimeout) * time.Second
-		BbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apiTimeout}
+		BbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: new(time.Duration(server.APITimeout) * time.Second)}
 		if valid, err := BbbApi.ValidateApiSettings(ctx); err != nil || !valid {
 			if err != nil {
 				fmt.Println("error occurred validating API settings for server '"+server.Hostname+"': ", err)

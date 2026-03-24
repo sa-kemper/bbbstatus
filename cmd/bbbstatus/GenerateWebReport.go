@@ -116,8 +116,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 		server = servers[0]
 		if server.Hostname == meeting.Bbbhostname {
 			if server.APITimeout != 0 {
-				apitimeout := time.Duration(server.APITimeout) * time.Second
-				meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: &apitimeout}
+				meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: new(time.Duration(server.APITimeout) * time.Second)}
 			} else {
 				meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret}
 			}
@@ -138,8 +137,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 	// Get recordings for this meeting
 	if len(ScaleliteServers) > 0 {
 		for _, scaleServer := range ScaleliteServers {
-			apitimeout := time.Duration(scaleServer.APITimeout) * time.Second
-			meetingServerAPI = BBBAPI.API{Hostname: scaleServer.Hostname, Port: scaleServer.ApiPort, SharedSecret: scaleServer.SharedSecret, Timeout: &apitimeout}
+			meetingServerAPI = BBBAPI.API{Hostname: scaleServer.Hostname, Port: scaleServer.ApiPort, SharedSecret: scaleServer.SharedSecret, Timeout: new(time.Duration(scaleServer.APITimeout) * time.Second)}
 			getRecordingsResponse, err := meetingServerAPI.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{MeetingID: &meeting.ExternalMeetingID}, meeting)
 			if err != nil {
 				if errors.Is(err, os.ErrDeadlineExceeded) {

@@ -62,12 +62,11 @@ func showRecordings(c echo.Context) (err error) {
 	if len(scaleLiteServers) > 0 {
 		//fmt.Println("DEBUG: Scale lite servers are used to obtain recordings.")
 		for _, server := range scaleLiteServers {
-			timeout := time.Duration(server.APITimeout) * time.Second
 			api := BBBAPI.API{
 				Hostname:     server.Hostname,
 				Port:         server.ApiPort,
 				SharedSecret: server.SharedSecret,
-				Timeout:      &timeout,
+				Timeout:      new(time.Duration(server.APITimeout) * time.Second),
 			}
 			recordings, err := api.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{}, db.Meeting{})
 			if err != nil {
@@ -78,12 +77,11 @@ func showRecordings(c echo.Context) (err error) {
 		}
 	} else {
 		for _, server := range bbbServers {
-			timeout := time.Duration(server.APITimeout) * time.Second
 			api := BBBAPI.API{
 				Hostname:     server.Hostname,
 				Port:         server.ApiPort,
 				SharedSecret: server.SharedSecret,
-				Timeout:      &timeout,
+				Timeout:      new(time.Duration(server.APITimeout) * time.Second),
 			}
 			recordings, err := api.GetRecordings(ctx, BBBAPI.GetRecordingsParameters{}, db.Meeting{})
 			if err != nil {

@@ -1,4 +1,4 @@
-# bbbstatus
+![banner.png](banner.png)
 
 bbbstatus is an utility to view and save events (and their details) from [bbb-webhooks](https://github.com/bigbluebutton/bbb-webhooks)
 bbbstatus was developed as my first golang project ever. the code quality and design choices reflect that, for a more up to date represenation of my skills please take a look at my github.

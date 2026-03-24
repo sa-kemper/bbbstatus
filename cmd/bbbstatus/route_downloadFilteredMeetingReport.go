@@ -82,6 +82,6 @@ func downloadFilteredMeetingReport(c echo.Context) (err error) {
 	}
 
 	meeting.Name = strings.ReplaceAll(strings.ReplaceAll(meeting.Name, " ", "-"), "'", "")
-	c.Response().Header().Set("Content-Disposition", "attachment; filename="+fmt.Sprintf("bbbstatus-meeting-report-%s-%s-filtered-for-userids-(%s).csv", meeting.Name, meeting.CreateTime.Time.Format("2006-02-01"), strings.Join(filteredForUserIds, "-and-")))
+	c.Response().Header().Set("Content-Disposition", "attachment; filename="+fmt.Sprintf("bbbstatus-meeting-report-%s-%s-filtered-for-userids-(%s).csv", meeting.Name, meeting.CreateTime.Time.Format("2006-01-02"), strings.Join(filteredForUserIds, "-and-")))
 	return c.Blob(http.StatusOK, "text/csv", report)
 }

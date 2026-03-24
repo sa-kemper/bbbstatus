@@ -17,6 +17,7 @@
 package BBBAPI
 
 import (
+	"errors"
 	"os"
 	"strings"
 )
@@ -25,7 +26,9 @@ func confGet(name string) string {
 	var env = make(map[string]string)
 	envConf, err := os.ReadFile(".env")
 	if err != nil {
-		panic(err)
+		if !errors.Is(err, os.ErrNotExist) {
+			panic(err)
+		}
 	}
 
 	for _, v := range strings.Split(string(envConf), "\n") {

@@ -31,7 +31,7 @@ import (
 )
 
 func downloadFilteredMeetingReport(c echo.Context) (err error) {
-	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
+	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
 	var internalMeetingId = c.Param("id")
 	var report []byte
 

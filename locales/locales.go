@@ -18,9 +18,11 @@ var LocaleFiles embed.FS
 var Localizer *i18n.Localizer
 var Bundle *i18n.Bundle
 
+type Translator string
+
 // TranslateFromCTX makes translating for individual requests thread safe.
 func TranslateFromCTX(ctx context.Context, messageID string) string {
-	translatorFromCtx := ctx.Value("Translator")
+	translatorFromCtx := ctx.Value(Translator("Translator"))
 	if translatorFromCtx == nil {
 		fmt.Println("translator is nil")
 		return "ERROR"
@@ -106,7 +108,7 @@ func InitI18n(frontendTextMessages []i18n.Message) {
 
 // TranslateAdvanced is a simple locales function that supports text templating
 func TranslateAdvanced(ctx context.Context, text string, data map[string]string) string {
-	translatorFromCtx := ctx.Value("Translator")
+	translatorFromCtx := ctx.Value(Translator("Translator"))
 	if translatorFromCtx == nil {
 		fmt.Println("translator is nil")
 		return "ERROR"

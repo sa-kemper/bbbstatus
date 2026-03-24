@@ -2,6 +2,7 @@ package main
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBEvents"
 	"context"
 	"fmt"
@@ -56,7 +57,7 @@ func summaryPage(c echo.Context) (err error) {
 		Name  string
 		Items []*SummaryItem
 	}
-	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
+	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
 	var conn *pgx.Conn
 
 	conn, err = pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
@@ -67,7 +68,13 @@ func summaryPage(c echo.Context) (err error) {
 	var dbQueries = db.New(conn)
 
 	firstMeeting, err := dbQueries.GetFirstMeetingDate(ctx)
+	if err != nil {
+		fmt.Println("ERROR occurred whilst fetching first meeting date", err.Error())
+	}
 	lastMeeting, err := dbQueries.GetLastMeetingDate(ctx)
+	if err != nil {
+		fmt.Println("ERROR occurred whilst fetching last meeting date", err.Error())
+	}
 	var requestParams = struct {
 		StartTime    string `query:"startTime"`
 		StopTime     string `query:"stopTime"`

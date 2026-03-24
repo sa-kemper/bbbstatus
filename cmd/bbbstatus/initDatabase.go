@@ -26,26 +26,30 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
-var postgresInitialUp = Database.PostgresInitialUp
+//var postgresInitialUp = Database.PostgresInitialUp
 
 func initDatabase() error {
 	db, err := sql.Open("pgx", confGet("DB_CONNECTION_STRING"))
 	if err != nil {
-		panic(fmt.Errorf("Unable to connect to database: %v\n", err))
+		panic(fmt.Errorf("unable to connect to database: %v", err))
 	}
 	defer db.Close()
 
 	err = db.Ping()
 	if err != nil {
-		panic(fmt.Errorf("Unable to connect to database: %v\n", err))
+		panic(fmt.Errorf("unable to connect to database: %v", err))
 	}
 
 	err = goose.SetDialect("pgx")
 	if err != nil {
-		panic(fmt.Errorf("Unable to connect to database: %v\n", err))
+		panic(fmt.Errorf("unable to connect to database: %v", err))
 	}
 	goose.SetBaseFS(Database.PostgresInitialUp)
 	files, err := Database.PostgresInitialUp.ReadDir(".") // Something wired happens here, we just use the provided dir name from this call
+	if err != nil {
+		fmt.Println("ERROR: cannot read embedded FS")
+		panic(err)
+	}
 	var folder = files[0].Name()
 
 	if err := goose.Up(db, folder); err != nil { //

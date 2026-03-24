@@ -93,7 +93,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 	// Connect to the db using
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
-		return Report{}, fmt.Errorf("Unable to connect to database: %v\n", err)
+		return Report{}, fmt.Errorf("unable to connect to database: %v", err)
 	}
 	//goland:noinspection ALL
 	defer conn.Close(ctx)
@@ -103,7 +103,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 	// Query and parse meeting using the row.next and row.scan methode of pgx
 	meeting, err := dbQueries.GetMeetingById(ctx, internalMeetingID)
 	if err != nil {
-		return Report{}, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
+		return Report{}, fmt.Errorf("unable to find meeting with Id %s: %v", internalMeetingID, err)
 	}
 
 	ScaleliteServers := confGetScaleLiteServers("")
@@ -111,7 +111,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 	var server bbbServer
 
 	if len(servers) < 1 {
-		return Report{}, fmt.Errorf("Unable to find server with hostname %s\n", meeting.Bbbhostname)
+		return Report{}, fmt.Errorf("unable to find server with hostname %s", meeting.Bbbhostname)
 	} else {
 		server = servers[0]
 		if server.Hostname == meeting.Bbbhostname {
@@ -231,7 +231,7 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 	for _, pollID := range *polls {
 		row, err := conn.Query(ctx, "SELECT internal_user_id, answer_ids, response_time FROM poll_responses WHERE poll_id = $1", pollID)
 		if err != nil {
-			return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
+			return timeline, fmt.Errorf("unable to find meeting with Id %s: %v", internalMeetingID, err)
 		}
 		for row.Next() {
 			var event Event
@@ -293,7 +293,7 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 	// insert the polls into the timeline
 	row, err := conn.Query(ctx, "SELECT poll_id, internal_user_id, question, answers, created_at FROM polls WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
-		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
+		return timeline, fmt.Errorf("unable to find meeting with Id %s: %v", internalMeetingID, err)
 	}
 	for row.Next() {
 		var event Event
@@ -350,7 +350,7 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 	// insert user messages into the timeline
 	meetingMessages, err := dbQueries.GetMeetingMessagesByID(ctx, internalMeetingID)
 	if err != nil {
-		return timeline, fmt.Errorf("Unable to obtaib meeting messages with Id %s: %v\n", internalMeetingID, err)
+		return timeline, fmt.Errorf("unable to obtain meeting messages with Id %s: %v", internalMeetingID, err)
 	}
 	for _, message := range meetingMessages {
 		var event = Event{}
@@ -394,7 +394,7 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 	// insert user events into the timeline
 	meetingEvents, err := dbQueries.GetUserEventsByMeetingID(ctx, internalMeetingID)
 	if err != nil {
-		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
+		return timeline, fmt.Errorf("unable to find meeting with Id %s: %v", internalMeetingID, err)
 	}
 
 	for _, userEvent := range meetingEvents { // convert each row in the db to a Event object so it can be used by the frontend template
@@ -429,7 +429,7 @@ func FillMeetingParticipants(ctx context.Context, internalMeetingID string, dbQu
 	// Query participants and parse them
 	meetingUsers, err := dbQueries.GetUserIDsFromMeetingByMeetingID(ctx, internalMeetingID)
 	if err != nil {
-		return nil, fmt.Errorf("Error occured when generating report for Id %s: %v\n", internalMeetingID, err)
+		return nil, fmt.Errorf("error occurred when generating report for Id %s: %v", internalMeetingID, err)
 	}
 	for _, participantID := range meetingUsers {
 		dbUser, err := dbQueries.GetUserById(ctx, participantID)

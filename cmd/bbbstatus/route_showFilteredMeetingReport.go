@@ -62,7 +62,7 @@ func showFilteredMeetingReport(echoContext echo.Context) error {
 	var meetingActive bool
 
 	// use the echoContext provided by the user request in order to respect the browsers / servers / admins settings.
-	var ctx = context.WithValue(echoContext.Request().Context(), "Translator", echoContext.Get("Translator"))
+	var ctx = context.WithValue(echoContext.Request().Context(), locales.Translator("Translator"), echoContext.Get("Translator"))
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
 		_ = echoContext.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
@@ -90,7 +90,7 @@ func showFilteredMeetingReport(echoContext echo.Context) error {
 		}
 	}
 
-	report, err := GenerateWebReport(context.WithValue(ctx, "gdpr", echoContext.QueryParam("gdpr") == "on"), internalMeetingId, &filteredForUserIds)
+	report, err := GenerateWebReport(context.WithValue(ctx, Gdpr("gdpr"), echoContext.QueryParam("gdpr") == "on"), internalMeetingId, &filteredForUserIds)
 	if err != nil {
 		fmt.Println("error occurred when generating report", err)
 		return err
@@ -117,6 +117,9 @@ func showFilteredMeetingReport(echoContext echo.Context) error {
 	}
 
 	result, err := dbQueries.GetMeetingActiveByID(ctx, internalMeetingId)
+	if err != nil {
+		fmt.Println("error occurred when fetching meeting active status", err)
+	}
 	meetingActive = result.(bool)
 
 	filteredReport := struct {

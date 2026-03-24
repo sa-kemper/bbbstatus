@@ -32,7 +32,7 @@ import (
 
 func downloadMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
-	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
+	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
 	var report, err = GenerateCSVReport(ctx, internalMeetingId, nil)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) { // this function may execute for a considerable amount of time. It's not completely unreasonable to assume that it may exceed time limits.

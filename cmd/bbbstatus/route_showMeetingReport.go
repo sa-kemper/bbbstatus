@@ -52,12 +52,12 @@ func showMeetingReport(c echo.Context) error {
 	var meetingExtists bool
 	//locales.Localizer = i18n.NewLocalizer(locales.Bundle, requestLanguage, language.English.String())
 	localizer := i18n.NewLocalizer(locales.Bundle, requestLanguage, language.English.String())
-	var ctx = context.WithValue(c.Request().Context(), "Translator", localizer)
+	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), localizer)
 
 	// Connect to the db using
 	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
-		return fmt.Errorf("Unable to connect to database: %v\n", err)
+		return fmt.Errorf("unable to connect to database: %v", err)
 	}
 	//goland:noinspection ALL
 	defer conn.Close(ctx)
@@ -69,7 +69,7 @@ func showMeetingReport(c echo.Context) error {
 		return c.Render(http.StatusNotFound, "notfound", nil)
 	}
 
-	report, err := GenerateWebReport(context.WithValue(ctx, "gdpr", c.QueryParam("gdpr") == "on"), internalMeetingId, nil)
+	report, err := GenerateWebReport(context.WithValue(ctx, Gdpr("gdpr"), c.QueryParam("gdpr") == "on"), internalMeetingId, nil)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
 			fmt.Println("FATAL: database timeout!")

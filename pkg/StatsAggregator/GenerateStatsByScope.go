@@ -89,7 +89,7 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 			if meeting.MeetingEnded.Time.IsZero() {
 				continue
 			}
-			if meeting.CreateTime.Time.Before(tf.Start) == true || meeting.MeetingEnded.Time.After(tf.End) == true {
+			if meeting.CreateTime.Time.Before(tf.Start) || meeting.MeetingEnded.Time.After(tf.End) {
 				continue
 			}
 
@@ -107,7 +107,7 @@ func GenerateStatsByScope(ctx context.Context, scope string, dbConnectionString 
 			if !user.LeaveTimestamp.Valid {
 				continue
 			}
-			if user.LeaveTimestamp.Time.IsZero() == true {
+			if user.LeaveTimestamp.Time.IsZero() {
 				continue
 			}
 			userUsageHours += user.LeaveTimestamp.Time.Sub(user.JoinTimestamp.Time)

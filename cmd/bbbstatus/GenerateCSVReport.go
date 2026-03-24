@@ -193,7 +193,7 @@ func fillCSVMessageEvents(ctx context.Context, internalMeetingID string, dbQueri
 	// insert user messages into the timeline
 	messages, err := dbQueries.GetMeetingMessagesByID(ctx, internalMeetingID)
 	if err != nil {
-		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
+		return timeline, fmt.Errorf("unable to find meeting with Id %s: %v", internalMeetingID, err)
 	}
 	for _, message := range messages {
 		var event = CSVEvent{Time: message.SendTime.Time}
@@ -238,7 +238,7 @@ func FillCSVUserEvents(ctx context.Context, internalMeetingID string, dbQueries 
 	// insert user events into the timeline
 	userEvents, err := dbQueries.GetUserEventsByMeetingID(ctx, internalMeetingID)
 	if err != nil {
-		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
+		return timeline, fmt.Errorf("unable to find meeting with Id %s: %v", internalMeetingID, err)
 	}
 	for _, dbEvent := range userEvents {
 		if filteredForUserIds != nil {
@@ -264,7 +264,7 @@ func FillCsvPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.
 	// insert the polls into the timeline
 	row, err := conn.Query(ctx, "SELECT poll_id, internal_user_id, question, answers, created_at FROM polls WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
-		return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
+		return timeline, fmt.Errorf("unable to find meeting with Id %s: %v", internalMeetingID, err)
 	}
 	for row.Next() {
 		var event CSVEvent
@@ -318,7 +318,7 @@ func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *
 	for _, pollID := range *polls {
 		row, err := conn.Query(ctx, "SELECT internal_user_id, answer_ids, response_time FROM poll_responses WHERE poll_id = $1", pollID)
 		if err != nil {
-			return timeline, fmt.Errorf("Unable to find meeting with Id %s: %v\n", internalMeetingID, err)
+			return timeline, fmt.Errorf("unable to find meeting with Id %s: %v", internalMeetingID, err)
 		}
 		for row.Next() {
 			var event CSVEvent

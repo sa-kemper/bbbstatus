@@ -30,6 +30,9 @@ type Template struct {
 	templates *template.Template
 }
 
+type Gdpr string
+type ServerLanguage string
+
 func main() {
 	var err = initDatabase()
 	if err != nil {

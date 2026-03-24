@@ -17,13 +17,12 @@
 package main
 
 import (
-	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBEvents"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
-var defaultLocaleFile = locales.LocaleFiles
+//var defaultLocaleFile = locales.LocaleFiles
 
 func init() { // Add all messages that are related to this file into the localization bundle
 	var msgs = []i18n.Message{

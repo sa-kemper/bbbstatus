@@ -18,6 +18,7 @@ package main
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBAPI"
 	"context"
 	"fmt"
@@ -50,7 +51,7 @@ func init() {
 }
 
 func showRecordings(c echo.Context) (err error) {
-	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
+	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
 	var scaleLiteServers = confGetScaleLiteServers("")
 	var bbbServers = confGetBBBServers("")
 	userQuery := c.QueryParam("query")

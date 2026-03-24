@@ -16,14 +16,7 @@
 
 package main
 
-import (
-	"context"
-	"errors"
-	"fmt"
-
-	"github.com/jackc/pgx/v5"
-)
-
+/*
 func addBBBServerToDb(conn *pgx.Conn, server bbbServer) (err error) {
 	var dbServer bbbServer
 	var dbInitialized bool
@@ -65,3 +58,4 @@ func addBBBServerToDb(conn *pgx.Conn, server bbbServer) (err error) {
 	runtimeBbbServers = append(runtimeBbbServers, dbServer)
 	return
 }
+*/

@@ -91,7 +91,7 @@ func showMeetings(c echo.Context) (err error) {
 	}
 	var startDate, endDate time.Time
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
-	var ctx = context.WithValue(c.Request().Context(), "Translator", c.Get("Translator"))
+	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
 	locales.Localizer = i18n.NewLocalizer(locales.Bundle, requestLanguage, language.English.String())
 
 	// handle filtered request

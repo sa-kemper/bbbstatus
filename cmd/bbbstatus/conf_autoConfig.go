@@ -90,7 +90,7 @@ var defaultConfiguration = config{
 
 var adminConf config
 var runtimeBbbServers []bbbServer // runtimeBbbServers is used to change configured bbbServer's at runtime (api key change, user settings, etc.) without mutating the original adminConf.
-var runtimeScaleliteServers []ScaleliteServer
+//var runtimeScaleliteServers []ScaleliteServer
 
 func init() {
 	var configFileConf config
@@ -211,6 +211,9 @@ func ValidateConfiguredBBBServers() {
 		}
 
 		err = dbQueries.SetRecordingsCountForHostname(context.TODO(), db.SetRecordingsCountForHostnameParams{Hostname: api.Hostname, RecordingsCount: int32(len(recordings.Recording))})
+		if err != nil {
+			fmt.Println("ERROR occurred setting recordings count for hostname: ", err)
+		}
 
 		runtimeBbbServers = append(runtimeBbbServers, server)
 		fmt.Printf("the server %s is configured with the api key '%s'", server.Hostname, server.SharedSecret)
@@ -245,14 +248,16 @@ func ValidateConfiguredScaleLiteServers() {
 		defer conn.Close(context.Background())
 		dbQueries := db.New(conn)
 
-		recordings, err := api.GetRecordings(context.TODO(),
+		recordings, err := api.GetRecordings(context.Background(),
 			BBBAPI.GetRecordingsParameters{}, db.Meeting{})
 		if err != nil {
 			log.Fatal("Error occurred getting recordings: ", err)
 		}
 
-		err = dbQueries.SetRecordingsCountForHostname(context.TODO(), db.SetRecordingsCountForHostnameParams{Hostname: api.Hostname, RecordingsCount: int32(len(recordings.Recording))})
-
+		err = dbQueries.SetRecordingsCountForHostname(context.Background(), db.SetRecordingsCountForHostnameParams{Hostname: api.Hostname, RecordingsCount: int32(len(recordings.Recording))})
+		if err != nil {
+			fmt.Println("ERROR occurred setting recordings count for hostname: ", err)
+		}
 		fmt.Printf("the server %s is configured with the api key '%s'", server.Hostname, server.SharedSecret)
 	}
 }

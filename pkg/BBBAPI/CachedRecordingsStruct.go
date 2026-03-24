@@ -31,7 +31,7 @@ type CachedRecordings struct {
 	api                     *API
 }
 
-func (c CachedRecordings) GetAll() (allItems []interface{}, err error) {
+func (c *CachedRecordings) GetAll() (allItems []interface{}, err error) {
 	if c.lastRequestTime.After(time.Now().Add(c.cacheInvalidationPeriod)) {
 		err = c.Update(context.TODO())
 		if err != nil {
@@ -45,7 +45,7 @@ func (c CachedRecordings) GetAll() (allItems []interface{}, err error) {
 	return
 }
 
-func (c CachedRecordings) GetByFilter(filter func(obj interface{}) bool) (filteredObjects []interface{}, err error) {
+func (c *CachedRecordings) GetByFilter(filter func(obj interface{}) bool) (filteredObjects []interface{}, err error) {
 	if c.lastRequestTime.After(time.Now().Add(c.cacheInvalidationPeriod)) {
 		err = c.Update(context.TODO())
 		if err != nil {
@@ -64,7 +64,7 @@ func (c CachedRecordings) GetByFilter(filter func(obj interface{}) bool) (filter
 	return
 }
 
-func (c CachedRecordings) Update(ctx context.Context) error {
+func (c *CachedRecordings) Update(ctx context.Context) error {
 	recordings, err := c.api.GetRecordings(ctx, GetRecordingsParameters{}, db.Meeting{})
 	if err != nil {
 		fmt.Println("error updating cached recordings")
@@ -80,6 +80,6 @@ func (c CachedRecordings) Update(ctx context.Context) error {
 	return nil
 }
 
-func (c CachedRecordings) GetFilteredRecordings(ctx context.Context, params GetRecordingsParameters, meeting db.Meeting) (result Recordings, err error) {
+func (c *CachedRecordings) GetFilteredRecordings(ctx context.Context, params GetRecordingsParameters, meeting db.Meeting) (result Recordings, err error) {
 	return c.api.GetRecordings(ctx, params, meeting)
 }

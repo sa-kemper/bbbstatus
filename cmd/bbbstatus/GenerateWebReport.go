@@ -415,7 +415,7 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 			continue
 		}
 		var event Event
-		if ctx.Value("gdpr").(bool) {
+		if ctx.Value(Gdpr("gdpr")).(bool) {
 			event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: locales.TranslateAdvanced(ctx, userEvent.EventType, map[string]string{"Username": eventUser.GdprName})}
 		} else {
 			event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: locales.TranslateAdvanced(ctx, userEvent.EventType, map[string]string{"Username": eventUser.Name})}
@@ -437,7 +437,7 @@ func FillMeetingParticipants(ctx context.Context, internalMeetingID string, dbQu
 			fmt.Println("Error occurred adding user to participants list:", err)
 			continue
 		}
-		if ctx.Value("gdpr").(bool) {
+		if ctx.Value(Gdpr("gdpr")).(bool) {
 			participants = append(participants, BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.GdprName, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool})
 		} else {
 			participants = append(participants, BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.Name, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool})

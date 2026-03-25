@@ -90,7 +90,7 @@ func Test_generateCalendarWeeks(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotResult := generateCalendarWeeks(tt.args.year); !reflect.DeepEqual(gotResult, tt.wantResult) {
+			if gotResult := generateCalendarWeeks(tt.args.year, berlin); !reflect.DeepEqual(gotResult, tt.wantResult) {
 				// This complex unit test needs some further investigation
 				for i := 1; i < 53; i++ {
 					_, gotWeek := gotResult[i].Start.ISOWeek()

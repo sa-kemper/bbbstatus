@@ -34,8 +34,8 @@ func generateMonthTimeFrames(start time.Time) map[string]TimeFrame {
 	return mtw
 }
 
-func generateCalendarWeeks(year int) (result map[int]TimeFrame) {
-	start := time.Date(year, 1, -7, 0, 0, 0, 0, time.Local)
+func generateCalendarWeeks(year int, location *time.Location) (result map[int]TimeFrame) {
+	start := time.Date(year, 1, -7, 0, 0, 0, 0, location)
 	result = make(map[int]TimeFrame)
 	for {
 		if start.Year() > year {
@@ -62,7 +62,7 @@ func collectCalendarWeeksForMonth(year int, month time.Month) (result []TimeFram
 	if month == time.January {
 		start = 1
 	}
-	calendarWeeks := generateCalendarWeeks(year)
+	calendarWeeks := generateCalendarWeeks(year, time.Local)
 	for i := start; i <= end; i++ {
 		result = append(result, calendarWeeks[i])
 	}

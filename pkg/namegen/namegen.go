@@ -34,7 +34,7 @@ var rng *rand.Rand
 
 func Generate(lang string) (name string) {
 	if rng == nil {
-		rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+		rng = rand.New(rand.NewSource(time.Now().Unix()))
 	}
 	adjectives, err := assets.ReadFile(fmt.Sprintf("assets/adjective_%s.txt", lang))
 	if err != nil {
@@ -62,13 +62,13 @@ func Generate(lang string) (name string) {
 
 func GenerateUnique(lang string, existingNames *[]string) (name string) {
 	var attemptCounter int
-	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+	rng = rand.New(rand.NewSource(time.Now().Unix()))
 
 	for {
 		var generatedName string
 		if attemptCounter == 3 { // regenerate the randomness if the failed attempts stack up, but only do this once.
 			// why only once? because this might be a heavy operation.
-			rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+			rng = rand.New(rand.NewSource(time.Now().Unix()))
 		}
 		if attemptCounter < 50 {
 			generatedName = Generate(lang)

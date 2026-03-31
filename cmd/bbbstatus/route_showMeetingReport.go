@@ -25,6 +25,8 @@ import (
 	"net/http"
 	"os"
 
+	database "bbbstatus/internal/database"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -39,6 +41,15 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "VIEWER", Other: "viewer"},
 		{ID: "MeetingReportMeetingDetailsGDPRCheckbox", Other: "view report GDPR compliant"},
 		{ID: "MeetingReportMeetingDetailsGDPRFormSubmit", Other: "change"},
+		{ID: "ForceCloseMeetingButton", Other: "force close this meeting"},
+		{ID: "ForceCloseModalTitle", Other: "Do you want to Force close the meeting: "},
+		{ID: "ForceCloseModalDescription", Other: "force closing this meeting in for bbbstatus does result in some functionality breaking. please only use this feature if you actually know that the meeting has ended, and bbbstatus is reporting it as active. the closing of active meetings is not supported and not tested and it may have unexpected consequences as this is not part of bbbstatus."},
+		{ID: "ForceCloseModalAlertTitle", Other: "This action is dangerous"},
+		{ID: "ForceCloseModalAlertText", Other: "Undoing this action can only be done by a database administrator"},
+		{ID: "Cancel", Other: "Cancel"},
+		{ID: "ForceCloseModalContinue", Other: "Force close this meeting"},
+		{ID: "ForceCloseModalWarningTitle", Other: "ATTENTION:"},
+		{ID: "ForceCloseModalWarningText", Other: "This does not close the meeting in big blue button!"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 	for _, m := range BBBEvents.UserEventTextRepresentation { // Add user events text representation to the language strings.
@@ -65,9 +76,19 @@ func showMeetingReport(c echo.Context) error {
 	// Query and parse meeting using the row.next and row.scan methode of pgx
 	err = conn.QueryRow(ctx, "SELECT TRUE FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingId).Scan(&meetingExtists)
 	if !meetingExtists || err != nil {
-		fmt.Println(err)
+		if err != nil {
+			fmt.Println("error occurred querying meetings from database:", err)
+		}
 		return c.Render(http.StatusNotFound, "notfound", nil)
 	}
+	db := database.New(conn)
+	var isMeetingActive bool
+	meeting, queryErr := db.GetMeetingById(ctx, internalMeetingId)
+	if queryErr != nil {
+		fmt.Println("error occurred querying meetings from database:", err)
+		isMeetingActive = false
+	}
+	isMeetingActive = meeting.MeetingEnded.Time.IsZero()
 
 	report, err := GenerateWebReport(context.WithValue(ctx, Gdpr("gdpr"), c.QueryParam("gdpr") == "on"), internalMeetingId, nil)
 	if err != nil {
@@ -79,5 +100,5 @@ func showMeetingReport(c echo.Context) error {
 		return err
 	}
 
-	return c.Render(http.StatusOK, "report", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": report, "Gdpr": c.QueryParam("gdpr") == "on"})
+	return c.Render(http.StatusOK, "report", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": report, "Gdpr": c.QueryParam("gdpr") == "on", "MeetingActive": isMeetingActive, "Meeting": meeting})
 }

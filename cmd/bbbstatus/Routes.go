@@ -43,6 +43,7 @@ type route struct {
 var routes = []route{
 	{Name: "meetings", Method: "GET", Path: "/meetings/", HandlerFunc: showMeetings},
 	{Name: "recordings", Method: "GET", Path: "/recordings", HandlerFunc: showRecordings},
+	{Name: "forceCloseMeeting", Method: "GET", Path: "/action/close-meeting/:id", HandlerFunc: forceCloseMeeting},
 	{Name: "report", Method: "GET", Path: "/report/:id", HandlerFunc: showMeetingReport},
 	{Name: "reportCsv", Method: "GET", Path: "/report/:id/csv", HandlerFunc: downloadMeetingReport},
 	{Name: "inspectReport", Method: "GET", Path: "/report/:id/inspect", HandlerFunc: showFilteredMeetingReport},

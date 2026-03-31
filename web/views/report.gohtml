@@ -35,6 +35,13 @@ limitations under the License.
                 <i class="fas fa-file-excel"></i>
                 <span>{{t "ReportOpenInExcelButton"}}</span>
             </a>
+            {{ if .MeetingActive }}
+                <button class="action-button force-close-button" popovertarget="force-close-modal"
+                        title="Force close the meeting for all participants">
+                    <i class="fas fa-ban"></i>
+                    <span>{{t "ForceCloseMeetingButton"}}</span>
+                </button>
+            {{ end }}
         </div>
 
         <div class="card header">
@@ -81,6 +88,47 @@ limitations under the License.
             <i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
         </a>
     </div>
+
+    <!-- Force Close Confirmation Modal (native popover) -->
+    <div id="force-close-modal" class="force-close-modal" popover>
+        <div class="modal-header">
+            <h2 class="modal-title">{{t "ForceCloseModalTitle"}}{{ .Meeting.Name}}</h2>
+        </div>
+
+        <p class="modal-description">
+            {{t "ForceCloseModalDescription"}}
+        </p>
+
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>{{t "ForceCloseModalAlertTitle"}}</strong>
+                <span>{{t "ForceCloseModalAlertText"}}</span>
+            </div>
+        </div>
+
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>{{t "ForceCloseModalWarningTitle"}}</strong>
+                <span>{{t "ForceCloseModalWarningText"}}</span>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" class="modal-button cancel-button"
+                    onclick="document.getElementById('force-close-modal').hidePopover()">
+                {{t "Cancel"}}
+            </button>
+            <a href="{{reverse "forceCloseMeeting" .InternalMeetingID}}"
+               class="modal-button force-button"
+               onclick="document.getElementById('force-close-modal').hidePopover();">
+                <i class="fas fa-ban"></i>
+                {{t "ForceCloseModalContinue"}}
+            </a>
+        </div>
+    </div>
+
     </body>
     </html>
 {{end}}

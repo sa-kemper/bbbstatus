@@ -1211,3 +1211,198 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
         page-break-inside: avoid;
     }
 }
+
+/* Force-close action button (danger styling inside existing .action-button) */
+.force-close-button {
+    color: #c24444;
+}
+
+.force-close-button:hover {
+    background: #ffebee !important;
+    color: #c24444;
+    box-shadow: 0 4px 12px rgba(194, 68, 68, 0.25) !important;
+}
+
+/* ====================== FORCE-CLOSE MODAL ====================== */
+.force-close-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+    padding: 2rem 5rem;
+    max-width: 40%;
+    width: 100%;
+    margin: 0 auto;
+    z-index: 100000;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/* Open animation (scale + fade) */
+.force-close-modal:popover-open {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Backdrop (dark overlay with fade) */
+.force-close-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0);
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.force-close-modal:popover-open::backdrop {
+    background-color: rgba(0, 0, 0, 0.65);
+}
+
+/* Modal header with icon on the left */
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.modal-icon {
+    font-size: 2rem;
+    color: #c24444;
+    flex-shrink: 0;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+    flex: 1;
+}
+
+.modal-description {
+    color: #6c757d;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 1.75rem;
+}
+
+.alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    color: #c24444;
+    background-color: oklch(from currentColor calc(l + 1) calc(c + 0.4) h);
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid #ffcdd2;
+}
+
+.alert-warning {
+    color: #93882f;
+}
+
+.alert i {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.alert strong {
+    display: block;
+    font-size: 1.05rem;
+    margin-bottom: 0.25rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.modal-button {
+    padding: 0.85rem 1.75rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.modal-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.modal-button:active {
+    transform: scale(0.96);
+}
+
+.cancel-button {
+    background-color: #f5f7fa;
+    color: #6c757d;
+}
+
+.cancel-button:hover {
+    background-color: #e9ecef;
+    color: #455a64;
+}
+
+.force-button {
+    background: linear-gradient(90deg, #c24444, #e57373);
+    color: #ffffff;
+}
+
+.force-button:hover {
+    background: linear-gradient(90deg, #b71c1c, #d32f2f);
+    box-shadow: 0 6px 16px rgba(194, 68, 68, 0.35);
+}
+
+/* ====================== RESPONSIVE MODAL ====================== */
+@media (max-width: 1024px) {
+    .force-close-modal {
+        max-width: 70%;
+        padding: 2rem 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .force-close-modal {
+        max-width: 92%;
+        padding: 2rem 1.75rem;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        gap: 0.75rem;
+    }
+
+    .modal-icon {
+        font-size: 1.75rem;
+    }
+
+    .modal-title {
+        font-size: 1.35rem;
+        margin-left: 0;
+    }
+
+    .modal-description,
+    .modal-alert {
+        font-size: 1rem;
+    }
+}
+
+/* Print hide */
+@media print {
+    .force-close-modal,
+    .force-close-button {
+        display: none !important;
+    }
+}

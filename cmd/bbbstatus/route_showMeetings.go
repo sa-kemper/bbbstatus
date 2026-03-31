@@ -27,6 +27,7 @@ import (
 	"os"
 	"slices"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -100,51 +101,62 @@ func showMeetings(c echo.Context) (err error) {
 
 	var selectedServers []bbbServer
 	var showMeetingsServerFiltered []ServerFilter
+	var serverMutex = new(sync.RWMutex)
+	var wg = new(sync.WaitGroup)
 
-	for _, server := range confGetBBBServers("") {
-		BbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: new(time.Duration(server.APITimeout) * time.Second)}
-		if valid, err := BbbApi.ValidateApiSettings(ctx); err != nil || !valid {
-			if err != nil {
-				fmt.Println("error occurred validating API settings for server '"+server.Hostname+"': ", err)
-				continue
+	bigBlueButtonQueryStartTime := time.Now()
+	bigBlueButtonServers := confGetBBBServers("")
+	wg.Add(len(bigBlueButtonServers))
+	for _, server := range bigBlueButtonServers {
+		go func(ctx context.Context) {
+			defer wg.Done()
+			var concurrentError error
+			BbbApi := BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: new(time.Duration(server.APITimeout) * time.Second)}
+
+			// fill server usage stats by meeting count
+			var serverMeetings []BBBAPI.GetMeetingInfoResponse
+			serverMeetings, concurrentError = BbbApi.GetMeetings(ctx)
+			if concurrentError != nil {
+				fmt.Printf("Error getting meetings: %v\n", concurrentError)
+				return
 			}
-			if !valid {
-				fmt.Println(server.Hostname, "has no valid API settings")
-				continue
+			serverMutex.Lock()
+			serverStats.TotalMeetings += len(serverMeetings)
+			serverStats.ServerCounts = append(serverStats.ServerCounts, struct {
+				Percentage float32
+				Hostname   string
+				Meetings   int
+			}{
+				Percentage: 0.0,
+				Hostname:   server.Hostname,
+				Meetings:   len(serverMeetings),
+			})
+			serverMutex.Unlock()
+
+			var userCount int
+			userCount, concurrentError = BbbApi.GetServerUserCount(ctx)
+			if concurrentError != nil {
+				fmt.Println("Error getting user count:", concurrentError)
+				return
 			}
-		}
+			currentServer := ServerFilter{Hostname: server.Hostname, Users: userCount}
 
-		// fill server usage stats by meeting count
-		serverMeetings, err := BbbApi.GetMeetings(ctx)
-		if err != nil {
-			fmt.Printf("Error getting meetings: %v\n", err)
-			continue
-		}
-		serverStats.TotalMeetings += len(serverMeetings)
-		serverStats.ServerCounts = append(serverStats.ServerCounts, struct {
-			Percentage float32
-			Hostname   string
-			Meetings   int
-		}{
-			Percentage: 0.0,
-			Hostname:   server.Hostname,
-			Meetings:   len(serverMeetings),
-		})
+			if c.QueryParam("server-filter-"+server.Hostname) != "" {
+				currentServer.FilteredFor = true
+				serverMutex.Lock()
+				selectedServers = append(selectedServers, server)
+				serverMutex.Unlock()
+			}
+			serverMutex.Lock()
+			showMeetingsServerFiltered = append(showMeetingsServerFiltered, currentServer)
+			serverMutex.Unlock()
+		}(context.WithoutCancel(ctx))
 
-		userCount, err := BbbApi.GetServerUserCount(ctx)
-		if err != nil {
-			fmt.Println("Error getting user count:", err)
-			continue
-		}
-		currentServer := ServerFilter{Hostname: server.Hostname, Users: userCount}
-
-		if c.QueryParam("server-filter-"+server.Hostname) != "" {
-			currentServer.FilteredFor = true
-			selectedServers = append(selectedServers, server)
-		}
-		showMeetingsServerFiltered = append(showMeetingsServerFiltered, currentServer)
 	}
-
+	wg.Wait()
+	if time.Since(bigBlueButtonQueryStartTime).Seconds() > 5 {
+		fmt.Println("# (WARNING) The big blue button servers are slow to query and took " + time.Since(bigBlueButtonQueryStartTime).String())
+	}
 	// update server stats percentages
 	if serverStats.TotalMeetings > 0 {
 		for iterator, count := range serverStats.ServerCounts {
@@ -153,17 +165,17 @@ func showMeetings(c echo.Context) (err error) {
 	}
 
 	startDate, err = time.Parse("2006-01-02", startDateParam)
-	if err != nil {
+	if err != nil && startDateParam != "" {
 		fmt.Println("Error parsing start date:", err)
 	}
 	endDate, err = time.Parse("2006-01-02", endDateParam)
-	if err != nil {
+	if err != nil && startDateParam != "" {
 		fmt.Println("Error parsing end date:", err)
 	}
-
 	if endDate.IsZero() {
 		endDate = time.Now()
 	}
+
 	if startDate.IsZero() {
 		startDate = endDate.AddDate(0, -1, 0)
 	}
@@ -184,6 +196,7 @@ func showMeetings(c echo.Context) (err error) {
 	}
 	meetings = *filteredMeetings
 
+	userCountAggregationStartTime := time.Now()
 	for iterator, meeting := range meetings {
 		if meeting.Active {
 			tmpInt, err := dbQueries.GetActiveUserCountInMeetingByID(ctx, meeting.BBBEventsMeeting.InternalMeetingID)
@@ -199,6 +212,9 @@ func showMeetings(c echo.Context) (err error) {
 			}
 			meetings[iterator].UserCount = int(usrCount)
 		}
+	}
+	if time.Since(userCountAggregationStartTime).Seconds() > 5 {
+		fmt.Println("# (WARNING) The GetActiveUserCountInMeetingByID and or the GetUserCountInMeetingByInternalID query returned slowly, some meetings may have been closed incorrectly or not at all; Aggregation time was " + time.Since(userCountAggregationStartTime).String())
 	}
 
 	sort.Slice(meetings, func(i, j int) bool {

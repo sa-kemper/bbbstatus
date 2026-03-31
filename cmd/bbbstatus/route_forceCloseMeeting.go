@@ -27,5 +27,6 @@ func forceCloseMeeting(context echo.Context) error {
 		fmt.Println("error occured during forceCloseMeeting:", err)
 		return err
 	}
-	return context.Redirect(http.StatusOK, context.Echo().Reverse("report", context.Param("id")))
+	err = context.Redirect(http.StatusFound, context.Echo().Reverse("report", context.Param("id")))
+	return err
 }

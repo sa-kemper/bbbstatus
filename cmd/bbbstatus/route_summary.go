@@ -45,25 +45,47 @@ func init() { // Add all messages that are related to this file into the localiz
 	}
 }
 
-func summaryPage(c echo.Context) (err error) {
+type SummaryItem struct {
+	Date        time.Time
+	MeetingName string
+	UserCount   int
+	Duration    time.Duration
+}
+type SummaryMonth struct {
+	Name  string
+	Items []*SummaryItem
+}
 
-	type SummaryItem struct {
-		Date        time.Time
-		MeetingName string
-		UserCount   int
-		Duration    time.Duration
+func summaryPage(c echo.Context) error {
+
+	requestParams, Months, err := getSummaryOfMeetingsForDates(c)
+	if err != nil {
+		fmt.Println("error getting summary of meetings:" + err.Error())
+		return err
 	}
-	type Month struct {
-		Name  string
-		Items []*SummaryItem
-	}
+
+	return c.Render(http.StatusOK, "summary", map[string]interface{}{"Data": Months, "Request": requestParams})
+}
+
+func getSummaryOfMeetingsForDates(c echo.Context) (struct {
+	StartTime    string `query:"startTime"`
+	StopTime     string `query:"stopTime"`
+	StartTimeMin string
+	StartTimeMax string
+}, []SummaryMonth, error) {
+	var err error
 	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
 	var conn *pgx.Conn
 
 	conn, err = pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
 	if err != nil {
 		fmt.Printf("ERROR Unable to connect to database: %v\n", err)
-		return err
+		return struct {
+			StartTime    string `query:"startTime"`
+			StopTime     string `query:"stopTime"`
+			StartTimeMin string
+			StartTimeMax string
+		}{}, nil, err
 	}
 	var dbQueries = db.New(conn)
 
@@ -92,10 +114,13 @@ func summaryPage(c echo.Context) (err error) {
 	if err != nil {
 		userInputStartTime = firstMeeting.(time.Time) // default back to the first meeting on invalid input
 	}
+	requestParams.StartTime = userInputStartTime.Format("2006-01-02")
+
 	userInputStopTime, err := time.Parse("2006-01-02", requestParams.StopTime)
 	if err != nil {
 		userInputStopTime = lastMeeting.(time.Time)
 	}
+	requestParams.StopTime = userInputStopTime.Format("2006-01-02")
 
 	MeetingSlice, err := dbQueries.GetMeetingsBetweenDates(ctx, db.GetMeetingsBetweenDatesParams{
 		CreateTime:   pgtype.Timestamp{Time: userInputStartTime, Valid: true},
@@ -103,11 +128,16 @@ func summaryPage(c echo.Context) (err error) {
 	})
 	if err != nil {
 		fmt.Println("error occurred whilst fetching meeting between dates", err.Error())
-		return err
+		return struct {
+			StartTime    string `query:"startTime"`
+			StopTime     string `query:"stopTime"`
+			StartTimeMin string
+			StartTimeMax string
+		}{}, nil, err
 	}
 
-	var Months []Month
-	var MonthMap = make(map[string]*Month)
+	var Months []SummaryMonth
+	var MonthMap = make(map[string]*SummaryMonth)
 	for _, meeting := range MeetingSlice {
 		meetingCreateMonthString := meeting.CreateTime.Time.Month().String()
 		monthPointer, ok := MonthMap[meetingCreateMonthString]
@@ -116,7 +146,7 @@ func summaryPage(c echo.Context) (err error) {
 			fmt.Println("error occurred whilst fetching user count in meeting", err.Error())
 		}
 		if !ok {
-			MonthMap[meetingCreateMonthString] = &Month{
+			MonthMap[meetingCreateMonthString] = &SummaryMonth{
 				Name: meetingCreateMonthString,
 				Items: []*SummaryItem{{
 					Date:        meeting.CreateTime.Time,
@@ -137,6 +167,5 @@ func summaryPage(c echo.Context) (err error) {
 	for _, month := range MonthMap {
 		Months = append(Months, *month)
 	}
-
-	return c.Render(http.StatusOK, "summary", map[string]interface{}{"Data": Months, "Request": requestParams})
+	return requestParams, Months, err
 }

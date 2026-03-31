@@ -60,7 +60,7 @@ func init() { // Add all messages that are related to this file into the localiz
 func showMeetingReport(c echo.Context) error {
 	var internalMeetingId = c.Param("id")
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
-	var meetingExtists bool
+	var meetingExists bool
 	//locales.Localizer = i18n.NewLocalizer(locales.Bundle, requestLanguage, language.English.String())
 	localizer := i18n.NewLocalizer(locales.Bundle, requestLanguage, language.English.String())
 	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), localizer)
@@ -74,8 +74,8 @@ func showMeetingReport(c echo.Context) error {
 	defer conn.Close(ctx)
 
 	// Query and parse meeting using the row.next and row.scan methode of pgx
-	err = conn.QueryRow(ctx, "SELECT TRUE FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingId).Scan(&meetingExtists)
-	if !meetingExtists || err != nil {
+	err = conn.QueryRow(ctx, "SELECT TRUE FROM meetings WHERE internal_meeting_id = $1 LIMIT 1", internalMeetingId).Scan(&meetingExists)
+	if !meetingExists || err != nil {
 		if err != nil {
 			fmt.Println("error occurred querying meetings from database:", err)
 		}

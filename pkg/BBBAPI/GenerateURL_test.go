@@ -28,10 +28,10 @@ func TestGenerateURL(t *testing.T) {
 		want string
 	}{
 		{
-			name: "Generate Valid URL",
+			name: "Generate Valid Create URL",
 			args: args{
 				config: URLConfig{
-					Hostname: confGet("bbbHostname"),
+					Hostname: "test-install.blindsidenetworks.com",
 					Methode:  "create",
 					Parameters: map[string]string{
 						"allowStartStopRecording": "true",
@@ -43,10 +43,57 @@ func TestGenerateURL(t *testing.T) {
 						"record":                  "false",
 						"voiceBridge":             "71225",
 					},
-					SharedSecret: confGet("bbbSharedSecret"),
+					SharedSecret: "8cd8ef52e8e101574e400365b55e11a6",
 				},
 			},
-			want: confGet("bbbCreateURL"),
+			want: "https://test-install.blindsidenetworks.com/bigbluebutton/api/create?allowStartStopRecording=true&attendeePW=AttendeePassword&autoStartRecording=false&meetingID=TestMeetingID&moderatorPW=ModeratorPassword&name=TestMeetingID&record=false&voiceBridge=71225&checksum=cef439299383b3430967b5277ffec13c8e310001",
+		},
+		{
+			name: "Generate Valid GetMeetings URL",
+			args: args{
+				config: URLConfig{
+					Hostname:     "test-install.blindsidenetworks.com",
+					Methode:      "getMeetings",
+					Parameters:   map[string]string{},
+					SharedSecret: "8cd8ef52e8e101574e400365b55e11a6",
+				},
+			},
+			want: "https://test-install.blindsidenetworks.com/bigbluebutton/api/getMeetings?checksum=d23fef405937517be465ffccae12d5c1103a5e00",
+		},
+		{
+			name: "Generate Valid getRecordings URL",
+			args: args{
+				config: URLConfig{
+					Hostname: "test-install.blindsidenetworks.com",
+					Methode:  "getRecordings",
+					Parameters: map[string]string{
+						"meetingID": "TestMeetingID",
+					},
+					SharedSecret: "8cd8ef52e8e101574e400365b55e11a6",
+				},
+			},
+			want: "https://test-install.blindsidenetworks.com/bigbluebutton/api/getRecordings?meetingID=TestMeetingID&checksum=765af7b0168adb286f3e07ee154d11f562b6a373",
+		},
+		{
+			name: "Generate Valid create URL",
+			args: args{
+				config: URLConfig{
+					Hostname: "bbb.example.com",
+					Methode:  "create",
+					Parameters: map[string]string{
+						"allowStartStopRecording": "true",
+						"attendeePW":              "AttendeePassword",
+						"autoStartRecording":      "false",
+						"meetingID":               "TestMeetingID",
+						"moderatorPW":             "ModeratorPassword",
+						"name":                    "TestMeetingID",
+						"record":                  "false",
+						"voiceBridge":             "71225",
+					},
+					SharedSecret: "yourcoolsharedsecretandall123",
+				},
+			},
+			want: "https://bbb.example.com/bigbluebutton/api/create?allowStartStopRecording=true&attendeePW=AttendeePassword&autoStartRecording=false&meetingID=TestMeetingID&moderatorPW=ModeratorPassword&name=TestMeetingID&record=false&voiceBridge=71225&checksum=14777141c8bafaface897174e2559314079d66e3",
 		},
 	}
 	for _, tt := range tests {

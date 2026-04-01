@@ -332,7 +332,7 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 			question = string([]byte(pollId)[0:5])
 		}
 
-		if ctx.Value("gdpr").(bool) {
+		if ctx.Value(Gdpr("gdpr")).(bool) {
 			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
 		} else {
 			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
@@ -380,7 +380,7 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 			fmt.Println("error obtaining user information of chat message")
 			fmt.Println(err)
 		}
-		if ctx.Value("gdpr").(bool) {
+		if ctx.Value(Gdpr("gdpr")).(bool) {
 			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportMessageEventRepresentation", map[string]string{"Username": messageUser.GdprName, "Message": message.MessageContent})
 		} else {
 			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportMessageEventRepresentation", map[string]string{"Username": messageUser.Name, "Message": message.MessageContent})

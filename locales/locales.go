@@ -120,3 +120,5 @@ func TranslateAdvanced(ctx context.Context, text string, data map[string]string)
 	}
 	return translator.MustLocalize(&i18n.LocalizeConfig{MessageID: text, TemplateData: data})
 }
+
+type ServerLanguage string

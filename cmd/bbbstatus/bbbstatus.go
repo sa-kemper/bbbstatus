@@ -31,7 +31,6 @@ type Template struct {
 }
 
 type Gdpr string
-type ServerLanguage string
 
 func main() {
 	var err = initDatabase()

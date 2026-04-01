@@ -18,6 +18,7 @@ package main
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBEvents"
 	"context"
 	"encoding/json"
@@ -57,7 +58,7 @@ func bbbWebHookEvent(c echo.Context) (err error) {
 	if confGet("CLEAR_QUEUE") == "true" {
 		return c.String(http.StatusOK, "Event was dropped.")
 	}
-	var ctx = context.WithValue(c.Request().Context(), ServerLanguage("SERVER_LANG"), confGet("SERVER_LANG")) // add a variable to the context in order to use it inside the BBBEvents package.
+	var ctx = context.WithValue(c.Request().Context(), locales.ServerLanguage("SERVER_LANG"), confGet("SERVER_LANG")) // add a variable to the context in order to use it inside the BBBEvents package.
 	var event BBBEvents.BaseEvent
 	postEvent := c.FormValue("event")
 	postEvent = strings.TrimLeft(postEvent, "[")

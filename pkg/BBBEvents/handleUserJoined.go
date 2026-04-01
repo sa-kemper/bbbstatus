@@ -18,6 +18,7 @@ package BBBEvents
 
 import (
 	db "bbbstatus/internal/database"
+	"bbbstatus/locales"
 	"bbbstatus/pkg/namegen"
 	"context"
 	"errors"
@@ -57,7 +58,7 @@ func handleUserJoined(ctx context.Context, dbQueries *db.Queries, user *User, me
 			userNames[i] = usersInTheCurrentMeeting[i].Name
 		}
 
-		GdprName := namegen.GenerateUnique(ctx.Value("SERVER_LANG").(string), &userNames)
+		GdprName := namegen.GenerateUnique(ctx.Value(locales.ServerLanguage("SERVER_LANG")).(string), &userNames)
 		err = dbQueries.InsertUser(ctx, db.InsertUserParams{InternalUserID: user.InternalUserID, ExternalUserID: user.ExternalUserID, Name: user.Name, GdprName: GdprName, Role: user.Role, IsGuest: pgtype.Bool{Bool: user.Guest, Valid: true}})
 		if err != nil {
 			fmt.Println(err)

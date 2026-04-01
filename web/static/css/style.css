@@ -1292,7 +1292,7 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    color: #c24444;
+    color: #4a2121;
     background-color: oklch(from currentColor calc(l + 1) calc(c + 0.4) h);
     padding: 1.25rem;
     border-radius: 8px;
@@ -1301,7 +1301,7 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
 }
 
 .alert-warning {
-    color: #93882f;
+    color: #413c15;
 }
 
 .alert i {

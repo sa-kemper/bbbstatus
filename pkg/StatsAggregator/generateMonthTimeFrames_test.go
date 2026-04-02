@@ -45,7 +45,7 @@ func Test_generateCalendarWeeks(t *testing.T) {
 			10: {Start: time.Date(2025, 03, 03, 0, 0, 0, 0, berlin), End: time.Date(2025, 03, 9, 23, 59, 59, 0, berlin)},
 			11: {Start: time.Date(2025, 03, 10, 0, 0, 0, 0, berlin), End: time.Date(2025, 03, 16, 23, 59, 59, 0, berlin)},
 			12: {Start: time.Date(2025, 03, 17, 0, 0, 0, 0, berlin), End: time.Date(2025, 03, 23, 23, 59, 59, 0, berlin)},
-			13: {Start: time.Date(2025, 03, 24, 0, 0, 0, 0, berlin), End: time.Date(2025, 3, 31, 23, 59, 59, 0, berlin)},
+			13: {Start: time.Date(2025, 03, 24, 0, 0, 0, 0, berlin), End: time.Date(2025, 3, 30, 23, 59, 59, 0, berlin)},
 			14: {Start: time.Date(2025, 03, 31, 0, 0, 0, 0, berlin), End: time.Date(2025, 4, 06, 23, 59, 59, 0, berlin)},
 			15: {Start: time.Date(2025, 04, 07, 0, 0, 0, 0, berlin), End: time.Date(2025, 4, 13, 23, 59, 59, 0, berlin)},
 			16: {Start: time.Date(2025, 04, 14, 0, 0, 0, 0, berlin), End: time.Date(2025, 4, 20, 23, 59, 59, 0, berlin)},

@@ -46,7 +46,7 @@ func generateCalendarWeeks(year int, location *time.Location) (result map[int]Ti
 			if _, ok := result[week]; ok {
 				return
 			}
-			result[week] = TimeFrame{start, start.AddDate(0, 0, 6).Add(time.Hour*23 + time.Minute*59 + time.Second*59)}
+			result[week] = TimeFrame{start, start.AddDate(0, 0, 7).Add(-time.Second * 1)}
 		}
 		start = start.AddDate(0, 0, 1)
 	}

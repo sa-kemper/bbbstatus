@@ -54,7 +54,13 @@ func generateURL(config URLConfig) string {
 		paramString += fmt.Sprintf("%s=%s&", key, config.Parameters[key])
 	}
 
-	checksumString := config.Methode + strings.TrimRight(paramString, "") + config.SharedSecret
+	var checksumString string
+	if len(keys) > 0 {
+		checksumString = config.Methode + strings.TrimRight(paramString, "&") + config.SharedSecret
+	} else {
+		checksumString = config.Methode + strings.TrimRight(paramString, "") + config.SharedSecret
+
+	}
 	checksum := sha1.New()
 	checksum.Write([]byte(checksumString))
 	// fmt.Println("DEBUG Input: ", result, " checksum: ", hex.EncodeToString(checksum.Sum(nil)), "shared secret: ", config.SharedSecret)

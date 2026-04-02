@@ -93,7 +93,7 @@ func TestGenerateURL(t *testing.T) {
 					SharedSecret: "yourcoolsharedsecretandall123",
 				},
 			},
-			want: "https://bbb.example.com/bigbluebutton/api/create?allowStartStopRecording=true&attendeePW=AttendeePassword&autoStartRecording=false&meetingID=TestMeetingID&moderatorPW=ModeratorPassword&name=TestMeetingID&record=false&voiceBridge=71225&checksum=14777141c8bafaface897174e2559314079d66e3",
+			want: "https://bbb.example.com/bigbluebutton/api/create?allowStartStopRecording=true&attendeePW=AttendeePassword&autoStartRecording=false&meetingID=TestMeetingID&moderatorPW=ModeratorPassword&name=TestMeetingID&record=false&voiceBridge=71225&checksum=04caf6b3a2366befad71b9a5cb3e0c2178654abd",
 		},
 	}
 	for _, tt := range tests {

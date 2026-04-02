@@ -1,5 +1,10 @@
 ![banner.png](banner.png)
 
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/sa-kemper/bbbstatus?style=for-the-badge)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/sa-kemper/bbbstatus/StaticAnalisys.yml?style=for-the-badge)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/sa-kemper/bbbstatus/UnitTests.yml?style=for-the-badge&label=unit%20test)
+![GitHub License](https://img.shields.io/github/license/sa-kemper/bbbstatus?style=for-the-badge)
+
 bbbstatus is an utility to view and save events (and their details) from [bbb-webhooks](https://github.com/bigbluebutton/bbb-webhooks)
 bbbstatus was developed as my first golang project ever. the code quality and design choices reflect that, for a more up to date represenation of my skills please take a look at my github.
 

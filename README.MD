@@ -5,8 +5,10 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/sa-kemper/bbbstatus/UnitTests.yml?style=for-the-badge&label=unit%20test)
 ![GitHub License](https://img.shields.io/github/license/sa-kemper/bbbstatus?style=for-the-badge)
 
-bbbstatus is an utility to view and save events (and their details) from [bbb-webhooks](https://github.com/bigbluebutton/bbb-webhooks)
-bbbstatus was developed as my first golang project ever. the code quality and design choices reflect that, for a more up to date represenation of my skills please take a look at my github.
+bbbstatus is a utility that allows you to view and save events and their details
+from [bbb-webhooks](https://github.com/bigbluebutton/bbb-webhooks).
+bbbstatus was developed as my first Go project. The code quality and design choices reflect this. For a more up-to-date
+representation of my skills, please take a look at my GitHub.
 
 # Configuration
 
@@ -67,7 +69,7 @@ If you configure bbbstatus using the config.toml, configure BBB_SERVERS like thi
    FRIENDLY_NAME = "Example Big Blue Button Server"
 ```
 
-To add another BBBServer, repeat this block for each server in your list of servers.
+To add another BBB server, repeat this block for each server in your list of servers.
 
 Through Environment variables / `.env`
 
@@ -83,25 +85,24 @@ The comma is only required when configuring multiple bbb servers.
 
 ## Notes
 
-- When configuring bbb servers this way, bbbstatus tries to automatically obtain the `SHARED_SECRET` as it's
-  provided with each bbb-webhook request. One limitation is that this is not persistent, meaning that you have to wait
-  for
-  bbb-webhooks after each restart in order to use API features (like get recordings).
+- When configuring BBB servers in this manner, BBBStatus attempts to automatically retrieve the 'SHARED_SECRET' provided
+  with each BBB-Webhook request. One limitation is that this is not persistent, meaning that you have to wait for
+  bbb-webhooks after each restart in order to use API features, such as getting recordings.
 
-  To make this absolutely clear, you restart bbbstatus => you cannot access recordings until the bbb server
-  corresponding has sent a new event.
+  To be absolutely clear: if you restart bbbstatus, you cannot access recordings until the corresponding bbb server has
+  sent a new event.
 
 
-- You may serve static files separately in your environment, therefore there is an option to disable it.
-  bbbstatus will use the path /static in any case.
+- You may serve static files separately in your environment; therefore, there is an option to disable this feature.
+  Bbbstatus will use the path /static in any case.
 
 # Customization
 
-You may override locales, templates, static content (like CSS) and even database migrations at runtime without
-recompiling bbbstatus. But be aware that even though this is possible, it may lead to problems, as only the embedded (
-files) /
-official versions (files) are tested.
-You may even override multiple files at once. To do that you need to override every file individually, just as described [here](markdown-documentation/Customisation.md).
+You can override locales, templates, static content (such as CSS) and even database migrations without recompiling
+bbbstatus. However, be aware that, although this is possible, it may cause problems as only the embedded and official
+versions are tested.
+You can also override multiple files at once. To do this, you need to override every file individually, as
+described [here](markdown-documentation/Customisation.md).
 
 # Deployment preparation:
 

@@ -35,6 +35,6 @@ func summaryCSVHandler(c echo.Context) error {
 		}
 	}
 
-	c.Response().Header().Set("Content-Disposition", "attachment; filename="+fmt.Sprintf("bbbstatus-%s-summary-%s.csv", fmt.Sprintf("StartDate(%v) - EndDate(%v)", requestParams.StartTime, requestParams.StopTime, time.Now().Format("2006-01-02"))))
+	c.Response().Header().Set("Content-Disposition", "attachment; filename="+fmt.Sprintf("bbbstatus-%s-summary-%s.csv", fmt.Sprintf("StartDate(%v) - EndDate(%v)", requestParams.StartTime, requestParams.StopTime), time.Now().Format("2006-01-02")))
 	return c.Blob(http.StatusOK, "text/csv", []byte(csv))
 }

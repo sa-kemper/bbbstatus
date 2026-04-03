@@ -7,6 +7,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/labstack/echo/v4 v4.13.4
+	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/labstack/gommon v0.4.2
 	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/nicksnyder/go-i18n/v2 v2.6.0

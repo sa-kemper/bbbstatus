@@ -121,6 +121,7 @@ Frontend:
 
 Backend:
 
+- github.com/ilyakaznacheev/cleanenv
 - github.com/BurntSushi/toml
 - github.com/jackc/pgx/v5
 - github.com/labstack/echo/v4

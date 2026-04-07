@@ -1,6 +1,7 @@
 ![banner.png](banner.png)
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/sa-kemper/bbbstatus?style=for-the-badge)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/sa-kemper/bbbstatus?style=for-the-badge)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/sa-kemper/bbbstatus/StaticAnalisys.yml?style=for-the-badge)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/sa-kemper/bbbstatus/UnitTests.yml?style=for-the-badge&label=unit%20test)
 ![GitHub License](https://img.shields.io/github/license/sa-kemper/bbbstatus?style=for-the-badge)

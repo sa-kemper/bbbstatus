@@ -16,6 +16,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBAPI"
@@ -77,6 +78,8 @@ type MeetingListMeetingWrapper struct {
 
 // e.Get("/meetings/", showMeetings)
 func showMeetings(c echo.Context) (err error) {
+	var cc = c.(*config.CustomContext)
+
 	type ServerFilter struct {
 		Hostname    string
 		Users       int
@@ -99,13 +102,13 @@ func showMeetings(c echo.Context) (err error) {
 	startDateParam := c.FormValue("start-date")
 	endDateParam := c.FormValue("end-date")
 
-	var selectedServers []bbbServer
+	var selectedServers []config.BbbServer
 	var showMeetingsServerFiltered []ServerFilter
 	var serverMutex = new(sync.RWMutex)
 	var wg = new(sync.WaitGroup)
 
 	bigBlueButtonQueryStartTime := time.Now()
-	bigBlueButtonServers := confGetBBBServers("")
+	bigBlueButtonServers := cc.Config.FindBBBServers("")
 	wg.Add(len(bigBlueButtonServers))
 	for _, server := range bigBlueButtonServers {
 		go func(ctx context.Context) {
@@ -180,7 +183,7 @@ func showMeetings(c echo.Context) (err error) {
 		startDate = endDate.AddDate(0, -1, 0)
 	}
 
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, cc.Config.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
 		return err
 	}
@@ -231,7 +234,7 @@ func showMeetings(c echo.Context) (err error) {
 	return nil
 }
 
-func HandleFilteredRequest(ctx context.Context, dbQueries *db.Queries, startDate time.Time, endDate time.Time, filteredServers []bbbServer, meetings *[]MeetingListMeetingWrapper) (filteredMeetings *[]MeetingListMeetingWrapper, err error) {
+func HandleFilteredRequest(ctx context.Context, dbQueries *db.Queries, startDate time.Time, endDate time.Time, filteredServers []config.BbbServer, meetings *[]MeetingListMeetingWrapper) (filteredMeetings *[]MeetingListMeetingWrapper, err error) {
 
 	if endDate.IsZero() {
 		endDate = time.Now()

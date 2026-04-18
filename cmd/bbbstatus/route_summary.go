@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBEvents"
@@ -73,11 +74,12 @@ func getSummaryOfMeetingsForDates(c echo.Context) (struct {
 	StartTimeMin string
 	StartTimeMax string
 }, []SummaryMonth, error) {
+	cc := c.(*config.CustomContext)
 	var err error
 	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
 	var conn *pgx.Conn
 
-	conn, err = pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	conn, err = pgx.Connect(ctx, cc.Config.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
 		fmt.Printf("ERROR Unable to connect to database: %v\n", err)
 		return struct {

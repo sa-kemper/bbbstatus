@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBAPI"
@@ -82,7 +83,7 @@ func init() { // Add all messages that are related to this file into the localiz
 	}
 }
 
-func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredForUserIds *[]string) (Report, error) {
+func GenerateWebReport(ctx context.Context, conf *config.ConfigurationStruct, internalMeetingID string, filteredForUserIds *[]string) (Report, error) {
 	var details = make([]Detail, 0)
 	var participants []BBBEvents.User
 	var timeline []Event
@@ -91,7 +92,7 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 	var recordings []BBBAPI.Recording
 
 	// Connect to the db using
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, conf.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
 		return Report{}, fmt.Errorf("unable to connect to database: %v", err)
 	}
@@ -106,24 +107,25 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 		return Report{}, fmt.Errorf("unable to find meeting with Id %s: %v", internalMeetingID, err)
 	}
 
-	ScaleliteServers := confGetScaleLiteServers("")
-	servers := confGetBBBServers(meeting.Bbbhostname)
-	var server bbbServer
+	ScaleliteServers := conf.FindScaleliteServers("")
+	servers := conf.FindBBBServers(meeting.Bbbhostname)
+	var server config.BbbServer
 
 	if len(servers) < 1 {
 		return Report{}, fmt.Errorf("unable to find server with hostname %s", meeting.Bbbhostname)
-	} else {
-		server = servers[0]
-		if server.Hostname == meeting.Bbbhostname {
-			if server.APITimeout != 0 {
-				meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: new(time.Duration(server.APITimeout) * time.Second)}
-			} else {
-				meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret}
-			}
-		} else {
-			//fmt.Println("DEBUG API SERVER FINDING: '" + server.Hostname + "' != '" + meeting.BbbHostname + "'")
-		}
 	}
+
+	server = servers[0]
+	if server.Hostname == meeting.Bbbhostname {
+		if server.APITimeout != 0 {
+			meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret, Timeout: new(time.Duration(server.APITimeout) * time.Second)}
+		} else {
+			meetingServerAPI = BBBAPI.API{Hostname: server.Hostname, Port: server.ApiPort, SharedSecret: server.SharedSecret}
+		}
+	} else {
+		//fmt.Println("DEBUG API SERVER FINDING: '" + server.Hostname + "' != '" + meeting.BbbHostname + "'")
+	}
+
 	details = append(details, Detail{locales.TranslateFromCTX(ctx, "ReportMeetingDetailMeetingName"), meeting.Name})
 	details = append(details, Detail{locales.TranslateFromCTX(ctx, "ReportMeetingDetailInternalMeetingID"), meeting.InternalMeetingID})
 	details = append(details, Detail{locales.TranslateFromCTX(ctx, "ReportMeetingDetailBBBHostname"), meeting.Bbbhostname})
@@ -176,13 +178,13 @@ func GenerateWebReport(ctx context.Context, internalMeetingID string, filteredFo
 	}
 	timeline = append(timeline, messageTimeline...)
 
-	pollTimeline, err := FillMeetingPollEvents(ctx, internalMeetingID, conn, &polls)
+	pollTimeline, err := FillMeetingPollEvents(ctx, conf, internalMeetingID, conn, &polls)
 	if err != nil {
 		return Report{}, err
 	}
 	timeline = append(timeline, pollTimeline...)
 
-	pollResponseTimeline, err := FillMeetingPollResponses(ctx, internalMeetingID, &polls, conn)
+	pollResponseTimeline, err := FillMeetingPollResponses(ctx, conf, internalMeetingID, &polls, conn)
 	if err != nil {
 		return Report{}, err
 	}
@@ -226,7 +228,7 @@ func FillMeetingEvents(ctx context.Context, id string, dbQueries *db.Queries) ([
 	return timeline, nil
 }
 
-func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, polls *[]string, conn *pgx.Conn) (timeline []Event, err error) {
+func FillMeetingPollResponses(ctx context.Context, conf *config.ConfigurationStruct, internalMeetingID string, polls *[]string, conn *pgx.Conn) (timeline []Event, err error) {
 	// insert the poll Answers into the timeline
 	for _, pollID := range *polls {
 		row, err := conn.Query(ctx, "SELECT internal_user_id, answer_ids, response_time FROM poll_responses WHERE poll_id = $1", pollID)
@@ -252,7 +254,7 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 			}
 
 			// we cannot use the same connection while the row is not closed.
-			conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+			conn2, err := pgx.Connect(ctx, conf.DatabaseConfig.DatabaseConnectionString)
 			if err != nil {
 				fmt.Println("error connecting to the database at least twice. ->", err)
 				return timeline, err
@@ -289,7 +291,7 @@ func FillMeetingPollResponses(ctx context.Context, internalMeetingID string, pol
 	return timeline, err
 }
 
-func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn, polls *[]string) (timeline []Event, err error) {
+func FillMeetingPollEvents(ctx context.Context, conf *config.ConfigurationStruct, internalMeetingID string, conn *pgx.Conn, polls *[]string) (timeline []Event, err error) {
 	// insert the polls into the timeline
 	row, err := conn.Query(ctx, "SELECT poll_id, internal_user_id, question, answers, created_at FROM polls WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
@@ -317,7 +319,7 @@ func FillMeetingPollEvents(ctx context.Context, internalMeetingID string, conn *
 		}
 
 		// we cannot use the same connection while the row is not closed.
-		conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+		conn2, err := pgx.Connect(ctx, conf.DatabaseConfig.DatabaseConnectionString)
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
 			return timeline, err

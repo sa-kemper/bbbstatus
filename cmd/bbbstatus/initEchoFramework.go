@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	"bbbstatus/locales"
 	"bbbstatus/web"
 	"fmt"
@@ -38,7 +39,7 @@ var defaultGohtmlTemplates = web.Views
 
 var staticFS = web.StaticFS
 
-func initEchoFramework() {
+func initEchoFramework(conf *config.ConfigurationStruct) {
 	var Templates *Template
 	const staticContentOverwriteFolder = "overwrite/static"
 	const gohtmlTemplateOverwriteFolder = "overwrite/public/views"
@@ -85,11 +86,11 @@ func initEchoFramework() {
 	echof.Logger.SetLevel(log.INFO)
 
 	// setup trusted proxies in order to trust x-forwarded-for.
-	if len(confGet("TRUSTED_PROXIES")) > 3 {
+	if len(conf.BaseConfig.TrustedProxies) > 3 {
 		var proxyTrustOptions []echo.TrustOption
-		for _, strCIDR := range strings.Split(confGet("TRUSTED_PROXIES"), ",") {
+		for _, strCIDR := range strings.Split(conf.BaseConfig.TrustedProxies, ",") {
 			if len(strCIDR) < 3 {
-				panic("Something is seriously wrong with the TRUSTED_PROXIES configuration. CIDR read:" + strCIDR + ", Full config: " + confGet("TRUSTED_PROXIES"))
+				panic("Something is seriously wrong with the TRUSTED_PROXIES configuration. CIDR read:" + strCIDR + ", Full config: " + conf.BaseConfig.TrustedProxies)
 			}
 			_, cidr, err := net.ParseCIDR(strCIDR)
 			if err != nil {

@@ -16,11 +16,13 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	"bbbstatus/locales"
 	"fmt"
 	"html/template"
 	"log"
 
+	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
@@ -33,16 +35,20 @@ type Template struct {
 type Gdpr string
 
 func main() {
-	var err = initDatabase()
+	var runtimeConfiguration = new(config.ConfigurationStruct)
+	var err = cleanenv.ReadConfig("config.toml", runtimeConfiguration)
+
+	err = initDatabase(runtimeConfiguration)
 	if err != nil {
 		fmt.Println("[!] Error connecting to database, this is required for the operation of bbbstatus [!]")
 		log.Fatalln(err)
 		return
 	}
 
-	locales.InitI18n(FrontendTextMessages) // initialize the localisation
-	initEchoFramework()                    // initialize the "framework"
-	initRoutes()                           // start routing
+	locales.InitI18n(FrontendTextMessages)  // initialize the localisation
+	initEchoFramework(runtimeConfiguration) // initialize the "framework"
+	initRoutes()                            // start routing
 
-	echof.Logger.Fatal(echof.Start(confGet("HOST") + ":" + confGet("PORT")))
+	echof.Use(config.ConfigMiddleware(runtimeConfiguration))
+	echof.Logger.Fatal(echof.Start(runtimeConfiguration.BaseConfig.Host + ":" + runtimeConfiguration.BaseConfig.Port))
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	"bbbstatus/internal/database"
 	"fmt"
 	"net/http"
@@ -12,9 +13,10 @@ import (
 )
 
 func forceCloseMeeting(context echo.Context) error {
+	cc := context.(*config.CustomContext)
 	var ctx = context.Request().Context()
 	// Connect to the db using
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, cc.Config.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
 		return fmt.Errorf("unable to connect to database: %v", err)
 	}

@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
 	"context"
@@ -31,6 +32,10 @@ import (
 )
 
 func downloadFilteredMeetingReport(c echo.Context) (err error) {
+	cc, ok := c.(*config.CustomContext)
+	if !ok {
+		return errors.New("custom context is not configured")
+	}
 	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
 	var internalMeetingId = c.Param("id")
 	var report []byte
@@ -38,7 +43,7 @@ func downloadFilteredMeetingReport(c echo.Context) (err error) {
 	var filteredForUserIds []string
 
 	// use the context provided by the user request in order to respect the browsers / servers / admins settings.
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, cc.Config.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
 		_ = c.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
 		return err
@@ -64,7 +69,7 @@ func downloadFilteredMeetingReport(c echo.Context) (err error) {
 		}
 	}
 
-	report, err = GenerateCSVReport(ctx, internalMeetingId, &filteredForUserIds)
+	report, err = GenerateCSVReport(ctx, cc.Config, internalMeetingId, &filteredForUserIds)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) { // this function may execute for a considerable amount of time. It's not completely unreasonable to assume that it may exceed time limits.
 			fmt.Println("Generate CSV Report Timed out.")

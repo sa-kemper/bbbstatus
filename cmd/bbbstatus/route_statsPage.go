@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	"bbbstatus/pkg/BBBEvents"
 	"bbbstatus/pkg/StatsAggregator"
 	"database/sql"
@@ -109,6 +110,7 @@ type templateStruct struct {
 //
 //	error: Returns an error if stats generation or rendering fails, nil otherwise
 func statsPage(c echo.Context) (err error) {
+	cc := c.(*config.CustomContext)
 	// Get and set default scope
 	scope := c.QueryParam("scope")
 	if scope == "" {
@@ -134,7 +136,7 @@ func statsPage(c echo.Context) (err error) {
 	dbStats, err := StatsAggregator.GenerateStatsByScope(
 		c.Request().Context(),
 		scope,
-		confGet("DB_CONNECTION_STRING"),
+		cc.Config.DatabaseConfig.DatabaseConnectionString,
 		targetTime,
 	)
 	if err != nil {
@@ -145,7 +147,7 @@ func statsPage(c echo.Context) (err error) {
 	// Get the earliest statistics date
 	earliestDataTimestamp, err := StatsAggregator.GetEarliestStatDate(
 		c.Request().Context(),
-		confGet("DB_CONNECTION_STRING"),
+		cc.Config.DatabaseConfig.DatabaseConnectionString,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

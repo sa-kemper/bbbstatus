@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBEvents"
 	"context"
@@ -58,6 +59,11 @@ func init() { // Add all messages that are related to this file into the localiz
 }
 
 func showMeetingReport(c echo.Context) error {
+	var cc, ok = c.(*config.CustomContext)
+	if !ok {
+		return errors.New("cannot cast config.CustomContext")
+	}
+
 	var internalMeetingId = c.Param("id")
 	var requestLanguage = c.Request().Header.Get("Accept-Language")
 	var meetingExists bool
@@ -66,7 +72,7 @@ func showMeetingReport(c echo.Context) error {
 	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), localizer)
 
 	// Connect to the db using
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, cc.Config.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
 		return fmt.Errorf("unable to connect to database: %v", err)
 	}
@@ -90,7 +96,7 @@ func showMeetingReport(c echo.Context) error {
 	}
 	isMeetingActive = meeting.MeetingEnded.Time.IsZero()
 
-	report, err := GenerateWebReport(context.WithValue(ctx, Gdpr("gdpr"), c.QueryParam("gdpr") == "on"), internalMeetingId, nil)
+	report, err := GenerateWebReport(context.WithValue(ctx, Gdpr("gdpr"), c.QueryParam("gdpr") == "on"), cc.Config, internalMeetingId, nil)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
 			fmt.Println("FATAL: database timeout!")

@@ -1,0 +1,93 @@
+/* --- meetings.css --- */
+
+.meetings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+/* Server Fleet Grid */
+.server-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.server-card {
+    border-left: 4px solid var(--border);
+    padding: 20px 24px;
+    transition: transform 0.2s;
+}
+
+.server-card:hover {
+    transform: translateY(-3px);
+}
+
+.server-card.active {
+    border-left-color: var(--primary);
+}
+
+.server-stats-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+}
+
+/* Filter Bar */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    background: white;
+    padding: 16px 32px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+}
+
+.search-input-wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-input-wrapper input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Meeting Table */
+.meeting-table-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.meeting-table td {
+    padding: 20px 32px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.meeting-table tr:hover {
+    background: #f8fafc;
+}
+
+.user-count-badge {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.8rem;
+}
+
+.action-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

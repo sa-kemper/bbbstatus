@@ -48,7 +48,6 @@ func (b *BaseEvent) Save(ctx context.Context, dbQueries *db.Queries, conn *pgx.C
 			dbUser, err := dbQueries.GetPresenterUserByMeetingID(ctx, meeting.InternalMeetingID)
 			if err != nil {
 				fmt.Println("error occurred whilst loadAdditionalUserData -> get meeting presenter: ", err, "meeting id: ", meeting.InternalMeetingID)
-				return err
 			}
 			user = &User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.Name, Role: dbUser.Role, Presenter: true, Guest: dbUser.IsGuest.Bool}
 		}

@@ -26,7 +26,7 @@ func (c *ConfigurationStruct) GetBBBServer(hostname string) *BbbServer {
 func (c *ConfigurationStruct) FindBBBServers(name string) (matches []BbbServer) {
 	matches = make([]BbbServer, 0)
 	for _, bbbServer := range c.BBBServers {
-		if strings.Contains(name, bbbServer.Hostname) {
+		if strings.Contains(name, bbbServer.Hostname) || name == "" {
 			matches = append(matches, bbbServer)
 		}
 	}
@@ -36,7 +36,7 @@ func (c *ConfigurationStruct) FindBBBServers(name string) (matches []BbbServer) 
 func (c *ConfigurationStruct) FindScaleliteServers(name string) (matches []ScaleliteServer) {
 	matches = make([]ScaleliteServer, 0)
 	for _, scaleLite := range c.ScaleLiteServers {
-		if strings.Contains(name, scaleLite.Hostname) {
+		if strings.Contains(name, scaleLite.Hostname) || name == "" {
 			matches = append(matches, scaleLite)
 		}
 	}

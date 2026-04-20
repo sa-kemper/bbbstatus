@@ -16,7 +16,6 @@
 					<span class="font-mono-xs" style="text-transform: uppercase;">Meetings</span>
 				</div>
 				<div style="text-align: right;">
-					{{/* Wir suchen die User-Anzahl aus dem ServerFilter-Request */}}
 					{{ $hostname := .Hostname }}
 					{{ range $.Request.ServerFilter }}
 						{{ if eq .Hostname $hostname }}

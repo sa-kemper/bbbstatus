@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	"bbbstatus/locales"
 	"bbbstatus/pkg/StatsAggregator"
 	"fmt"
@@ -30,6 +31,7 @@ import (
 )
 
 func statsPageCSV(c echo.Context) (err error) {
+	cc := c.(*config.CustomContext)
 	var result string
 	var StatsOrder []string
 	var fileDate string
@@ -45,7 +47,7 @@ func statsPageCSV(c echo.Context) (err error) {
 		return err
 	}
 
-	stats, err := StatsAggregator.GenerateStatsByScope(c.Request().Context(), scope, confGet("DB_CONNECTION_STRING"), startTime)
+	stats, err := StatsAggregator.GenerateStatsByScope(c.Request().Context(), scope, cc.Config.DatabaseConfig.DatabaseConnectionString, startTime)
 	if err != nil {
 		_ = renderError(c, "Error occurred generating cvs")
 		return err

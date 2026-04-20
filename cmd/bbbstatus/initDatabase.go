@@ -18,6 +18,7 @@ package main
 
 import (
 	"bbbstatus/Database"
+	"bbbstatus/internal/config"
 	"database/sql"
 	_ "embed"
 	"fmt"
@@ -28,8 +29,8 @@ import (
 
 //var postgresInitialUp = Database.PostgresInitialUp
 
-func initDatabase() error {
-	db, err := sql.Open("pgx", confGet("DB_CONNECTION_STRING"))
+func initDatabase(conf *config.ConfigurationStruct) error {
+	db, err := sql.Open("pgx", conf.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
 		panic(fmt.Errorf("unable to connect to database: %v", err))
 	}

@@ -17,6 +17,8 @@
 package main
 
 import (
+	"bbbstatus/internal/apiCredentialHelper"
+	"bbbstatus/internal/config"
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBEvents"
@@ -54,11 +56,12 @@ Note:
 - The function does not handle any errors that may occur during the database connection or the `Save` operation. It simply logs the errors and returns them.
 */
 func bbbWebHookEvent(c echo.Context) (err error) {
+	cc := c.(*config.CustomContext)
 	// Debug deployments
-	if confGet("CLEAR_QUEUE") == "true" {
+	if cc.Config.BaseConfig.ClearQueue {
 		return c.String(http.StatusOK, "Event was dropped.")
 	}
-	var ctx = context.WithValue(c.Request().Context(), locales.ServerLanguage("SERVER_LANG"), confGet("SERVER_LANG")) // add a variable to the context in order to use it inside the BBBEvents package.
+	var ctx = context.WithValue(c.Request().Context(), locales.ServerLanguage("SERVER_LANG"), cc.Config.BaseConfig.ServerLang) // add a variable to the context in order to use it inside the BBBEvents package.
 	var event BBBEvents.BaseEvent
 	postEvent := c.FormValue("event")
 	postEvent = strings.TrimLeft(postEvent, "[")
@@ -66,7 +69,7 @@ func bbbWebHookEvent(c echo.Context) (err error) {
 	apiKey := c.Request().Header.Get("Authorization")
 	apiKey = strings.TrimSpace(strings.Replace(apiKey, "Bearer ", "", -1))
 	// fmt.Println("API key: '" + apiKey + "'")
-	fmt.Println("DEBUG bbbWebHookEvent -> postEvent: ", postEvent)
+	// fmt.Println("DEBUG bbbWebHookEvent -> postEvent: ", postEvent)
 
 	var requesterIpAddress string
 
@@ -91,7 +94,7 @@ func bbbWebHookEvent(c echo.Context) (err error) {
 		event.Data.Attributes.Meeting.BbbHostname = strings.TrimSpace(strings.TrimRight(addr[0], "."))
 		//fmt.Println("DEBUG bbbWebHookEvent -> BBBServer: '" + event.Data.Attributes.Meeting.BbbHostname + "'")
 	}
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	conn, err := pgx.Connect(ctx, cc.Config.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
 		fmt.Println("error occurred during pgx connect (bbbWebHookEvent): ", err)
 		return c.String(http.StatusInternalServerError, "Error occurred database connect (bbbWebHookEvent)")
@@ -101,28 +104,17 @@ func bbbWebHookEvent(c echo.Context) (err error) {
 	dbQueries := db.New(conn)
 
 	// Simple host based webhook safety, not really great but better than nothing at all.
-	bbbServers := confGetBBBServers(event.Data.Attributes.Meeting.BbbHostname)
-	if len(bbbServers) < 1 {
-		//fmt.Println("List of valid hosts: ", confGetBBBServers(""))
-		//fmt.Println("Failed to authenticate host: '" + event.Data.Attributes.Meeting.BbbHostname + "'")
-		return c.String(http.StatusUnauthorized, "Unauthorized")
-	} else {
-		server := bbbServers[0]
-		if server.SharedSecret != apiKey {
-			//fmt.Println("DEBUG: updating bbb API key")
-			//fmt.Println("DEBUG server.SharedSecret='" + server.SharedSecret + "' api_key='" + apiKey + "'")
-			server.SharedSecret = apiKey
-			err = confSetServer(ctx, server)
-			if err != nil {
-				fmt.Println("error occurred during confSetServer: ", err)
-			}
+	if apiCredentialHelper.GetApiKey(event.Data.Attributes.Meeting.BbbHostname) != apiKey {
+		err = apiCredentialHelper.UpdateApiKey(event.Data.Attributes.Meeting.BbbHostname, apiKey)
+		if err != nil {
+			fmt.Println("Error occurred during updating api key ( of server "+event.Data.Attributes.Meeting.BbbHostname+" ) err : ", err)
 		}
 	}
 
 	err = event.Save(ctx, dbQueries, conn)
 	if err != nil {
 		fmt.Println("error occurred during save event: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
+		return c.Render(http.StatusInternalServerError, "BBBWebHookEvent", map[string]interface{}{})
 	}
 
 	return c.String(http.StatusOK, "")

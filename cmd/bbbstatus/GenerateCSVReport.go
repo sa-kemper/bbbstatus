@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBEvents"
@@ -75,11 +76,12 @@ func init() {
 	FrontendTextMessages = append(FrontendTextMessages, messages...)
 }
 
-func GenerateCSVReport(ctx context.Context, internalMeetingID string, filteredUserIds *[]string) ([]byte, error) {
+func GenerateCSVReport(ctx context.Context, conf *config.ConfigurationStruct, internalMeetingID string, filteredUserIds *[]string) ([]byte, error) {
 	var result string
 	var timeline []CSVEvent
 	var polls []string
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+
+	conn, err := pgx.Connect(ctx, conf.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
 		if errors.Is(err, os.ErrDeadlineExceeded) {
 			fmt.Println("FATAL Database timed out")
@@ -97,7 +99,7 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string, filteredUs
 	dbQueries := db.New(conn)
 
 	// Translate CSV Header
-	splitResult := strings.Split(confGet("CSV_STRUCTURE"), ",")
+	splitResult := strings.Split(conf.ReportConfig.CsvStructure, ",")
 	for _, value := range splitResult {
 		value = strings.TrimSpace(value)
 		value = strings.ReplaceAll(value, " ", "")
@@ -117,13 +119,13 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string, filteredUs
 		return nil, err
 	}
 
-	pollTimeline, err := FillCsvPollEvents(ctx, internalMeetingID, conn, &polls)
+	pollTimeline, err := FillCsvPollEvents(ctx, conf, internalMeetingID, conn, &polls)
 	if err != nil {
 		fmt.Println("error occurred while filling poll timeline (GenerateCSVReport)", err.Error())
 		return nil, err
 	}
 
-	pollResponseTimeline, err := FillCsvPollResponses(ctx, internalMeetingID, &polls, conn)
+	pollResponseTimeline, err := FillCsvPollResponses(ctx, conf, internalMeetingID, &polls, conn)
 	if err != nil {
 		fmt.Println("error occurred while filling poll responses (GenerateCSVReport)", err.Error())
 		return nil, err
@@ -150,7 +152,7 @@ func GenerateCSVReport(ctx context.Context, internalMeetingID string, filteredUs
 		return timeline[i].Time.Before(timeline[j].Time)
 	})
 
-	CsvStructureConfig := strings.Split(confGet("CSV_STRUCTURE"), ",")
+	CsvStructureConfig := strings.Split(conf.ReportConfig.CsvStructure, ",")
 	for _, event := range timeline {
 		result += event.ReturnCSVRow(CsvStructureConfig)
 	}
@@ -260,7 +262,7 @@ func FillCSVUserEvents(ctx context.Context, internalMeetingID string, dbQueries 
 	return timeline, err
 }
 
-func FillCsvPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.Conn, polls *[]string) (timeline []CSVEvent, err error) {
+func FillCsvPollEvents(ctx context.Context, conf *config.ConfigurationStruct, internalMeetingID string, conn *pgx.Conn, polls *[]string) (timeline []CSVEvent, err error) {
 	// insert the polls into the timeline
 	row, err := conn.Query(ctx, "SELECT poll_id, internal_user_id, question, answers, created_at FROM polls WHERE internal_meeting_id = $1", internalMeetingID)
 	if err != nil {
@@ -287,7 +289,7 @@ func FillCsvPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.
 		}
 
 		// we cannot use the same connection while the row is not closed.
-		conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+		conn2, err := pgx.Connect(ctx, conf.DatabaseConfig.DatabaseConnectionString)
 		if err != nil {
 			fmt.Println("error connecting to the database at least twice. ->", err)
 			return timeline, err
@@ -313,7 +315,7 @@ func FillCsvPollEvents(ctx context.Context, internalMeetingID string, conn *pgx.
 	return timeline, err
 }
 
-func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *[]string, conn *pgx.Conn) (timeline []CSVEvent, err error) {
+func FillCsvPollResponses(ctx context.Context, conf *config.ConfigurationStruct, internalMeetingID string, polls *[]string, conn *pgx.Conn) (timeline []CSVEvent, err error) {
 	// insert the poll Answers into the timeline
 	for _, pollID := range *polls {
 		row, err := conn.Query(ctx, "SELECT internal_user_id, answer_ids, response_time FROM poll_responses WHERE poll_id = $1", pollID)
@@ -339,7 +341,7 @@ func FillCsvPollResponses(ctx context.Context, internalMeetingID string, polls *
 			}
 
 			// we cannot use the same connection while the row is not closed.
-			conn2, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+			conn2, err := pgx.Connect(ctx, conf.DatabaseConfig.DatabaseConnectionString)
 			if err != nil {
 				fmt.Println("error connecting to the database at least twice. ->", err)
 				return timeline, err

@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBAPI"
@@ -51,9 +52,10 @@ func init() {
 }
 
 func showRecordings(c echo.Context) (err error) {
+	cc := c.(*config.CustomContext)
 	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
-	var scaleLiteServers = confGetScaleLiteServers("")
-	var bbbServers = confGetBBBServers("")
+	var scaleLiteServers = cc.Config.FindScaleliteServers("")
+	var bbbServers = cc.Config.FindBBBServers("")
 	userQuery := c.QueryParam("query")
 	userStartDate := c.FormValue("start-date")
 	userEndDate := c.FormValue("end-date")
@@ -138,7 +140,7 @@ func showRecordings(c echo.Context) (err error) {
 
 	// find other information that the user is looking for
 	if userQuery != "" {
-		conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+		conn, err := pgx.Connect(ctx, cc.Config.DatabaseConfig.DatabaseConnectionString)
 		if err != nil {
 			_ = c.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
 			return err

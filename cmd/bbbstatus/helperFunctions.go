@@ -7,6 +7,7 @@ import (
 	"net"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -33,6 +34,12 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 
 		},
 		"reverse": c.Echo().Reverse,
+		"formatTime": func(ts time.Time) string {
+			if time.Since(ts).Hours() > 24 {
+				return ts.Format("2006-01-02 15:04:05")
+			}
+			return time.Since(ts).String()
+		},
 	})
 	return t.templates.ExecuteTemplate(w, name, data)
 }

@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bbbstatus/internal/config"
 	db "bbbstatus/internal/database"
 	"bbbstatus/locales"
 	"bbbstatus/pkg/BBBAPI"
@@ -35,9 +36,14 @@ import (
 	"golang.org/x/text/language"
 )
 
-func showFilteredMeetingReport(echoContext echo.Context) error {
+func showFilteredMeetingReport(c echo.Context) error {
+	cc, ok := c.(*config.CustomContext)
+	if !ok {
+		return errors.New("config.CustomContext must not be nil")
+	}
+
 	if locales.Localizer == nil {
-		locales.Localizer = i18n.NewLocalizer(locales.Bundle, echoContext.Request().Header.Get("Accept-Language"), language.English.String())
+		locales.Localizer = i18n.NewLocalizer(locales.Bundle, c.Request().Header.Get("Accept-Language"), language.English.String())
 	}
 	type customUserType struct {
 		InternalUserID string
@@ -55,17 +61,17 @@ func showFilteredMeetingReport(echoContext echo.Context) error {
 		LeaveTimestamp *time.Time
 		IsFilteredFor  bool
 	}
-	var internalMeetingId = echoContext.Param("id")
+	var internalMeetingId = c.Param("id")
 	var customParticipants []customUserType
 	var filteredForUserIds []string
 	var filterParamsString string
 	var meetingActive bool
 
 	// use the echoContext provided by the user request in order to respect the browsers / servers / admins settings.
-	var ctx = context.WithValue(echoContext.Request().Context(), locales.Translator("Translator"), echoContext.Get("Translator"))
-	conn, err := pgx.Connect(ctx, confGet("DB_CONNECTION_STRING"))
+	var ctx = context.WithValue(c.Request().Context(), locales.Translator("Translator"), c.Get("Translator"))
+	conn, err := pgx.Connect(ctx, cc.Config.DatabaseConfig.DatabaseConnectionString)
 	if err != nil {
-		_ = echoContext.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
+		_ = c.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
 		return err
 	}
 	defer conn.Close(ctx)
@@ -77,20 +83,20 @@ func showFilteredMeetingReport(echoContext echo.Context) error {
 	participants, err := dbQueries.GetUsersInMeetingByInternalID(ctx, internalMeetingId)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return echoContext.Render(http.StatusNotFound, "notfound", nil)
+			return c.Render(http.StatusNotFound, "notfound", nil)
 		}
-		_ = echoContext.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
+		_ = c.Render(http.StatusInternalServerError, "errorPage", map[string]interface{}{"ErrorTitle": "Internal Error", "ErrorParagraph": err.Error()})
 		return err
 	}
 
 	for _, participant := range participants {
-		if echoContext.QueryParam(participant.InternalUserID) == "on" {
+		if c.QueryParam(participant.InternalUserID) == "on" {
 			filteredForUserIds = append(filteredForUserIds, participant.InternalUserID)
 			filterParamsString += fmt.Sprintf("%s=on&", participant.InternalUserID)
 		}
 	}
 
-	report, err := GenerateWebReport(context.WithValue(ctx, Gdpr("gdpr"), echoContext.QueryParam("gdpr") == "on"), internalMeetingId, &filteredForUserIds)
+	report, err := GenerateWebReport(context.WithValue(ctx, Gdpr("gdpr"), c.QueryParam("gdpr") == "on"), cc.Config, internalMeetingId, &filteredForUserIds)
 	if err != nil {
 		fmt.Println("error occurred when generating report", err)
 		return err
@@ -128,5 +134,5 @@ func showFilteredMeetingReport(echoContext echo.Context) error {
 		Timeline     []Event
 		Recordings   []BBBAPI.Recording
 	}{Details: report.Details, Participants: customParticipants, Timeline: report.Timeline, Recordings: report.Recordings}
-	return echoContext.Render(http.StatusOK, "inspectReport", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": filteredReport, "FilteredUsersParam": template.URL(strings.TrimRight(filterParamsString, "&")), "MeetingActive": meetingActive, "Gdpr": echoContext.QueryParam("gdpr") == "on"})
+	return c.Render(http.StatusOK, "inspectReport", map[string]interface{}{"InternalMeetingID": internalMeetingId, "Report": filteredReport, "FilteredUsersParam": template.URL(strings.TrimRight(filterParamsString, "&")), "MeetingActive": meetingActive, "Gdpr": c.QueryParam("gdpr") == "on"})
 }

@@ -44,5 +44,9 @@ func handleMeetingEnded(ctx context.Context, dbQueries *db.Queries, meeting Meet
 		fmt.Println(err)
 		return err
 	}
-	return nil
+	err = dbQueries.LeaveAllUsersFromMeetingBySingleTimestamp(ctx, db.LeaveAllUsersFromMeetingBySingleTimestampParams{
+		InternalMeetingID: meeting.InternalMeetingID,
+		LeaveTimestamp:    pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true},
+	})
+	return err
 }

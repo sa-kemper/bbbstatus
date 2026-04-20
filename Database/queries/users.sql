@@ -61,3 +61,15 @@ WHERE internal_user_id IN (SELECT DISTINCT internal_user_id
                            FROM user_events
                            WHERE internal_meeting_id = $1
                              AND leave_timestamp IS NULL);
+
+-- name: LeaveAllUsersFromMeetingBySingleTimestamp :exec
+UPDATE users
+SET leave_timestamp = $2
+WHERE internal_user_id in (SELECT DISTINCT internal_user_id FROM meeting_events WHERE internal_meeting_id = $1);
+
+-- name: GetUserEventsState :many
+SELECT event_type, MAX(event_timestamp) as latest_timestamp
+FROM user_events
+WHERE internal_user_id = $1
+GROUP BY event_type
+ORDER BY latest_timestamp;

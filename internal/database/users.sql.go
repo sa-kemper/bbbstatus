@@ -107,6 +107,38 @@ func (q *Queries) GetUserCountInMeetingByInternalID(ctx context.Context, interna
 	return usercount, err
 }
 
+const getUserEventsState = `-- name: GetUserEventsState :many
+SELECT event_type, MAX(event_timestamp) as latest_timestamp
+FROM user_events
+WHERE internal_user_id = $1
+GROUP BY event_type ORDER BY latest_timestamp
+`
+
+type GetUserEventsStateRow struct {
+	EventType       string
+	LatestTimestamp interface{}
+}
+
+func (q *Queries) GetUserEventsState(ctx context.Context, internalUserID string) ([]GetUserEventsStateRow, error) {
+	rows, err := q.db.Query(ctx, getUserEventsState, internalUserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserEventsStateRow
+	for rows.Next() {
+		var i GetUserEventsStateRow
+		if err := rows.Scan(&i.EventType, &i.LatestTimestamp); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserExistsByID = `-- name: GetUserExistsByID :one
 SELECT TRUE
 FROM users
@@ -255,6 +287,20 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
 		arg.Role,
 		arg.IsGuest,
 	)
+	return err
+}
+
+const leaveAllUsersFromMeetingBySingleTimestamp = `-- name: LeaveAllUsersFromMeetingBySingleTimestamp :exec
+UPDATE users SET leave_timestamp = $2 WHERE internal_user_id in (SELECT DISTINCT internal_user_id FROM meeting_events WHERE internal_meeting_id = $1)
+`
+
+type LeaveAllUsersFromMeetingBySingleTimestampParams struct {
+	InternalMeetingID string
+	LeaveTimestamp    pgtype.Timestamp
+}
+
+func (q *Queries) LeaveAllUsersFromMeetingBySingleTimestamp(ctx context.Context, arg LeaveAllUsersFromMeetingBySingleTimestampParams) error {
+	_, err := q.db.Exec(ctx, leaveAllUsersFromMeetingBySingleTimestamp, arg.InternalMeetingID, arg.LeaveTimestamp)
 	return err
 }
 

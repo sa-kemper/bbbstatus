@@ -32,6 +32,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
@@ -132,7 +133,7 @@ func GenerateWebReport(ctx context.Context, conf *config.ConfigurationStruct, in
 	details = append(details, Detail{locales.TranslateFromCTX(ctx, "ReportMeetingDetailBBBHostname"), meeting.Bbbhostname})
 	details = append(details, Detail{locales.TranslateFromCTX(ctx, "ReportMeetingDetailCreationDate"), meeting.CreateTime.Time.Format("02.01.2006")})
 
-	participants, err = FillMeetingParticipants(ctx, internalMeetingID, dbQueries)
+	participants, err = FillMeetingParticipants(ctx, dbQueries, internalMeetingID, meeting)
 	if err != nil {
 		return Report{}, err
 	}
@@ -433,7 +434,7 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 	return timeline, err
 }
 
-func FillMeetingParticipants(ctx context.Context, internalMeetingID string, dbQueries *db.Queries) (participants []BBBEvents.User, err error) {
+func FillMeetingParticipants(ctx context.Context, dbQueries *db.Queries, internalMeetingID string, meeting db.Meeting) (participants []BBBEvents.User, err error) {
 	// Query participants and parse them
 	meetingUsers, err := dbQueries.GetUserIDsFromMeetingByMeetingID(ctx, internalMeetingID)
 	if err != nil {
@@ -445,11 +446,47 @@ func FillMeetingParticipants(ctx context.Context, internalMeetingID string, dbQu
 			fmt.Println("Error occurred adding user to participants list:", err)
 			continue
 		}
-		if ctx.Value(Gdpr("gdpr")).(bool) {
-			participants = append(participants, BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.GdprName, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool})
-		} else {
-			participants = append(participants, BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.Name, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool})
+		var states []db.GetUserEventsStateRow
+		states, err = dbQueries.GetUserEventsState(ctx, participantID)
+		if err != nil {
+			fmt.Println("Error occurred getting user events state:", err)
 		}
+		participant := BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.GdprName, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool}
+
+		for _, state := range states {
+			switch state.EventType {
+			case "user-left":
+				if ts, ok := state.LatestTimestamp.(pgtype.Timestamp); ok {
+					if participant.LeaveTimestamp == nil && !ts.Time.IsZero() {
+						participant.LeaveTimestamp = &ts.Time
+					}
+				}
+			case "user-presenter-as-signed":
+				participant.Presenter = true
+			case "user-audio-voice-enabled":
+				participant.ListeningOnly = true
+			case "user-audio-voice-disabled":
+				participant.ListeningOnly = false
+			case "user-audio-muted":
+				participant.Muted = true
+			case "user-audio-unmuted":
+				participant.Muted = false
+			case "user-cam-broadcast-start":
+				participant.Stream = "broadcast"
+			case "user-cam-broadcast-end":
+				participant.Stream = ""
+			case "user-emoji-changed":
+			}
+		}
+		if !meeting.MeetingEnded.Time.IsZero() {
+			participant.LeaveTimestamp = &meeting.MeetingEnded.Time
+		}
+		if ctx.Value(Gdpr("gdpr")).(bool) {
+			participant.Name = dbUser.GdprName
+		} else {
+			participant.Name = dbUser.Name
+		}
+		participants = append(participants, participant)
 	}
 
 	return participants, err

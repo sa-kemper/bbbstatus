@@ -202,3 +202,97 @@ input:checked + .slider:before {
     padding: 1rem;
 
 }
+
+.participant-card.is-host {
+    border: 2px solid var(--primary-light) !important;
+    background: linear-gradient(to right, #f0f7ff, #ffffff) !important;
+    order: -1;
+}
+
+.avatar-container {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0; /* Verhindert das Quetschen bei langen Namen */
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    background: #e2e8f0;
+    color: #475569;
+    border-radius: 10px; /* Leicht abgerundete Ecken wirken moderner als Kreise */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1rem;
+    position: relative;
+    z-index: 2;
+    border: 2px solid white; /* Trennung zum Status-Ring */
+}
+
+.status-ring {
+    position: absolute;
+    inset: -3px; /* Etwas größer als der Avatar */
+    border-radius: 12px;
+    border: 3px solid transparent;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+/* Status-Farben */
+.status-speaking .status-ring {
+    border-color: var(--primary);
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.2);
+}
+
+.status-active .status-ring {
+    border-color: #16a34a;
+}
+
+.status-silent .status-ring {
+    border-color: #dc2626;
+}
+
+.status-left .status-ring {
+    border-color: #cbd5e1;
+    opacity: 0.5;
+}
+
+/* Host-Zusatz */
+.participant-card.is-host {
+    background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%) !important;
+    border: 2px solid var(--primary-light) !important;
+}
+
+.host-badge {
+    background: var(--primary);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    letter-spacing: 0.05em;
+}
+
+.device-strip {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: #cbd5e1; /* Standardmäßig ausgegraut */
+}
+
+.device-strip i.active {
+    color: var(--text-main); /* Leuchtet auf, wenn aktiv */
+}
+
+.device-strip i.active.fa-microphone {
+    color: #2563eb;
+}
+
+.device-strip i.active.fa-video {
+    color: #8b5cf6;
+}

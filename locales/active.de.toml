@@ -31,12 +31,12 @@ hash = "sha1-2d9f69d2585a19376a0da1e0c87287229c72b547"
 other = "Meeting beendet"
 
 [CSVMeetingAction-meeting-recording-started]
-hash = "sha1-bde81afa928840be70c67638434105d89efb658e"
-other = "Aufzeichnungs start"
+hash = "sha1-90d18a9ae1312849abda21fe386eb3aae362bcb9"
+other = "Aufzeichnug start"
 
 [CSVMeetingAction-meeting-recording-stopped]
-hash = "sha1-460b7c299f9e8ffead1efb400e3169cdbb5d399a"
-other = "Aufzeichnungs stopp"
+hash = "sha1-0580ccf01cb16547420b48eda94bd6166e220bf8"
+other = "Aufzeichnug stop"
 
 [CSVMeetingEvent-meeting-created]
 hash = "sha1-2d270a2a9076c8b3b6fbf37030f6ccb9e23da44d"
@@ -47,11 +47,11 @@ hash = "sha1-2d9f69d2585a19376a0da1e0c87287229c72b547"
 other = "Meeting ende"
 
 [CSVMeetingEvent-meeting-recording-started]
-hash = "sha1-3059a09fc54d90a32f8d68efaaa50b7f6782c911"
-other = "Die Aufzeichnung der Besprechung wurde gestartet"
+hash = "sha1-bf5bf86dedbb55c832b76f3ffd34fa3bdb19eb90"
+other = "Die Aufzeichnung der Sitzung hat begonnen"
 
 [CSVMeetingEvent-meeting-recording-stopped]
-hash = "sha1-683f3e6d204f8d12b2949fa0e544d5b723675916"
+hash = "sha1-d7a4010774e3a9849d4cf60ad39ceef7cc0aac94"
 other = "Die Aufzeichnung der Besprechung wurde beendet"
 
 [CSVReportAction-meeting-screenshare-started]
@@ -59,8 +59,8 @@ hash = "sha1-633afd85413de3549b27f836ce0d1605cad76c63"
 other = "Bildschirmfreigabe gestartet"
 
 [CSVReportAction-meeting-screenshare-stopped]
-hash = "sha1-835b70b523d3231a678a798d6922f3a72f4df6af"
-other = "Bildschirmfreigabe beendet"
+hash = "sha1-8784ce57c0044e8f2f3cc30f2903ba1514592233"
+other = "die Bildschirmfreigabe beendet"
 
 [CSVReportAction-user-audio-muted]
 hash = "sha1-e4b074a036fcdaa716be36f4e93f268ffe1befb9"
@@ -130,6 +130,10 @@ other = "Benutzer"
 hash = "sha1-81d24cc01ffe84a8b639a3189c84d25955cc34ae"
 other = "KW"
 
+[Cancel]
+hash = "sha1-77dfd2135f4db726c47299bb55be26f7f4525a46"
+other = "Abbrechen"
+
 [CurrentISO639]
 hash = "sha1-094b0fe0e302854af1311afab85b5203ba457a3b"
 other = "de"
@@ -151,8 +155,8 @@ hash = "sha1-56d3c9490be2608ac36f5a4805bfec2f21f7f982"
 other = "Zeitüberschreitung"
 
 [EventTimelineHeader]
-hash = "sha1-83dfe3fade94c6e8a57de702d5c3f7816a3db4c5"
-other = "Ereigniszeitachse"
+hash = "sha1-4e6dc384ca536b01cf218e5b5340b9b495699d33"
+other = "Zeitachse der Ereignisse"
 
 [Feb]
 hash = "sha1-dc8415ccfe52505f1d0a74025c76b3c26c88c59d"
@@ -162,12 +166,48 @@ other = "Feb"
 hash = "sha1-5c3a35ef85f22d508f90171bdcb2e6d820731d20"
 other = "Febuar"
 
+[FleetStatus]
+hash = "sha1-a77339f6d5366f370217987788c939cc2effb58a"
+other = "Status des Serverclusters"
+
+[ForceCloseMeetingButton]
+hash = "sha1-a75e81a15fb4422758d883f70822f626a9e3d6e9"
+other = "Dieses Meeting erzwingend beenden"
+
+[ForceCloseModalAlertText]
+hash = "sha1-e4b3579cdab98a15d2b2d0b282375fd482dc6329"
+other = "Diese Aktion kann nur von einem Datenbankadministrator rückgängig gemacht werden"
+
+[ForceCloseModalAlertTitle]
+hash = "sha1-378e17034621cdff5546a3a5509d055cefc15a7c"
+other = "Diese Handlung ist gefährlich"
+
+[ForceCloseModalContinue]
+hash = "sha1-aca49378b63f9ee19673e530ab393f58368edc7c"
+other = "Dieses Meeting erzwingend beenden"
+
+[ForceCloseModalDescription]
+hash = "sha1-b4f4cee14e08a45d22c09bd7f80a421ccd7a875e"
+other = "Das erzwungene Beenden dieses Meetings in bbbstatus führt dazu, dass einige Funktionen nicht mehr ordnungsgemäß funktionieren. Bitte nutze diese Funktion nur, wenn du sicher bist, dass das Meeting tatsächlich beendet ist und bbbstatus es weiterhin als aktiv anzeigt. Das Beenden aktiver Meetings wird nicht unterstützt und nicht getestet und kann unerwartete Folgen haben, da dies nicht Teil von bbbstatus ist."
+
+[ForceCloseModalTitle]
+hash = "sha1-91d380bddb39fb8eb7bc09ab53dfe95ce2ef62a5"
+other = "Möchten Sie das Meeting mit volgendem namen erzwingend beenden? "
+
+[ForceCloseModalWarningText]
+hash = "sha1-251d4f503878b03d16ab68ddc23df138679d813d"
+other = "Dadurch wird die Besprechung nicht in Big Blue Button beendet!"
+
+[ForceCloseModalWarningTitle]
+hash = "sha1-d41d252d6ff1cc96ef1b150b98b9e01f7b3dac95"
+other = "ACHTUNG:"
+
 [Fri]
 hash = "sha1-bbd6e32ee1326237814b697269b4368033d50d2f"
 other = "Fr"
 
 [InternalServerError]
-hash = "sha1-afb805f32e78b0de0fbdc4080f959d65a7f19e07"
+hash = "sha1-9761539a1c87f25bf8e9122abfdcc6f9479fe5d0"
 other = "Interner Serverfehler"
 
 [Jan]
@@ -194,9 +234,9 @@ other = "Jun"
 hash = "sha1-a9db906761699b31567727716eaa6fd19ae5f5d5"
 other = "Juni"
 
-[MDOERATOR]
-hash = "sha1-ad3b15c3a7bca16179ba5807b875d6e8269d5ae9"
-other = "Moderator"
+[LiveMonitorandManagement]
+hash = "sha1-66876d25d4c98f256ab7277b65cd84ac56fe3d9c"
+other = "Live-Überwachung und -Verwaltung"
 
 [MODERATOR]
 hash = "sha1-79f52b5b92498b00cb18284f1dcb466bd40ad559"
@@ -219,12 +259,12 @@ hash = "sha1-2bb6b986c5d6fb26dd9dd1054b545ce022371b0c"
 other = "Aktiv"
 
 [MeetingCreateTime]
-hash = "sha1-196301b25ffe6adbd1a7179b1a6aaa292f43251e"
-other = "Erstellungs zeit"
+hash = "sha1-c0195fa7c77c3e62216e8284ace1bd8135084583"
+other = "Erstellungs Zeitpunkt"
 
 [MeetingCreated]
-hash = "sha1-19b6b586f60dbae898ca8e37ef98779f6bf2118c"
-other = "Erstellt am"
+hash = "sha1-21c50805b553b7a40e48394a5d77d442587ddee2"
+other = "Erstellt"
 
 [MeetingDuration]
 hash = "sha1-5d3f344b5bd21e9500c69ca575a3286c85b28f1c"
@@ -247,8 +287,8 @@ hash = "sha1-41a106c82058a0cbeadab46541e23443b2d90afb"
 other = "Aufzeichnung der Besprechung gestartet"
 
 [MeetingEvent-meeting-recording-stopped]
-hash = "sha1-f39520d5be0f2e5b5a9227206be078af14bb6ec0"
-other = "Aufzeichnung der Besprechung gestopt"
+hash = "sha1-d272814256d1ccbffafee251696ace151c1324af"
+other = "Aufzeichnung der Besprechung beendet"
 
 [MeetingExternalID]
 hash = "sha1-d83cfbb878a543c948fdf15e721e8a59482aadc4"
@@ -304,8 +344,8 @@ hash = "sha1-7126428b618359626f50238bb3a2918feb828310"
 other = "aufzeichnungen sind möglich"
 
 [MeetingRecordingStatusHeader]
-hash = "sha1-38adb0a14125adb510c8b19c1d0b569422e3f564"
-other = "Aufzeichnungen"
+hash = "sha1-5d7c6eae5b5bc57597ed6604693be92a23d11ab0"
+other = "Aufzeichnung"
 
 [MeetingReportMeetingDetailsGDPRCheckbox]
 hash = "sha1-3566e58a44435e22bd995c8024bc9afaf9c0d024"
@@ -322,6 +362,54 @@ other = "Zur Zusammenfassung"
 [MeetingUserCount]
 hash = "sha1-5b7dcd14a4faa2cdd54cf6eb8d4bc35da31914a1"
 other = "Benutzer"
+
+[Meetings]
+hash = "sha1-27c4470db25a39ab137d1d38558f4e2a255e5ef6"
+other = "meetings"
+
+[MeetingsMeetingDetailsFirstUserJoined]
+hash = "sha1-ccd0764882abd3ad84262899a081d63fa568e653"
+other = "Erster nuzter"
+
+[MeetingsPageDetailsPopupRecordingAvailableStateLabel]
+hash = "sha1-7c62a1424469b1c1cf402f254409a96a0e6770cf"
+other = "Verfügbar"
+
+[MeetingsPageDetailsPopupRecordingNotAvailableStateLabel]
+hash = "sha1-d1a17af19f5388af9d6596cc0ea7dbb1d739e255"
+other = "Nicht verfügbar"
+
+[MeetingsPageMettingsDetailOngoingMeeting]
+hash = "sha1-2e0254c28e2b06c621fe3e5af23ceeb7e03e64e7"
+other = "Laufend"
+
+[MeetingsPageSearchPlaceholder]
+hash = "sha1-6d7a30a931a35ef0373a28fc4507bf29ba239fda"
+other = "Suchen..."
+
+[MeetingsPageViewRecording]
+hash = "sha1-e3a47099dcaaba943d03b3955c3d8fcf1efb2d98"
+other = "Aufzeicnung sehen"
+
+[MeetingsSearchPlaceholder]
+hash = "sha1-0fc9ab33953ac210e936824b143e727c4f23c7ac"
+other = "Nach meeting namen / servername suchen..."
+
+[MeetingsTableFirstColumnMeetingNameAndID]
+hash = "sha1-f3765f3c9110bd5399e67d521e4603c41553de0e"
+other = "Meeting & ID"
+
+[MeetingsTableFourhtColumnActions]
+hash = "sha1-c3cd636a585b20c40ac2df5ffb403e83cb2eef51"
+other = "Aktionen"
+
+[MeetingsTableSecondColumnServerHostname]
+hash = "sha1-533619109b207b73cc4c3d4075b3f747e5063cbc"
+other = "Servername"
+
+[MeetingsTableThrirdColumnUserCount]
+hash = "sha1-9f8a2389a20ca0752aa9e95093515517e90e194c"
+other = "Nutzerzahl"
 
 [Mon]
 hash = "sha1-24b2a0993d0cfa93c44282d6bba72bcf58b300d6"
@@ -394,6 +482,10 @@ other = "Nicht veröffentlicht"
 [RecordingPageRecordingType]
 hash = "sha1-d0a3e7f81a9885e99049d1cae0336d269d5e47a9"
 other = "Typ"
+
+[Recordings]
+hash = "sha1-92032ce5069af219bede3f481f8b33d6e449584c"
+other = "Aufzeichnungen"
 
 [RecordingsHeader]
 hash = "sha1-92032ce5069af219bede3f481f8b33d6e449584c"
@@ -472,9 +564,13 @@ hash = "sha1-1c542e79c9b4257e640ccf72974d61fd590a5c26"
 other = "September"
 
 [ServerStatsMeetings]
-hash = "sha1-b23a193872fc22386b943b59124e30963e802c52"
-one = "Meeting"
+hash = "sha1-27c4470db25a39ab137d1d38558f4e2a255e5ef6"
+one = "meeting"
 other = "Meetings"
+
+[Statistics]
+hash = "sha1-3d18b2ea89fa5357cf6423b4e6985b46fa10195e"
+other = "Statistiken"
 
 [StatsPageAttendeeCountTableHeader]
 hash = "sha1-078705a379b72b2a630f668f1306c032f04256c6"
@@ -589,8 +685,8 @@ hash = "sha1-80ef4ac783caef7ac8a830239d74e77ac72ec089"
 other = "System Nachricht"
 
 [SystemSentMessage]
-hash = "sha1-32b8a07e7d6f0e6ef7b424a0fe4121a8f709ef73"
-other = "System sendete die nachricht: '{{.Message}}'"
+hash = "sha1-ce1687380bb7cccd6380fecbbd9e2b64f2b89d82"
+other = "Das System hat die Nachricht gesendet: '{{.Message}}'"
 
 [Thu]
 hash = "sha1-3593ccd96f6c0fad4e362d18ac37226707f2ea46"
@@ -605,7 +701,7 @@ hash = "sha1-529541bb390c76152e313351d89de3cd30a1c4bd"
 other = "Di"
 
 [VIEWER]
-hash = "sha1-dbad9f126b33570e09839a2d60720898de1a512d"
+hash = "sha1-40b4f25b1fd956b576d880db2b41182e0444bd1d"
 other = "Zuschauer"
 
 [Wed]
@@ -620,10 +716,6 @@ other = "woche"
 hash = "sha1-4ff0b1538469338a0073e2cdaab6a517801b6ab4"
 other = "jahr"
 
-[chat-group-message-sent]
-hash = "sha1-a654dd949b3203e2fe4a925330395dfe48d4236f"
-other = "Der Benutzer „{{.Username}}“ hat sein Emoji geändert."
-
 [meeting-screenshare-started]
 hash = "sha1-4f2ac6fba737374a9008246f1236c27bbf9446d1"
 other = "Benutzer „{{.Username}}“ hat eine Bildschirmfreigabe gestartet."
@@ -632,62 +724,37 @@ other = "Benutzer „{{.Username}}“ hat eine Bildschirmfreigabe gestartet."
 hash = "sha1-3cb8a063c37803477cde96c3799dc88bc29a3f71"
 other = "Benutzer „{{.Username}}“ hat die Bildschirmfreigabe beendet."
 
-[meetingListFilterEndDate]
-hash = "sha1-269c8b374312ec6d721499b184df007340e16294"
-other = "End datum"
-
-[meetingListFilterFilterButton]
-hash = "sha1-4bb4ca75941b7bbc5bc6a12be44b22fc9c8d234e"
-other = "filter"
-
-[meetingListFilterStartDate]
-hash = "sha1-87269431ee45c3e09809fb92a9fd328d2f581ba2"
-other = "start datum"
-
 [meetingListHeader]
 hash = "sha1-2c4e04f93ec30463cce1cabc9c6effbd0c72a77e"
 other = "Meeting Liste"
 
-[meetingListHeaderSeeStatisticsButton]
-hash = "sha1-1e5040d90ba8b0b64ee15faedbf1950cb0a6a7f9"
-other = "Siehe Statistiken"
-
-[meetingListReloadButton]
-hash = "sha1-cce7155371fc26686b89c7452337d8419692f31e"
-other = "Neu laden"
-
-[meetingListUserCountLabel]
-hash = "sha1-57f2b181d0a5e79a147ea1cdf41457f58dbbb3c9"
-one = "User"
-other = "Benutzer"
-
 [user-audio-muted]
-hash = "sha1-ad09fb9b8bd0855c10e7d140d1b31d550d383d65"
-other = "Der Benutzer „{{.Username}}“ hat sich selbst stummgeschaltet."
+hash = "sha1-0467206f3cdca6486c6b550cf4788474780af3b3"
+other = "Der Benutzer „{{.Username}}“ hat sich selbst stummgeschaltet und ist für andere nicht zu hören"
 
 [user-audio-unmuted]
-hash = "sha1-0c29ad9dc0b4cee3149b7248f1d9c275a1a6684f"
-other = "Der Benutzer „{{.Username}}“ hat sein mikrofon freigegeben."
+hash = "sha1-0467206f3cdca6486c6b550cf4788474780af3b3"
+other = "Der Benutzer „{{.Username}}“ hat seine Stummschaltung aufgehoben und ist für andere nicht mehr zu hören"
 
 [user-audio-voice-disabled]
-hash = "sha1-9353855dacac6982a0651870bfb94b152e7320e0"
-other = "Der Benutzer „{{.Username}}“ hat den Audiokanal verlassen."
+hash = "sha1-eacd312a4157a80b56f874e167a9aa0443dd7c9f"
+other = "Der Benutzer „{{.Username}}“ hat den Sprachkanal verlassen und kann andere nicht mehr hören"
 
 [user-audio-voice-enabled]
-hash = "sha1-506305eca085447c2b2d86555deeba084829fd85"
-other = "Der Benutzer „{{.Username}}“ hat sich dem Audiokanal angeschlossen."
+hash = "sha1-9fb2a9ab4efde412241b3408f54455a73d6eadc2"
+other = "Der Benutzer „{{.Username}}“ hat den Audio-Sprachkanal aktiviert und kann nun andere hören"
 
 [user-cam-broadcast-end]
-hash = "sha1-a5d3ec0a89d24fb01c4f41a84e52d6f475516cf1"
-other = "Der Benutzer „{{.Username}}“ hat eine Webcam-Übertragung beendet."
+hash = "sha1-f12e5b29d2d529cf1eb242b56bd149bd1ebc01f5"
+other = "Der Benutzer „{{.Username}}“ hat eine Webcam-Übertragung beendet"
 
 [user-cam-broadcast-start]
-hash = "sha1-0e29eadab7f2cae91c4ee8965bcbed5e69e4f04b"
-other = "Der Benutzer „{{.Username}}“ hat eine Webcam-Übertragung gestartet."
+hash = "sha1-c468d213eeddbed7e97959768284a22bd0c83894"
+other = "Der Benutzer „{{.Username}}“ hat eine Webcam-Übertragung gestartet"
 
 [user-emoji-changed]
-hash = "sha1-c54add215da6a19a60688c73acea3b2b4050e2d4"
-other = "Benutzer „{{.Username}}“ hat sein emoji geändert."
+hash = "sha1-a654dd949b3203e2fe4a925330395dfe48d4236f"
+other = "Der Benutzer „{{.Username}}“ hat sein Emoji geändert"
 
 [user-joined]
 hash = "sha1-0d217605370bdfb836626f065031d7b23a16c17c"
@@ -698,12 +765,12 @@ hash = "sha1-da84294cfb95c5c9064553f93272ca792aaab181"
 other = "Benutzer „{{.Username}}“ hat die Besprechung verlassen."
 
 [user-presenter-assigned]
-hash = "sha1-a30e3c571925b16b7730b56a61e30da0643e1978"
-other = "Der Benutzer „{{.Username}}“ ist nun Presenter."
+hash = "sha1-6006a8c40f0862255856a07f70e8cc17475d8a6f"
+other = "Der Benutzer „{{.Username}}“ wurde als Presentator der Besprechung zugewiesen"
 
 [user-presenter-unassigned]
-hash = "sha1-b7b2b1fd5a2b43dfd83651d92c5c3f6d1aa36c99"
-other = "Der Benutzer „{{.Username}}“ ist nicht mehr Presenter."
+hash = "sha1-fcdaee6f5688d07fc9ab9cd0d13558487cc07369"
+other = "Der Benutzer „{{.Username}}“ wurde als Presentator der Besprechung abgesetzt"
 
 [user-raise-hand-changed]
 hash = "sha1-c54add215da6a19a60688c73acea3b2b4050e2d4"

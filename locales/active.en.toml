@@ -178,9 +178,3 @@ one = "user"
 other = "users"
 
 [ServerStatsMeetings]
-one = "Meeting"
-other = "Meetings"
-
-[meetingListUserCountLabel]
-one = "User"
-other = "Users"

@@ -85,23 +85,6 @@ type ScaleliteServer struct {
 	FriendlyName string `toml:"FRIENDLY_NAME"`
 }
 
-func (s BbbServer) isEqual(other BbbServer) bool {
-	return s.Hostname == other.Hostname &&
-		s.ApiPort == other.ApiPort &&
-		s.SharedSecret == other.SharedSecret &&
-		s.FriendlyName == other.FriendlyName
-}
-
-var defaultConfiguration = ConfigurationStruct{
-	BaseConfig:     BaseConfig{Host: "0.0.0.0", Port: "8080", ServeStaticContent: true},
-	ReportConfig:   ReportConfig{CsvStructure: "time,user,action,text representation"},
-	DatabaseConfig: DbConfig{DatabaseConnectionString: "postgres://bbbstatus:bbbstatus@localhost/bbbstatus"},
-	BBBServers: []BbbServer{
-		{Hostname: "localhost", ApiPort: "443", SharedSecret: "aDefaultSharedSecret", APITimeout: 5},
-		{Hostname: "other-host", ApiPort: "443", SharedSecret: "aDefaultSharedSecret", APITimeout: 2},
-	},
-}
-
 type CustomContext struct {
 	echo.Context
 	Config *ConfigurationStruct

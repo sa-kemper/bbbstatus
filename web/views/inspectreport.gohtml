@@ -5,80 +5,146 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>{{t "ReportHeader"}}</title>
-		<link rel="stylesheet" href="/static/css/style.css">
 		<link rel="stylesheet" href="/static/fontawesome.min.css">
+		<link rel="stylesheet" href="/static/css/base.css">
+		<link rel="stylesheet" href="/static/css/report.css">
+		<style>
+			/* Spezifische Ergänzung für die interaktive Teilnehmerliste */
+			.inspect-participant-item {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 8px 12px;
+				border-radius: 8px;
+				cursor: pointer;
+				transition: background 0.2s;
+			}
+
+			.inspect-participant-item:hover {
+				background: #f1f5f9;
+			}
+
+			.participant-checkbox {
+				width: 18px;
+				height: 18px;
+				cursor: pointer;
+			}
+
+			.inspect-submit-area {
+				margin-top: 16px;
+				padding-top: 16px;
+				border-top: 1px solid var(--border);
+				display: flex;
+				justify-content: flex-end;
+			}
+		</style>
 	</head>
 	<body>
-	<div class="container">
-		<div class="action-buttons">
-			<button class="action-button" onclick="window.print()">
-				<i class="fas fa-print"></i>
-				<span>{{t "ReportPrintReportButton"}}</span>
-			</button>
-			<a class="action-button" href="{{reverse "inspectedReportCsv" .InternalMeetingID}}?{{.FilteredUsersParam}}">
-				<i class="fas fa-file-excel"></i>
-				<span>{{t "ReportOpenInExcelButton"}}</span>
+
+	<div class="layout-wrapper">
+		<header>
+			<a href="{{reverse "meetings"}}" class="no-print"
+			   style="text-decoration:none; color: var(--primary); font-weight: 600; font-size: 0.9rem;">
+				<i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
+			</a>
+			<h1 class="meeting-title">{{ .Meeting.Name }}</h1>
+			<div class="meeting-id-badge">ID: {{ .InternalMeetingID }}</div>
+
+			<div class="action-bar no-print">
+				<button class="btn btn-expandable" onclick="window.print()">
+					<i class="fas fa-print"></i> <span>{{t "ReportPrintReportButton"}}</span>
+				</button>
+				<a class="btn btn-expandable"
+				   href="{{reverse "inspectedReportCsv" .InternalMeetingID}}?{{.FilteredUsersParam}}">
+					<i class="fas fa-file-excel"></i> <span>Excel</span>
+				</a>
+				{{ if .MeetingActive }}
+					<button class="btn btn-danger btn-expandable" popovertarget="force-close-modal">
+						<i class="fas fa-ban"></i> <span>{{t "ForceCloseMeetingButton"}}</span>
+					</button>
+				{{ end }}
+			</div>
+		</header>
+
+		<main class="main-content">
+			{{ if .MeetingActive }}
+				<div class="no-print" style="margin-bottom: 24px; display: flex; justify-content: center;">
+					<a href="{{reverse "inspectReport" .InternalMeetingID}}?{{.FilteredUsersParam}}&ts={{ timestamp }}"
+					   class="btn">
+						<i class="fa-solid fa-rotate-right"></i> {{t "Reload"}}
+					</a>
+				</div>
+			{{ end }}
+
+			{{ if .Report.Recordings }}{{template "inlineRecordings" .Report.Recordings}}{{ end }}
+			{{template "timeline" .Report.Timeline}}
+		</main>
+
+		<aside class="sidebar">
+			<form action="{{reverse "inspectReport" .InternalMeetingID}}" method="GET">
+
+				<div class="card no-print" style="padding: 16px 24px;">
+					<div style="display:flex; justify-content: space-between; align-items:center;">
+						<span style="font-size: 0.9rem; font-weight: 500;">{{t "MeetingReportMeetingDetailsGDPRCheckbox"}}</span>
+						<label class="switch">
+							<input type="checkbox" name="gdpr" onchange="this.form.submit()"
+							       {{ if .Gdpr }}checked{{ end }}>
+							<span class="slider"></span>
+						</label>
+					</div>
+				</div>
+
+				{{template "meetingdetails" .Report.Details}}
+
+				<div class="card no-print">
+					<h2>{{t "ReportParticipantsHeader"}}</h2>
+					<div class="inspect-participants-list"
+					     style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;">
+						{{ with .Report.Participants }}
+							{{ range . }}
+								<label class="inspect-participant-item" for="{{.InternalUserID}}">
+									<input type="checkbox" class="participant-checkbox" name="{{.InternalUserID}}"
+									       id="{{.InternalUserID}}" {{if .IsFilteredFor}}checked{{end}}>
+
+									<div style="display: flex; flex-direction: column; overflow: hidden;">
+										<span style="font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ .Name }}</span>
+										<span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">{{ .Role }}</span>
+									</div>
+								</label>
+							{{ end }}
+						{{ end }}
+					</div>
+
+					<div class="inspect-submit-area">
+						<button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+							<i class="fas fa-filter"></i> Filter Timeline
+						</button>
+					</div>
+				</div>
+			</form>
+		</aside>
+	</div>
+
+	<div id="force-close-modal" class="force-close-modal" popover>
+		<h2 style="margin-bottom: 8px;">{{t "ForceCloseModalTitle"}}</h2>
+		<p class="text-muted" style="font-size: 0.95rem;">{{t "ForceCloseModalDescription"}}</p>
+		<div class="alert alert-danger">
+			<i class="fas fa-exclamation-triangle"></i>
+			<div><strong>{{t "ForceCloseModalAlertTitle"}}</strong><br>{{t "ForceCloseModalAlertText"}}</div>
+		</div>
+		<div class="alert alert-warning">
+			<i class="fas fa-exclamation-triangle"></i>
+			<div><strong>{{t "ForceCloseModalWarningTitle"}}</strong><br>{{t "ForceCloseModalWarningText"}}</div>
+		</div>
+		<div class="modal-actions">
+			<button class="btn"
+			        onclick="document.getElementById('force-close-modal').hidePopover()">{{t "Cancel"}}</button>
+			<a href="{{reverse "forceCloseMeeting" .InternalMeetingID}}" class="btn btn-danger">
+				<i class="fas fa-ban"></i> {{t "ForceCloseModalContinue"}}
 			</a>
 		</div>
-
-		<div class="card header">
-			<h1>{{t "ReportHeader"}}</h1>
-		</div>
-		<a class="meeting-button report-back-meeting-button" href="{{reverse "meetings"}}" id="topBackToMeetings">
-			<i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
-		</a>
-
-		<!-- Meeting Details -->
-        {{template "meetingdetails" .Report.Details}}
-
-		<div class="card">
-			<h2>{{t "ReportParticipantsHeader"}}</h2>
-			<form class="participants-list">
-				<div id="gdpr-filter-form">
-					<span>{{t "MeetingReportMeetingDetailsGDPRCheckbox"}}</span>
-					<label class="switch" id="gdpr-label">
-						<input type="checkbox" name="gdpr" {{ if .Gdpr  }}checked{{ end }}>
-						<span class="slider"></span>
-					</label>
-				</div>
-				{{ with .Report.Participants }}
-                    {{ range . }}
-						<div>
-							<input type="checkbox" class="participant-checkbox" name="{{.InternalUserID}}"
-								   id="{{.InternalUserID}}" {{if .IsFilteredFor}}checked{{end}}/>
-							<label class="participant-card" for="{{.InternalUserID}}">
-								<h3>{{ .Name }}</h3>
-								<span class="role-badge role-moderator">{{ .Role }}</span>
-							</label>
-						</div>
-					{{ end }}
-				{{ end }}
-				<input type="submit" class="meeting-button participant-filter-submit" value="filter">
-			</form>
-		</div>
-
-        {{ if .MeetingActive }}
-			<div class="reload-container" onclick="location.reload()">
-				<a href="{{reverse "inspectReport" .InternalMeetingID}}?{{.FilteredUsersParam}}&ts={{ timestamp }}"
-				   class="reload-button">
-					<i class="fa-solid fa-rotate-right"></i>
-					Reload
-				</a>
-			</div>
-        {{ end }}
-
-		<!-- Recordings -->
-        {{ if .Report.Recordings }}
-            {{template "inlineRecordings" .Report.Recordings}}
-        {{ end }}
-		<!-- Timeline -->
-        {{template "timeline" .Report.Timeline}}
-
-		<a class="meeting-button report-back-meeting-button" href="{{reverse "meetings"}}" id="bottomBackToMeetings">
-			<i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
-		</a>
 	</div>
+
 	</body>
 	</html>
-
 {{ end }}

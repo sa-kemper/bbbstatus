@@ -18,7 +18,7 @@ package BBBEvents
 
 import "github.com/nicksnyder/go-i18n/v2/i18n"
 
-var UserEventTextRepresentation = map[string]i18n.Message{
+var UserEventTextRepresentation = map[BBBEventType]i18n.Message{
 	EventUserJoined:                {ID: "user-joined", Other: "User '{{.Username}}' joined the meeting"},
 	EventUserLeft:                  {ID: "user-left", Other: "User '{{.Username}}' left the meeting"},
 	EventUserPresenterAssigned:     {ID: "user-presenter-assigned", Other: "User '{{.Username}}' has been assigned as the meetings presenter"},

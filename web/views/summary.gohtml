@@ -5,234 +5,112 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{t "StatsPageStatisticsHeader"}}</title>
-        <link rel="stylesheet" href="/static/css/style.css">
         <link rel="stylesheet" href="/static/fontawesome.min.css">
-        <link rel="stylesheet" href="/static/charts.min.css">
-        <style>
-            #StatsPagesStopTimeSelectorPrintLabel,
-            #StatsPagesStartTimeSelectorPrintLabel {
-                display: none;
-            }
-
-            @media print {
-                #StatsPagesStopTimeSelectorPrintLabel,
-                #StatsPagesStartTimeSelectorPrintLabel {
-                    display: unset;
-                }
-
-                #StatsPagesStartTimeSelectorLabel, #StatsPageStopTimeSelectorLabel {
-                    display: none;
-                }
-            }
-
-            .stats-card {
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                padding: 1.5rem;
-                margin-bottom: 2rem;
-                transition: box-shadow 0.3s ease;
-            }
-
-            .stats-card:hover {
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            }
-
-            .stats-header {
-                color: #2c3e50;
-                font-size: 1.5rem;
-                font-weight: 600;
-                margin-bottom: 1rem;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .stats-form {
-                display: flex;
-                flex-direction: column;
-                margin-bottom: 1.5rem;
-            }
-
-            .stats-label {
-                color: #6c757d;
-                margin-bottom: 0.5rem;
-                font-size: 0.875rem;
-                display: block;
-            }
-
-            .table-container {
-                overflow-x: auto;
-                margin-top: 1rem;
-            }
-
-            .stats-table {
-                width: 100%;
-                border-collapse: separate;
-                border-spacing: 0;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                background: white;
-            }
-
-            .stats-table thead th {
-                background: linear-gradient(90deg, #f8f9fa, #e9ecef);
-                color: #2c3e50;
-                font-weight: 600;
-                padding: 1rem;
-                text-align: left;
-                font-size: 0.875rem;
-                text-transform: uppercase;
-            }
-
-            .stats-table tbody td {
-                padding: 1rem;
-                border-top: 1px solid #e9ecef;
-                color: #333;
-                font-size: 0.875rem;
-            }
-
-            .stats-table tbody tr:nth-child(even) {
-                background-color: #f9fafb;
-            }
-
-            .stats-table tbody tr:hover {
-                background-color: #e3f2fd;
-                transition: background-color 0.2s ease;
-            }
-
-            @media (max-width: 768px) {
-                .stats-header {
-                    font-size: 1.25rem;
-                }
-
-                .stats-table thead th,
-                .stats-table tbody td {
-                    padding: 0.75rem;
-                    font-size: 0.75rem;
-                }
-            }
-
-            @media print {
-                .stats-card {
-                    box-shadow: none;
-                    border: 1px solid #e9ecef;
-                }
-
-                .stats-table {
-                    box-shadow: none;
-                }
-
-                .stats-table thead th {
-                    background: #f8f9fa;
-                }
-
-                .stats-table tbody tr:nth-child(even) {
-                    background-color: #f9fafb;
-                }
-            }
-        </style>
+        <link rel="stylesheet" href="/static/css/base.css">
+        <link rel="stylesheet" href="/static/css/summary.css">
     </head>
     <body>
     <div class="container">
-        <div class="card header">
-            <h1>{{t "StatsPageStatisticsHeader"}}</h1>
-            <a class="meeting-button" href="{{ reverse "meetings" }}">
-                <i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
-            </a>
-        </div>
 
-        <div class="action-buttons">
-            <button class="action-button" onclick="window.print()">
-                <i class="fas fa-print"></i>
-                <span>{{t "ReportPrintReportButton"}}</span>
-            </button>
-            <a class="action-button"
-               href="{{ reverse "summaryCsv" }}?startTime={{.Request.StartTime}}&endTime={{.Request.StopTime}}">
-                <i class="fas fa-file-excel"></i>
-                <span>{{t "ReportOpenInExcelButton"}}</span>
-            </a>
-        </div>
+        <div class="layout-container">
+            <header class="stats-header">
+                <div class="header-left">
+                    <nav class="breadcrumb no-print">
+                        <a href="{{ reverse "meetings" }}">← {{t "BackToMeetingsButton"}}</a>
+                    </nav>
+                    <h1 class="page-title">{{t "StatsPageStatisticsHeader"}}</h1>
+                </div>
 
-        <div class="link-group">
-            <div class="link">
-                <a href="{{ reverse "statistics" }}?scope=week"
-                   class="name">{{t "Week"}}</a>
+                <div class="header-actions no-print">
+                    <button class="btn btn-expandable" onclick="window.print()">
+                        <i class="fas fa-print"></i> <span>{{t "ReportPrintReportButton"}}</span>
+                    </button>
+                    <a class="btn btn-expandable"
+                       href="{{ reverse "summaryCsv" }}?startTime={{.Request.StartTime}}&endTime={{.Request.StopTime}}">
+                        <i class="fas fa-file-excel"></i> <span>Excel</span>
+                    </a>
+                </div>
+            </header>
+
+            <div class="filter-bar no-print">
+                <div class="segmented-control">
+                    <a href="{{ reverse "statistics" }}?scope=week" class="control-item">{{t "Week"}}</a>
+                    <a href="{{ reverse "statistics" }}?scope=month" class="control-item">{{t "Month"}}</a>
+                    <a href="{{ reverse "statistics" }}?scope=year" class="control-item">{{t "Year"}}</a>
+                    <a href="{{ reverse "summary" }}" class="control-item active">{{t "Summary"}}</a>
             </div>
-            <div class="link">
-                <a href="{{ reverse "statistics" }}?scope=month"
-                   class="name ">{{t "Month"}}</a>
-            </div>
-            <div class="link">
-                <a href="{{ reverse "statistics" }}?scope=year"
-                   class="name">{{t "Year"}}</a>
-            </div>
-            <div class="link">
-                <a href="{{ reverse "summary" }}"
-                   class="name active ">{{t "Summary"}}</a>
-            </div>
-        </div>
 
-        <div class="card stats-card">
-            <h2 class="stats-header">{{t "StatsPageStatisticsOverviewHeader"}}</h2>
-            <form class="stats-form" action="{{reverse "summary"}}">
-                <input type="hidden" name="scope" value="year">
-                <label for="StatsPageStartTimeSelector" class="stats-label">
-                    <span id="StatsPagesStartTimeSelectorLabel">{{t "StatsPageSelectScopeStartTime"}}</span>
-                    <span id="StatsPagesStartTimeSelectorPrintLabel"
-                          class="stats-label">{{t "StatsPageSelectScopeStartTimePrint"}}</span>
-                </label>
-                <input type="date"
-                       onblur="this.form.submit();" name="startTime"
-                       value="{{ .Request.StartTime }}" min="{{ .Request.StartTimeMin }}"
-                       max="{{ .Request.StartTimeMax }}" required id="StatsPageStartTimeSelector">
+                <form class="date-filters" action="{{reverse "summary"}}">
+                    <input type="hidden" name="scope" value="year">
+                    <div class="filter-input-group">
+                        <label>{{t "StatsPageSelectScopeStartTime"}}</label>
+                        <input type="date" name="startTime" onchange="this.form.submit();"
+                               value="{{ .Request.StartTime }}" min="{{ .Request.StartTimeMin }}"
+                               max="{{ .Request.StartTimeMax }}">
+                    </div>
+                    <div class="filter-divider"></div>
+                    <div class="filter-input-group">
+                        <label>{{t "StatsPageSelectScopeStopTime"}}</label>
+                        <input type="date" name="stopTime" onchange="this.form.submit();"
+                               value="{{ .Request.StopTime }}" min="{{ .Request.StartTimeMin }}"
+                               max="{{ .Request.StartTimeMax }}">
+                    </div>
+                    <noscript>
+                        <button type="submit" class="btn">OK</button>
+                    </noscript>
+                </form>
+            </div>
 
-                <label for="StatsPageStopTimeSelector" class="stats-label">
-                    <span id="StatsPageStopTimeSelectorLabel">{{t "StatsPageSelectScopeStopTime"}}</span>
-                    <span id="StatsPagesStopTimeSelectorPrintLabel">{{t "StatsPageSelectScopeStopTimePrint"}}</span>
-                </label>
-                <input type="date"
-                       onblur="this.form.submit();" name="stopTime"
-                       value="{{ .Request.StopTime }}" min="{{ .Request.StartTimeMin }}"
-                       max="{{ .Request.StartTimeMax }}" required id="StatsPageStopTimeSelector">
-                <noscript>
-                    <input type="submit" class="meeting-button">
-                </noscript>
-            </form>
+            <div class="kpi-grid">
+                <div class="card kpi-card">
+                    <span class="kpi-label">Gesamtanzahl Meetings</span>
+                    <span class="kpi-value">{{ len .Data }}</span> {{/* Beispiel-Logik */}}
+                </div>
+                <div class="card kpi-card">
+                    <span class="kpi-label">Zeitraum</span>
+                    <span class="kpi-value text-sm"
+                          style="font-size: 1rem;">{{ .Request.StartTime }} - {{ .Request.StopTime }}</span>
+                </div>
+                <div class="card kpi-card">
+                    <span class="kpi-label">Status</span>
+                    <span class="kpi-value"><i class="fas fa-check-circle text-success"></i> Aktiv</span>
+                </div>
+            </div>
 
-            <div class="table-container">
+            <div class="card table-card">
+                <h2 class="card-title">{{t "StatsPageStatisticsOverviewHeader"}}</h2>
+                <div class="table-responsive">
                 <table class="stats-table">
                     <thead>
                     <tr>
                         <th>{{t "Month"}}</th>
                         <th>{{t "SummaryMeetingName"}}</th>
-                        <th>{{t "SummaryUserCount"}}</th>
-                        <th>{{t "SummaryDuration"}}</th>
+                        <th class="text-center">{{t "SummaryUserCount"}}</th>
+                        <th class="text-right">{{t "SummaryDuration"}}</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {{ range .Data}}
-                        <tr>
-                            <td>{{t .Name }}</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                    {{ range .Data }}
+                        <tr class="month-divider">
+                            <td colspan="4">{{t .Name }}</td>
                         </tr>
                         {{ range .Items }}
                             <tr>
-                                <td>{{ formatDate .Date }}</td>
-                                <td>{{ .MeetingName }}</td>
-                                <td>{{ .UserCount }}</td>
-                                <td>{{ formatDuration .Duration }}</td>
+                                <td class="col-date">{{ formatDate .Date }}</td>
+                                <td class="col-name font-bold">{{ .MeetingName }}</td>
+                                <td class="col-users text-center">
+                                    <span class="user-badge">{{ .UserCount }}</span>
+                                </td>
+                                <td class="col-duration text-right font-mono">{{ formatDuration .Duration }}</td>
                             </tr>
                         {{ end }}
                     {{ end }}
-
                     </tbody>
                 </table>
             </div>
         </div>
+        </div>
+
     </div>
     </body>
     </html>

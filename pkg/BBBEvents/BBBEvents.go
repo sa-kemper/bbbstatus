@@ -199,35 +199,37 @@ func (b *BaseEvent) GetTimestamp() time.Time {
 	return time.Unix(b.Data.Event.Timestamp/1000, 0)
 }
 
+type BBBEventType string
+
 // Event type constants
 const (
-	EventMeetingCreated            = "meeting-created"
-	EventUserJoined                = "user-joined"
-	EventUserLeft                  = "user-left"
-	EventUserPresenterAssigned     = "user-presenter-assigned"
-	EventUserPresenterUnassigned   = "user-presenter-unassigned"
-	EventUserAudioVoiceEnabled     = "user-audio-voice-enabled"
-	EventUserAudioVoiceDisabled    = "user-audio-voice-disabled"
-	EventUserAudioMuted            = "user-audio-muted"
-	EventUserAudioUnmuted          = "user-audio-unmuted"
-	EventUserCamBroadcastStart     = "user-cam-broadcast-start"
-	EventUserCamBroadcastEnd       = "user-cam-broadcast-end"
-	EventMeetingScreenshareStarted = "meeting-screenshare-started"
-	EventMeetingScreenshareStopped = "meeting-screenshare-stopped"
-	EventChatGroupMessageSent      = "chat-group-message-sent"
-	EventUserEmojiChanged          = "user-emoji-changed"
-	EventUserRaiseHandChanged      = "user-raise-hand-changed"
-	EventPollStarted               = "poll-started"
-	EventPollResponded             = "poll-responded"
-	EventMeetingEnded              = "meeting-ended"
-	EventMeetingRapArchiveEnded    = "meeting-rap-archive-ended" // TODO: use this as a counter for recordings of a meeting.
-	EventMeetingRapArchiveStarted  = "meeting-rap-archive-started"
-	EventSharedNotesChanged        = "pad-content"
-	MeetingRecordingStarted        = "meeting-recording-started"
-	MeetingRecordingStopped        = "meeting-recording-stopped"
+	EventMeetingCreated            = BBBEventType("meeting-created")
+	EventUserJoined                = BBBEventType("user-joined")
+	EventUserLeft                  = BBBEventType("user-left")
+	EventUserPresenterAssigned     = BBBEventType("user-presenter-assigned")
+	EventUserPresenterUnassigned   = BBBEventType("user-presenter-unassigned")
+	EventUserAudioVoiceEnabled     = BBBEventType("user-audio-voice-enabled")
+	EventUserAudioVoiceDisabled    = BBBEventType("user-audio-voice-disabled")
+	EventUserAudioMuted            = BBBEventType("user-audio-muted")
+	EventUserAudioUnmuted          = BBBEventType("user-audio-unmuted")
+	EventUserCamBroadcastStart     = BBBEventType("user-cam-broadcast-start")
+	EventUserCamBroadcastEnd       = BBBEventType("user-cam-broadcast-end")
+	EventMeetingScreenshareStarted = BBBEventType("meeting-screenshare-started")
+	EventMeetingScreenshareStopped = BBBEventType("meeting-screenshare-stopped")
+	EventChatGroupMessageSent      = BBBEventType("chat-group-message-sent")
+	EventUserEmojiChanged          = BBBEventType("user-emoji-changed")
+	EventUserRaiseHandChanged      = BBBEventType("user-raise-hand-changed")
+	EventPollStarted               = BBBEventType("poll-started")
+	EventPollResponded             = BBBEventType("poll-responded")
+	EventMeetingEnded              = BBBEventType("meeting-ended")
+	EventMeetingRapArchiveEnded    = BBBEventType("meeting-rap-archive-ended")
+	EventMeetingRapArchiveStarted  = BBBEventType("meeting-rap-archive-started")
+	EventSharedNotesChanged        = BBBEventType("pad-content")
+	MeetingRecordingStarted        = BBBEventType("meeting-recording-started")
+	MeetingRecordingStopped        = BBBEventType("meeting-recording-stopped")
 )
 
-var handledBBBEvents = []string{EventMeetingCreated,
+var handledBBBEvents = []BBBEventType{EventMeetingCreated,
 	EventUserJoined,
 	EventUserLeft,
 	EventUserPresenterAssigned,

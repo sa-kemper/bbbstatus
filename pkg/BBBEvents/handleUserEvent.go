@@ -29,10 +29,11 @@ import (
 func handleUserEvent(ctx context.Context, dbQueries *db.Queries, user *User, meeting Meeting, b *BaseEvent) error {
 	var userInRequestExists bool
 	var err error
-	if b.Data.ID == "user-joined" {
+	EventID := BBBEventType(b.Data.ID)
+	if EventID == "user-joined" {
 		return handleUserJoined(ctx, dbQueries, user, meeting, b)
 	}
-	if b.Data.ID == "user-left" {
+	if EventID == "user-left" {
 		err = dbQueries.LeaveUserByID(ctx, db.LeaveUserByIDParams{LeaveTimestamp: pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true}, InternalUserID: user.InternalUserID})
 		if err != nil {
 			fmt.Printf("Data invalidation Error -> updating users.leave_timestamp (userID:%v): %v\n", user.InternalUserID, err)
@@ -41,7 +42,7 @@ func handleUserEvent(ctx context.Context, dbQueries *db.Queries, user *User, mee
 	}
 
 	if user == nil {
-		if b.Data.ID == EventMeetingScreenshareStopped || b.Data.ID == EventMeetingScreenshareStarted {
+		if EventID == EventMeetingScreenshareStopped || EventID == EventMeetingScreenshareStarted {
 			user = &User{}
 			dbUser, err := dbQueries.GetPresenterUserByMeetingID(ctx, meeting.InternalMeetingID) // huh?
 			if err != nil {                                                                      // handle the failure of the query
@@ -65,7 +66,7 @@ func handleUserEvent(ctx context.Context, dbQueries *db.Queries, user *User, mee
 	err = dbQueries.InsertUserEvent(ctx, db.InsertUserEventParams{
 		EventTimestamp:    pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true},
 		InternalUserID:    user.InternalUserID,
-		EventType:         b.Data.ID,
+		EventType:         string(EventID),
 		InternalMeetingID: meeting.InternalMeetingID,
 	})
 	if err != nil {

@@ -5,87 +5,98 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>{{t "RecordingsPageTitle"}}</title>
-		<link rel="stylesheet" href="/static/css/style.css">
 		<link rel="stylesheet" href="/static/fontawesome.min.css">
+		<link rel="stylesheet" href="/static/css/base.css">
+		<link rel="stylesheet" href="/static/css/recordings.css">
 	</head>
-	<body class="recordings-page">
-	<div class="container recordings-container">
-		<!-- Header -->
-		<div class="header recordings-header animate-slide-in" style="--animation-order: 1;">
-			<h1><i class="fas fa-video"></i> {{t "RecordingsPageTitle"}}</h1>
-			<a href="{{ reverse "meetings" }}" class="home-button recordings-home-button"><i
-						class="fas fa-home"></i> {{t "BackToMeetingsButton"}}</a>
-		</div>
+	<body>
+	<div class="container">
+		<header class="page-header">
+			<div class="header-left">
+				<div class="header-icon"><i class="fas fa-video"></i></div>
+				<h1 class="page-title">{{t "RecordingsPageTitle"}}</h1>
+			</div>
+			<a href="{{ reverse "meetings" }}" class="btn btn-expandable no-print">
+				<i class="fas fa-home"></i> <span>{{t "BackToMeetingsButton"}}</span>
+			</a>
+		</header>
 
-		<!-- Search and Filters -->
-		<div class="search-filter animate-fade-in" style="--animation-order: 2;">
-			<form class="search-form" method="GET" action="/recordings">
-				<div class="search-input-wrapper">
-					<i class="fas fa-search search-icon"></i>
+		<div class="filter-bar no-print">
+			<form class="filter-form" method="GET" action="/recordings">
+				<div class="search-group">
+					<i class="fas fa-search"></i>
 					<input type="text" name="query" placeholder="{{t "RecordingsPageSearchBar"}}"
-						   value="{{.Request.Query}}">
+					       value="{{.Request.Query}}">
 				</div>
-				<div class="filter-group">
-					<label for="start-date">{{t "MeetingListFilterStartDate"}}</label>
-					<input type="date" name="start-date" id="start-date" value="{{.Request.StartDate}}">
+				<div class="date-group">
+					<div class="filter-input-group">
+						<label for="start-date">{{t "MeetingListFilterStartDate"}}</label>
+						<input type="date" name="start-date" id="start-date" value="{{.Request.StartDate}}">
+					</div>
+					<div class="filter-input-group">
+						<label for="end-date">{{t "MeetingListFilterEndDate"}}</label>
+						<input type="date" name="end-date" id="end-date" value="{{.Request.EndDate}}">
+					</div>
 				</div>
-				<div class="filter-group">
-					<label for="end-date">{{t "MeetingListFilterEndDate"}}</label>
-					<input type="date" name="end-date" id="end-date" value="{{.Request.EndDate}}">
-				</div>
-				<button type="submit" class="search-button"><i
-							class="fas fa-filter"></i> {{t "MeetingListFilterFilterButton"}}</button>
+				<button type="submit" class="btn btn-primary">
+					<i class="fas fa-filter"></i> {{t "MeetingListFilterFilterButton"}}
+				</button>
 			</form>
 		</div>
 
-		<!-- Recordings List -->
-		<div class="recordings-grid animate-fade-in" style="--animation-order: 3;">
-            {{range .Recordings.Recording}}
-				<div class="recording-card">
-					<div class="recording-header">
-						<h2>{{.Name}}</h2>
+		<div class="recording-grid">
+			{{range .Recordings.Recording}}
+				<div class="card recording-card">
+					<div class="card-header-flex">
+						<h2 class="recording-title">{{.Name}}</h2>
 						<span class="status-badge status-{{if .Published}}published{{else}}unpublished{{end}}">
-                        {{if .Published}}{{t "RecordingPageRecordingState-published"}}{{else}}{{t "RecordingPageRecordingState-unpublished"}}{{end}}
-                    </span>
+                            {{if .Published}}{{t "RecordingPageRecordingState-published"}}{{else}}{{t "RecordingPageRecordingState-unpublished"}}{{end}}
+                        </span>
 					</div>
-					<div class="recording-meta">
-						<div class="meta-item">
-							<span class="meta-label">{{t "RecordingPageRecordingMeetingID"}}:</span>
-							<span class="meta-value">{{.MeetingID}}</span>
+
+					<div class="recording-details">
+						<div class="detail-item">
+							<span class="detail-label">{{t "RecordingPageRecordingMeetingID"}}</span>
+							<span class="detail-value font-mono truncate" title="{{.MeetingID}}">{{.MeetingID}}</span>
 						</div>
-						<div class="meta-item">
-							<span class="meta-label">{{t "ReportParticipantsHeader"}}:</span>
-							<span class="meta-value">{{.Participants}}</span>
+						<div class="detail-item">
+							<span class="detail-label">{{t "ReportParticipantsHeader"}}</span>
+							<span class="detail-value">{{.Participants}}</span>
 						</div>
-						<div class="meta-item">
-							<span class="meta-label">{{t "MeetingListFilterStartDate"}}:</span>
-							<span class="meta-value">{{formatDate .StartDate}}</span>
+						<div class="detail-item">
+							<span class="detail-label">{{t "MeetingListFilterStartDate"}}</span>
+							<span class="detail-value">{{formatDate .StartDate}}</span>
 						</div>
-						<div class="meta-item">
-							<span class="meta-label">{{t "RecordingPageRecordingDuration"}}:</span>
-							<span class="meta-value">{{(index .Playback.Format 0).Length}} mins</span>
+						<div class="detail-item">
+							<span class="detail-label">{{t "RecordingPageRecordingDuration"}}</span>
+							<span class="detail-value">{{(index .Playback.Format 0).Length}} mins</span>
 						</div>
-                        {{if .IsBreakout}}
-							<div class="meta-item">
-								<span class="meta-label">{{t "RecordingPageRecordingType"}}:</span>
-								<span class="meta-value">{{t "RecordingPageRecordingBreakout"}}</span>
+						{{if .IsBreakout}}
+							<div class="detail-item breakout-badge">
+								<span class="detail-label">{{t "RecordingPageRecordingType"}}</span>
+								<span class="detail-value"><i
+											class="fas fa-puzzle-piece"></i> {{t "RecordingPageRecordingBreakout"}}</span>
 							</div>
-                        {{end}}
+						{{end}}
 					</div>
-					<div class="recording-actions">
-                        {{range .Playback.Format}}
-							<a href="{{.Url}}" class="recording-link recordings-play-link" target="_blank">
-								<i class="fas fa-play"></i> {{t "RecordingPageRecordingPlay"}} {{.Type}}
+
+					<div class="action-grid">
+						{{range .Playback.Format}}
+							<a href="{{.Url}}" class="btn btn-play {{if eq .Type "video"}}btn-full{{end}}"
+							   target="_blank">
+								<i class="fas {{if eq .Type "video"}}fa-circle-play{{else if eq .Type "statistics"}}fa-chart-simple{{else if eq .Type "notes"}}fa-file-lines{{else}}fa-play{{end}}"></i>
+								{{if eq .Type "video"}}{{t "RecordingPageRecordingPlay"}}{{end}} {{.Type}}
 							</a>
-                        {{end}}
+						{{end}}
 					</div>
 				</div>
-            {{else}}
-				<div class="not-found-container recordings-not-found animate-fade-in" style="--animation-order: 3;">
+			{{else}}
+				<div class="card not-found-card">
+					<i class="fas fa-magnifying-glass"></i>
 					<h1>{{t "RecordingPageNoRecordingsFound"}}</h1>
 					<p>{{t "RecordingPageNoRecordingsFoundHint"}}</p>
 				</div>
-            {{end}}
+			{{end}}
 		</div>
 	</div>
 	</body>

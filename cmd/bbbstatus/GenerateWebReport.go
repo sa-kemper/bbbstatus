@@ -43,6 +43,7 @@ type Detail struct {
 type Event struct {
 	Time               time.Time
 	FormattedTime      string
+	EventType          BBBEvents.BBBEventType
 	TextRepresentation string
 }
 
@@ -158,7 +159,7 @@ func GenerateWebReport(ctx context.Context, conf *config.ConfigurationStruct, in
 				if errors.Is(err, os.ErrDeadlineExceeded) {
 					fmt.Println("FATAL: BBB API Timeout for host:", meetingServerAPI.Hostname)
 				}
-				//fmt.Println("DEBUG: Error occurred whilst geting recordings. ", err)
+				//fmt.Println("DEBUG: Error occurred whilst getting recordings. ", err)
 				return Report{}, err
 			}
 			recordings = getRecordingsResponse.Recording
@@ -223,6 +224,7 @@ func FillMeetingEvents(ctx context.Context, id string, dbQueries *db.Queries) ([
 		timeline = append(timeline, Event{
 			Time:               event.EventTimestamp.Time,
 			TextRepresentation: locales.TranslateFromCTX(ctx, "MeetingEvent-"+event.EventType),
+			EventType:          BBBEvents.BBBEventType(event.EventType),
 		})
 	}
 	return timeline, nil
@@ -281,6 +283,7 @@ func FillMeetingPollResponses(ctx context.Context, conf *config.ConfigurationStr
 				poll.Question = string([]byte(pollID)[0:5])
 			}
 			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportPollResponseEventRepresentation", map[string]string{"username": user.Name, "pollQuestion": poll.Question, "pollAnswer": poll.Answers[poll.AnswerIds[0]].Key})
+			event.EventType = BBBEvents.EventPollResponded
 			timeline = append(timeline, event)
 			//goland:noinspection ALL
 			conn2.Close(ctx)
@@ -339,6 +342,7 @@ func FillMeetingPollEvents(ctx context.Context, conf *config.ConfigurationStruct
 		} else {
 			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportPollStartedEventRepresentation", map[string]string{"Username": userName, "PollQuestion": question, "PollOptions": answersTextRepresentation})
 		}
+		event.EventType = BBBEvents.EventPollStarted
 		timeline = append(timeline, event)
 		//goland:noinspection ALL
 		conn2.Close(ctx)
@@ -387,6 +391,7 @@ func FillMeetingMessageEvents(ctx context.Context, internalMeetingID string, dbQ
 		} else {
 			event.TextRepresentation = locales.TranslateAdvanced(ctx, "ReportMessageEventRepresentation", map[string]string{"Username": messageUser.Name, "Message": message.MessageContent})
 		}
+		event.EventType = BBBEvents.EventChatGroupMessageSent
 		timeline = append(timeline, event)
 	}
 	return timeline, err
@@ -422,6 +427,7 @@ func FillMeetingUserEvents(ctx context.Context, internalMeetingID string, dbQuer
 		} else {
 			event = Event{Time: userEvent.EventTimestamp.Time, TextRepresentation: locales.TranslateAdvanced(ctx, userEvent.EventType, map[string]string{"Username": eventUser.Name})}
 		}
+		event.EventType = BBBEvents.BBBEventType(userEvent.EventType)
 		timeline = append(timeline, event)
 	}
 	return timeline, err

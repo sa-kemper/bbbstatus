@@ -5,171 +5,151 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{t "StatsPageStatisticsHeader"}}</title>
-        <link rel="stylesheet" href="/static/css/style.css">
         <link rel="stylesheet" href="/static/fontawesome.min.css">
         <link rel="stylesheet" href="/static/charts.min.css">
-        <style>
-            #StatsPageSelectScopeTimePrintLabel {
-                visibility: hidden;
-            }
-
-            @media print {
-                #StatsPageSelectScopeTimePrintLabel {
-                    visibility: visible;
-                }
-
-                #StatsPageTimeSelectorLabel {
-                    visibility: hidden;
-                }
-            }
-        </style>
+        <link rel="stylesheet" href="/static/css/base.css">
+        <link rel="stylesheet" href="/static/css/statistics.css">
     </head>
     <body>
     <div class="container">
-        <div class="card header">
-            <h1>{{t "StatsPageStatisticsHeader"}}</h1>
-            <a class="meeting-button" href="{{ reverse "meetings" }}">
-                <i class="fas fa-arrow-left"></i> {{t "BackToMeetingsButton"}}
-            </a>
-        </div>
+        <header class="stats-header">
+            <div class="header-left">
+                <nav class="breadcrumb no-print">
+                    <a href="{{ reverse "meetings" }}">← {{t "BackToMeetingsButton"}}</a>
+                </nav>
+                <h1 class="page-title">{{t "StatsPageStatisticsHeader"}}</h1>
+            </div>
 
-        <div class="action-buttons">
-            <button class="action-button" onclick="window.print()">
-                <i class="fas fa-print"></i>
-                <span>{{t "ReportPrintReportButton"}}</span>
-            </button>
-            <a class="action-button"
-               href="{{ reverse "statisticsCsv" }}{{if .CurrentScope}}?scope={{.CurrentScope}}{{end}}">
-                <i class="fas fa-file-excel"></i>
-                <span>{{t "ReportOpenInExcelButton"}}</span>
-            </a>
-        </div>
+            <div class="header-actions no-print">
+                <button class="btn btn-expandable" onclick="window.print()">
+                    <i class="fas fa-print"></i> <span>{{t "ReportPrintReportButton"}}</span>
+                </button>
+                <a class="btn btn-expandable"
+                   href="{{ reverse "statisticsCsv" }}{{if .CurrentScope}}?scope={{.CurrentScope}}{{end}}">
+                    <i class="fas fa-file-excel"></i> <span>Excel</span>
+                </a>
+            </div>
+        </header>
 
-        <div class="link-group">
-            <div class="link">
+        <div class="filter-bar no-print">
+            <div class="segmented-control">
                 <a href="{{ reverse "statistics" }}?scope=week"
-                   class="name {{if .WeekActive }}active{{end}}">{{t "Week"}}</a>
-            </div>
-            <div class="link">
+                   class="control-item {{if .WeekActive }}active{{end}}">{{t "Week"}}</a>
                 <a href="{{ reverse "statistics" }}?scope=month"
-                   class="name {{if .MonthActive }}active{{end}}">{{t "Month"}}</a>
-            </div>
-            <div class="link">
+                   class="control-item {{if .MonthActive }}active{{end}}">{{t "Month"}}</a>
                 <a href="{{ reverse "statistics" }}?scope=year"
-                   class="name {{if .YearActive }}active{{end}}">{{t "Year"}}</a>
+                   class="control-item {{if .YearActive }}active{{end}}">{{t "Year"}}</a>
+                <a href="{{ reverse "summary" }}" class="control-item">{{t "Summary"}}</a>
             </div>
-            <div class="link">
-                <a href="{{ reverse "summary" }}"
-                   class="name ">{{t "Summary"}}</a>
-            </div>
-        </div>
 
-
-        <div class="card">
-            <h2>{{t "StatsPageStatisticsOverviewHeader"}}</h2>
-            <form action="{{reverse "statistics"}}">
+            <form class="date-filters" action="{{reverse "statistics"}}">
                 <input type="hidden" name="scope" value="{{.CurrentScope}}">
-                <label for="StatsPageTimeSelector" class="label"><span
-                            id="StatsPageTimeSelectorLabel">{{t "StatsPageSelectScopeTime"}}</span><span
-                            id="StatsPageSelectScopeTimePrintLabel">{{t "StatsPageSelectScopeTimePrintLabel"}}</span></label>
-                <input type="{{ if eq .CurrentScope "week" }}week{{ else }}{{if eq .CurrentScope "month"}}month{{ else }}date{{ end }}{{ end }}"
-                       onblur="this.form.submit();" name="startTime"
-                       value="{{ .StartTime }}" min="{{ .StartTimeMin }}"
-                       max="{{ .StartTimeMax }}" required id="StatsPageTimeSelector">
+                <div class="filter-input-group">
+                    <label id="StatsPageTimeSelectorLabel">{{t "StatsPageSelectScopeTime"}}</label>
+                    <label id="StatsPageSelectScopeTimePrintLabel"
+                           class="print-only">{{t "StatsPageSelectScopeTimePrintLabel"}}</label>
+                    <input type="{{ if eq .CurrentScope "week" }}week{{ else }}{{if eq .CurrentScope "month"}}month{{ else }}date{{ end }}{{ end }}"
+                           onchange="this.form.submit();" name="startTime"
+                           value="{{ .StartTime }}" min="{{ .StartTimeMin }}" max="{{ .StartTimeMax }}" required
+                           id="StatsPageTimeSelector">
+                </div>
                 <noscript>
-                    <input type="submit" class="meeting-button">
+                    <button type="submit" class="btn">OK</button>
                 </noscript>
             </form>
+        </div>
 
-            <!-- Placeholder for charts -->
-            <table id="conference-count-table"
-                   class="charts-css bar show-heading show-labels data-outside sorted data-spacing-5">
-                <caption> {{t "StatsPageConferenceCountHeader"}} </caption>
-                <thead>
-                <tr>
-                    <th>{{.CurrentScope}}</th>
-                    <th>{{t "StatsPageConferencesTableHeader"}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {{ range .StatsOrder }}
-                    <tr>
-                        <th scope="row">{{t . }}</th>
-                        <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceCount . }} / {{ $.Statistics.HighestConferenceCount }})">
-                            <span class="data">{{ valFromIndex $.Statistics.ConferenceCount . }}</span>
-                            <span
-                                    class="tooltip"> {{t "StatsPageConferencesInToolTip"}} {{t . }}: {{ valFromIndex $.Statistics.ConferenceCount . }} </span>
-                        </td>
-                    </tr>
-                {{ end }}
-                </tbody>
-            </table>
+        <div class="charts-grid">
 
-            <table id="attendee-count-table"
-                   class="charts-css bar show-heading show-labels data-outside sorted data-spacing-5">
-                <caption> {{t "StatsPageConferenceAttendeeCountHeader"}} </caption>
-                <thead>
-                <tr>
-                    <th>{{.CurrentScope}}</th>
-                    <th>{{t "StatsPageAttendeeCountTableHeader"}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {{ range .StatsOrder }}
-                    <tr>
-                        <th scope="row">{{t . }}</th>
-                        <td style="--size: calc({{ valFromIndex $.Statistics.MaxUserCount . }} / {{ $.Statistics.HighestMaxUserCount }})">
-                            <span class="data">{{ valFromIndex $.Statistics.MaxUserCount . }} </span> <span
-                                    class="tooltip"> {{t "StatsPageAttendeesInToolTip"}} {{t . }}: {{ valFromIndex $.Statistics.MaxUserCount . }} </span>
-                        </td>
-                    </tr>
-                {{ end }}
-                </tbody>
-            </table>
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-label">{{t "StatsPageConferenceCountHeader"}}</h2>
+                    <span class="chart-total">{{ $.Statistics.HighestConferenceCount }}</span>
+                </div>
+                <div class="chart-wrapper">
+                    <table id="conference-count-table" class="charts-css bar show-labels data-spacing-5">
+                        <tbody>
+                        {{ range .StatsOrder }}
+                            <tr>
+                                <th scope="row">{{t . }}</th>
+                                <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceCount . }} / {{ $.Statistics.HighestConferenceCount }})">
+                                    <span class="data">{{ valFromIndex $.Statistics.ConferenceCount . }}</span>
+                                    <span class="tooltip">{{t . }}: {{ valFromIndex $.Statistics.ConferenceCount . }}</span>
+                                </td>
+                            </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <table id="conference-total-meeting-hours-count-table"
-                   class="charts-css bar show-heading show-labels data-outside sorted data-spacing-5">
-                <caption> {{t "StatsPageConferenceTotalMeetingHoursHeader"}} </caption>
-                <thead>
-                <tr>
-                    <th>{{.CurrentScope}}</th>
-                    <th>{{t "StatsPageTotalMeetingHoursTableHeader"}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {{ range .StatsOrder }}
-                    <tr>
-                        <th scope="row">{{t . }}</th>
-                        <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceUsageHours . }} / {{ $.Statistics.HighestConferenceUsageHours }})">
-                            <span class="data">{{ valFromIndex $.Statistics.ConferenceUsageHours . }}</span> <span
-                                    class="tooltip"> {{t "StatsPageConferenceUsageHoursToolTip"}} {{t . }}: {{ valFromIndex $.Statistics.ConferenceUsageHours . }} </span>
-                        </td>
-                    </tr>
-                {{ end }}
-                </tbody>
-            </table>
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-label">{{t "StatsPageConferenceAttendeeCountHeader"}}</h2>
+                    <span class="chart-total">{{ $.Statistics.HighestMaxUserCount }}</span>
+                </div>
+                <div class="chart-wrapper">
+                    <table id="attendee-count-table" class="charts-css bar show-labels data-spacing-5">
+                        <tbody>
+                        {{ range .StatsOrder }}
+                            <tr>
+                                <th scope="row">{{t . }}</th>
+                                <td style="--size: calc({{ valFromIndex $.Statistics.MaxUserCount . }} / {{ $.Statistics.HighestMaxUserCount }})">
+                                    <span class="data">{{ valFromIndex $.Statistics.MaxUserCount . }}</span>
+                                    <span class="tooltip">{{t . }}: {{ valFromIndex $.Statistics.MaxUserCount . }}</span>
+                                </td>
+                            </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <table id="conference-user-hours-table"
-                   class="charts-css bar show-heading show-labels data-outside sorted data-spacing-5">
-                <caption> {{t "StatsPageConferenceUserHoursHeader"}} </caption>
-                <thead>
-                <tr>
-                    <th>{{.CurrentScope}}</th>
-                    <th>{{t "StatsPageConferencesUserHoursTableHeader"}}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {{ range .StatsOrder }}
-                    <tr>
-                        <th scope="row">{{t . }}</th>
-                        <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }} / {{ $.Statistics.HighestConferenceUsersUsageHours }})">
-                            <span class="data">{{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }}</span> <span
-                                    class="tooltip"> {{t "StatsPageConferenceUserHoursToolTip"}} {{t . }}: {{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }} </span>
-                        </td>
-                    </tr>
-                {{ end }}
-                </tbody>
-            </table>
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-label">{{t "StatsPageConferenceTotalMeetingHoursHeader"}}</h2>
+                    <span class="chart-total">{{ $.Statistics.HighestConferenceUsageHours }}h</span>
+                </div>
+                <div class="chart-wrapper">
+                    <table id="conference-total-meeting-hours-count-table"
+                           class="charts-css bar show-labels data-spacing-5">
+                        <tbody>
+                        {{ range .StatsOrder }}
+                            <tr>
+                                <th scope="row">{{t . }}</th>
+                                <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceUsageHours . }} / {{ $.Statistics.HighestConferenceUsageHours }})">
+                                    <span class="data">{{ valFromIndex $.Statistics.ConferenceUsageHours . }}</span>
+                                    <span class="tooltip">{{t . }}: {{ valFromIndex $.Statistics.ConferenceUsageHours . }}h</span>
+                                </td>
+                            </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-label">{{t "StatsPageConferenceUserHoursHeader"}}</h2>
+                    <span class="chart-total">{{ $.Statistics.HighestConferenceUsersUsageHours }}h</span>
+                </div>
+                <div class="chart-wrapper">
+                    <table id="conference-user-hours-table" class="charts-css bar show-labels data-spacing-5">
+                        <tbody>
+                        {{ range .StatsOrder }}
+                            <tr>
+                                <th scope="row">{{t . }}</th>
+                                <td style="--size: calc({{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }} / {{ $.Statistics.HighestConferenceUsersUsageHours }})">
+                                    <span class="data">{{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }}</span>
+                                    <span class="tooltip">{{t . }}: {{ valFromIndex $.Statistics.ConferenceUsersUsageHours . }}h</span>
+                                </td>
+                            </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
     </body>

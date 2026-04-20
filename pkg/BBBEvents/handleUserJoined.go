@@ -69,7 +69,7 @@ func handleUserJoined(ctx context.Context, dbQueries *db.Queries, user *User, me
 	err = dbQueries.InsertUserEvent(ctx, db.InsertUserEventParams{
 		InternalMeetingID: meeting.InternalMeetingID,
 		InternalUserID:    user.InternalUserID,
-		EventType:         EventUserJoined,
+		EventType:         string(EventUserJoined),
 		EventTimestamp:    pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true},
 	})
 	if err != nil {

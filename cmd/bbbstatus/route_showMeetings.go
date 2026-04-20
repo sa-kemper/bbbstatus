@@ -28,6 +28,7 @@ import (
 	"os"
 	"slices"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -41,6 +42,9 @@ import (
 func init() { // Add all messages that are related to this file into the localization bundle
 	var msgs = []i18n.Message{
 		{ID: "meetingListHeader", Other: "meeting list"},
+		{ID: "Meetings", Other: "meetings"},
+		{ID: "Recordings", Other: "recordings"},
+		{ID: "Statistics", Other: "statistics"},
 		{ID: "MeetingActive", Other: "active"},
 		{ID: "MeetingEnded", Other: "ended"},
 		{ID: "MeetingCreated", Other: "created"},
@@ -63,6 +67,19 @@ func init() { // Add all messages that are related to this file into the localiz
 		{ID: "ServerStatsMeetings", One: "meeting", Other: "meetings"},
 		{ID: "MeetingListHeaderSeeRecordingsButton", Other: "see recordings"},
 		{ID: "MeetingListReloadButton", Other: "reload"},
+		{ID: "FleetStatus", Other: "Server Fleet Status"},
+		{ID: "LiveMonitorandManagement", Other: "Live Monitor & Management"},
+		{ID: "MeetingsSearchPlaceholder", Other: "Search for meeting / hostname..."},
+		{ID: "MeetingsTableFirstColumnMeetingNameAndID", Other: "Meeting & ID"},
+		{ID: "MeetingsTableSecondColumnServerHostname", Other: "Server Hostname"},
+		{ID: "MeetingsTableThrirdColumnUserCount", Other: "User"},
+		{ID: "MeetingsTableFourhtColumnActions", Other: "Actions"},
+		{ID: "MeetingsPageMettingsDetailOngoingMeeting", Other: "Ongoing"},
+		{ID: "MeetingsPageViewRecording", Other: "View recording"},
+		{ID: "MeetingsMeetingDetailsFirstUserJoined", Other: "First User"},
+		{ID: "MeetingsPageSearchPlaceholder", Other: "Search..."},
+		{ID: "MeetingsPageDetailsPopupRecordingAvailableStateLabel", Other: "Available"},
+		{ID: "MeetingsPageDetailsPopupRecordingNotAvailableStateLabel", Other: "Not available"},
 	}
 	FrontendTextMessages = append(FrontendTextMessages, msgs...)
 }
@@ -101,6 +118,7 @@ func showMeetings(c echo.Context) (err error) {
 	// handle filtered request
 	startDateParam := c.FormValue("start-date")
 	endDateParam := c.FormValue("end-date")
+	searchQuery := c.FormValue("query")
 
 	var selectedServers []config.BbbServer
 	var showMeetingsServerFiltered []ServerFilter
@@ -192,7 +210,7 @@ func showMeetings(c echo.Context) (err error) {
 	defer conn.Close(ctx)
 	var meetings []MeetingListMeetingWrapper
 
-	filteredMeetings, err := HandleFilteredRequest(ctx, dbQueries, startDate, endDate, selectedServers, &meetings)
+	filteredMeetings, err := HandleFilteredRequest(ctx, dbQueries, startDate, endDate, selectedServers, searchQuery, &meetings)
 	if err != nil {
 		fmt.Println("error handling filtered request:", err)
 		return err
@@ -227,19 +245,20 @@ func showMeetings(c echo.Context) (err error) {
 		StartDate    string
 		EndDate      string
 		ServerFilter []ServerFilter
-	}{StartDate: startDate.Format("2006-01-02"), EndDate: endDate.Format("2006-01-02"), ServerFilter: showMeetingsServerFiltered}, "Meetings": meetings, "ServerStats": serverStats})
+		Query        string
+	}{StartDate: startDate.Format("2006-01-02"), EndDate: endDate.Format("2006-01-02"), ServerFilter: showMeetingsServerFiltered, Query: searchQuery}, "Meetings": meetings, "ServerStats": serverStats})
 	if err != nil {
 		fmt.Println(err)
 	}
 	return nil
 }
 
-func HandleFilteredRequest(ctx context.Context, dbQueries *db.Queries, startDate time.Time, endDate time.Time, filteredServers []config.BbbServer, meetings *[]MeetingListMeetingWrapper) (filteredMeetings *[]MeetingListMeetingWrapper, err error) {
+func HandleFilteredRequest(ctx context.Context, dbQueries *db.Queries, startDate time.Time, endDate time.Time, filteredServers []config.BbbServer, Query string, meetings *[]MeetingListMeetingWrapper) (filteredMeetings *[]MeetingListMeetingWrapper, err error) {
 
 	if endDate.IsZero() {
 		endDate = time.Now()
 	}
-	endDate = endDate.Add(time.Hour * 25) // make the end date inclusive.
+	endDate = endDate.AddDate(0, 0, 1).Add(-time.Second * 1) // make the end date inclusive.
 	dbMeetings, err := dbQueries.GetMeetingsBetweenDates(ctx, db.GetMeetingsBetweenDatesParams{
 		CreateTime: pgtype.Timestamp{
 			Valid: true,
@@ -260,7 +279,9 @@ func HandleFilteredRequest(ctx context.Context, dbQueries *db.Queries, startDate
 
 	for _, m := range dbMeetings {
 		rm := BBBEvents.ConvertDBToBBBMeeting(m)
-		*meetings = append(*meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Valid})
+		if Query == "" || strings.Contains(rm.BbbHostname, Query) || strings.Contains(rm.Name, Query) || strings.Contains(rm.InternalMeetingID, Query) {
+			*meetings = append(*meetings, MeetingListMeetingWrapper{BBBEventsMeeting: rm, BbbHostname: rm.BbbHostname, Active: !m.MeetingEnded.Valid})
+		}
 	}
 	var meetingClone = slices.Clone(*meetings)
 	if len(filteredServers) > 0 {
@@ -274,10 +295,13 @@ func HandleFilteredRequest(ctx context.Context, dbQueries *db.Queries, startDate
 			if slices.Contains(allowedHostnames, meeting.BbbHostname) {
 				filteredSlice = append(filteredSlice, meeting)
 			}
+			if strings.Contains(meeting.BbbHostname, Query) {
+				// the user searched for this hostname
+				filteredSlice = append(filteredSlice, meeting)
+			}
 			continue
 		}
 		return &filteredSlice, nil
-
 	}
 
 	return &meetingClone, nil

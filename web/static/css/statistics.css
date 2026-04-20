@@ -1,0 +1,90 @@
+/* --- statistics.css --- */
+
+.stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+}
+
+/* Charts Grid Layout */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+}
+
+@media (max-width: 1200px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Chart Card Styling */
+.chart-card {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.chart-label {
+    font-size: 0.7rem !important; /* Überschreibt h2 Standard */
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 800;
+    margin: 0 !important;
+}
+
+.chart-total {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1;
+}
+
+/* Charts.css Customization */
+.chart-wrapper {
+    height: 280px;
+    width: 100%;
+}
+
+.charts-css.bar {
+    --labels-size: 60px;
+    --primary: var(--primary);
+    height: 100%;
+    margin: 0;
+}
+
+.charts-css.bar tr td {
+    --color: var(--primary);
+    border-radius: 0 4px 4px 0;
+    transition: opacity 0.2s;
+}
+
+.charts-css.bar tr:hover td {
+    opacity: 0.8;
+}
+
+.charts-css.bar th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding-right: 12px;
+}
+
+/* Tooltip Styling (falls charts.css tooltips aktiv sind) */
+.charts-css .tooltip {
+    background: var(--text-main);
+    color: white;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+}

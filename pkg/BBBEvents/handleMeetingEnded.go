@@ -27,7 +27,7 @@ import (
 func handleMeetingEnded(ctx context.Context, dbQueries *db.Queries, meeting Meeting, b *BaseEvent) (err error) {
 	err = dbQueries.InsertMeetingEventForID(ctx, db.InsertMeetingEventForIDParams{
 		InternalMeetingID: meeting.InternalMeetingID,
-		EventType:         EventMeetingEnded,
+		EventType:         string(EventMeetingEnded),
 		EventTimestamp:    pgtype.Timestamp{Valid: true, Time: b.GetTimestamp()},
 	})
 

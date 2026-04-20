@@ -1,114 +1,162 @@
 {{ define "meetings" }}
 	<!DOCTYPE html>
 	<html lang="{{t "CurrentISO639"}}">
-
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>{{t "meetingListHeader"}}</title>
-		<link rel="stylesheet" href="/static/css/style.css">
+		<title>{{t "MeetingListHeader"}}</title>
 		<link rel="stylesheet" href="/static/fontawesome.min.css">
+		<link rel="stylesheet" href="/static/css/base.css">
+		<link rel="stylesheet" href="/static/css/meetings.css">
 	</head>
-
 	<body>
 	<div class="container">
-		<div class="card header">
-			<h1>{{t "MeetingListHeader"}}</h1>
-            <a class="meeting-button meeting-button-details" href="{{ reverse "statistics" }}">
-				<i class="fas fa-chart-line"></i>
-				{{t "MeetingListHeaderSeeStatisticsButton"}}
-			</a>
-            <a class="meeting-button meeting-button-details" href="{{ reverse "recordings" }}"
-               style="margin-left: 1rem;">
-			<i class="fas fa-video"></i>
-			{{t "MeetingListHeaderSeeRecordingsButton" }}
-			</a>
+		<header class="meetings-header">
+			<div>
+				<h1 class="page-title">{{t "MeetingListHeader"}}</h1>
+				<p class="text-muted" style="font-size: 0.9rem; font-weight: 500;">{{t "LiveMonitorandManagement"}}</p>
+			</div>
+			<div class="nav-group no-print">
+				<a href="{{ reverse "meetings" }}" class="control-item active">{{t "Meetings"}}</a>
+				<a href="{{ reverse "recordings" }}" class="control-item">{{t "Recordings"}}</a>
+				<a href="{{ reverse "statistics" }}" class="control-item">{{t "Statistics"}}</a>
+			</div>
+		</header>
+
+		<div class="server-grid">
+			{{ template "server_diagram" . }}
 		</div>
 
-		<div class="card">
-			<h2>Meetings by Server</h2>
-            {{ template "server_diagram" .ServerStats }}
-		</div>
-
-		<div class="card">
-			<form class="filters" method="GET" action="{{ reverse "meetings" }}">
-				<div class="filter-group">
-					<label for="start-date">{{t "MeetingListFilterStartDate"}}</label>
-					<input type="date" id="start-date" name="start-date" value="{{.Request.StartDate}}">
+		<div class="filter-bar no-print">
+			<form action="{{ reverse "meetings" }}" method="GET" class="filter-form"
+			      style="display:flex; width:100%; align-items:center; gap:20px;">
+				<div class="search-input-wrapper">
+					<i class="fas fa-search text-muted"></i>
+					<input type="text" name="query" placeholder="{{t "MeetingsPageSearchPlaceholder"}}"
+					       value="{{ .Request.Query }}">
 				</div>
-				<div class="filter-group">
-					<label for="end-date">{{t "MeetingListFilterEndDate"}}</label>
-					<input type="date" id="end-date" name="end-date" value="{{.Request.EndDate}}">
+				<div class="date-filters">
+					<input type="date" name="start-date" value="{{.Request.StartDate}}">
+					<span class="text-muted">→</span>
+					<input type="date" name="end-date" value="{{.Request.EndDate}}">
 				</div>
-				<div class="server-filter-card">
-					Server filter
-					<ul class="server-filter-servers">
-                        {{ range .Request.ServerFilter }}
-							<li>
-								<input class="server-filter-checkbox"
-									   type="checkbox" {{if .FilteredFor }} checked {{end}}
-									   id="server-filter-{{.Hostname}}" name="server-filter-{{.Hostname}}">
-								<label for="server-filter-{{.Hostname}}" class="server-filter-label">{{.Hostname}}
-									({{.Users}} {{t "MeetingListUserCountLabel"}})</label>
-							</li>
-                        {{ end }}
-					</ul>
-					<input type="submit" class="meeting-button" id="server-filter-submit"
-						   value="{{t "MeetingListFilterFilterButton"}}">
-				</div>
-
-				<div class=" filter-group filter-action" id="filter-group-submit-div">
-					<input type="submit" class="meeting-button" id="filter-group-submit-input"
-						   value="{{t "MeetingListFilterFilterButton"}}">
-				</div>
+				<button type="submit" class="btn btn-primary">{{t "MeetingListFilterFilterButton"}}</button>
 			</form>
 		</div>
 
-		<div class="reload-container" onclick="location.reload()">
-			<a href="{{reverse "meetings" }}?ts={{ timestamp }}" class="reload-button">
-				<i class="fa-solid fa-rotate-right"></i>
-				{{t "MeetingListReloadButton"}}
-			</a>
-		</div>
+		<div class="card meeting-table-card">
+			<table class="meeting-table">
+				<thead>
+				<tr style="background: #f8fafc; border-bottom: 1px solid var(--border);">
+					<th style="padding: 16px 32px;"
+					    class="card-title">{{t "MeetingsTableFirstColumnMeetingNameAndID"}}</th>
+					<th class="card-title hide-mobile">{{t "MeetingsTableSecondColumnServerHostname"}}</th>
+					<th class="card-title text-center">{{t "MeetingsTableThrirdColumnUserCount"}}</th>
+					<th class="card-title text-right">{{t "MeetingsTableFourhtColumnActions"}}</th>
+				</tr>
+				</thead>
+				<tbody>
+				{{ range .Meetings }}
+					<tr>
+						<td>
+							<div style="display: flex; align-items: center; gap: 10px;">
+								{{ if .Active }}<span class="status-pulse"></span>{{ end }}
+								<span class="font-bold">{{ .BBBEventsMeeting.Name }}</span>
+							</div>
+							<span class="font-mono-xs"
+							      style="display:block; margin-top:4px;">{{ .BBBEventsMeeting.InternalMeetingID }}</span>
+						</td>
+						<td class="hide-mobile"><span class="font-mono-xs">{{ .BbbHostname }}</span></td>
+						<td class="text-center">
+							<span class="user-count-badge">{{ .UserCount }}</span>
+						</td>
+						<td>
+							<div class="action-btns">
+								<button popovertarget="inspect-{{ .BBBEventsMeeting.InternalMeetingID }}"
+								        class="btn btn-sm" title="Quick Info"
+								        style="color: var(--primary) ; anchor-name: CssAnchor-MeetingDetails-{{ .BBBEventsMeeting.InternalMeetingID }}">
+									<i class="fas fa-eye"></i> <span>Info</span>
+								</button>
+								<a href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}" class="btn btn-sm"
+								   title="Report">
+									<i class="fas fa-chart-bar"></i> <span class="hide-mobile">Report</span>
+								</a>
+							</div>
 
-		<div class=" meetings-list">
-					<!-- Example Meeting Card -->
-                    {{ range .Meetings}}
-						<div class="meeting-card" tabindex="0">
-							<div class="status-badge status-{{if .Active}}active{{else}}ended{{end}}">{{ if .Active}}{{t "MeetingActive"}}{{else}}{{t "MeetingEnded"}}{{end}}</div>
-							<h3>{{ .BBBEventsMeeting.Name}}</h3>
-							<div class="detail-item">
-								<span class="detail-label">{{t "ReportMeetingDetailBBBHostname"}}</span>
-								<span class="detail-value">{{ .BbbHostname }}</span>
-							</div>
-							<div class="detail-item">
-								<span class="detail-label">{{t "MeetingCreated"}}</span>
-								<span class="detail-value">{{ .BBBEventsMeeting.CreateDate }}</span>
-							</div>
-							<div class="detail-item">
-								<a class="meeting-button meeting-button-to-report"
-								   href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}">
-                                    {{t "MeetingToReport"}}
-								</a>
-								<a class="meeting-button meeting-button-details">
-                                    {{t "MeetingOpenDetails"}}
-								</a>
-							</div>
-							<div class="meeting-details">
-								<div class="detail-item">
-									<span class="detail-label">{{t "MeetingCreateTime"}}</span>
-									<span class="detail-value">{{formatTime .BBBEventsMeeting.CreateTime }}</span>
-									<span class="detail-label">{{t "MeetingUserCount"}}</span>
-									<span class="detail-value">{{ .UserCount }}</span>
+							<div id="inspect-{{ .BBBEventsMeeting.InternalMeetingID }}" popover
+							     class="info-card-popover card"
+							     style="position-anchor: CssAnchor-MeetingDetails-{{ .BBBEventsMeeting.InternalMeetingID }}">
+								<div class="popover-header">
+									<h3 class="font-bold"
+									    style="font-size: 0.9rem; margin:0;">{{ .BBBEventsMeeting.Name }}</h3>
+									<button class="btn" style="border:none; padding:4px;"
+									        popovertarget="inspect-{{ .BBBEventsMeeting.InternalMeetingID }}"
+									        popovertargetaction="hide">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+
+								<div class="popover-body">
+									<div class="info-grid">
+										<div class="info-item">
+											<span class="info-label">Start</span>
+											<span class="info-value">{{ formatTime .BBBEventsMeeting.CreateTime }}</span>
+										</div>
+										<div class="info-item">
+											<span class="info-label">Ende</span>
+											<span class="info-value">{{ if .BBBEventsMeeting.MeetingEnded }}{{ formatTime .BBBEventsMeeting.MeetingEnded }}{{ else }}—{{ end }}</span>
+										</div>
+										<div class="info-item">
+											<span class="info-label">Dauer</span>
+											<span class="info-value">
+												{{ if .BBBEventsMeeting.MeetingEnded }}
+													{{ timeDurationTsPtr .BBBEventsMeeting.CreateTime .BBBEventsMeeting.MeetingEnded }}
+												{{ else }}
+													{{t "MeetingsPageMettingsDetailOngoingMeeting"}}
+												{{end}}
+													</span>
+										</div>
+										<div class="info-item">
+											<span class="info-label">{{t "MeetingsMeetingDetailsFirstUserJoined"}}</span>
+											<span class="info-value">{{ if .BBBEventsMeeting }}"Hardcoded"{{ else }}—{{ end }}</span>
+										</div>
+									</div>
+
+									<div class="recording-status-box">
+										<div>
+											<span class="info-label">Recording</span>
+											<span class="info-value" style="font-size: 0.8rem;">
+                                            {{ if .BBBEventsMeeting.Record }}{{t "MeetingsPageDetailsPopupRecordingAvailableStateLabel"}}{{ else }}{{t "MeetingsPageDetailsPopupRecordingNotAvailableStateLabel"}}{{ end }}
+                                        </span>
+										</div>
+										{{ if .BBBEventsMeeting.Record }}
+											<a href="{{ reverse "recordings" }}?query={{ .BBBEventsMeeting.InternalMeetingID }}"
+											   class="btn btn-primary btn-sm">
+												<i class="fas fa-play"></i> {{t "MeetingsPageViewRecording"}}
+											</a>
+										{{ end }}
+									</div>
+								</div>
+
+								<div class="popover-footer"
+								     style="padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px;">
+									<a href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}"
+									   class="btn btn-sm" style="flex:1; justify-content:center;">
+										<i class="fas fa-chart-bar"></i> {{t "MeetingToReport"}}
+									</a>
+									<a href="{{ reverse "reportCsv" .BBBEventsMeeting.InternalMeetingID }}"
+									   class="btn btn-sm btn-excel" style="flex:1; justify-content:center;">
+										<i class="fas fa-file-excel"></i> {{t "ReportOpenInExcelButton"}}
+									</a>
 								</div>
 							</div>
-						</div>
-                    {{ else }}
-						<div class="meeting-card" tabindex="0">{{t "MeetingNoMeetingsExist"}}</div>
-                    {{ end }}
-				</div>
+						</td>
+					</tr>
+				{{ end }}
+				</tbody>
+			</table>
 		</div>
+	</div>
 	</body>
-
 	</html>
 {{ end }}

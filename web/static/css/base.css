@@ -47,7 +47,12 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Expandable Button Logic */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    height: 36px;
+}
+
 .btn-expandable {
     width: 42px;
     height: 42px;
@@ -57,7 +62,7 @@ body {
     padding: 0 0 0 13px;
 }
 
-.btn-expandable:hover {
+.btn-expandable:hover, .btn-expandable:active {
     width: fit-content;
     padding-right: 5px;
 }
@@ -76,6 +81,33 @@ body {
     color: var(--danger);
     border-color: #fecdd3;
 }
+
+.btn-excel {
+    background-color: #f0fdf4 !important;
+    color: #166534 !important;
+    border-color: #bbf7d0 !important;
+}
+
+.btn-excel:hover {
+    background-color: #dcfce7 !important;
+}
+
+/* Button Group für das Popover */
+.btn-group {
+    display: flex;
+    gap: 1px;
+    background: var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.btn-group .btn {
+    border: none;
+    border-radius: 0;
+    flex: 1;
+}
+
 
 /* --- GENERIC CARD --- */
 .container {
@@ -297,6 +329,41 @@ th {
     color: var(--text-muted);
 }
 
+[popover] {
+    border: none;
+    padding: 0;
+    background: transparent;
+    overflow: visible; /* Erlaubt Schatten außerhalb der Card */
+    max-width: 400px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-radius: var(--radius);
+}
+
+/* Popover Fixierung: Schwebend über der Tabelle */
+[popover].info-card-popover {
+    margin: auto; /* Zentriert im Viewport */
+    border: 1px solid var(--border);
+    padding: 0;
+    width: 360px;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Animation für das Erscheinen */
+[popover]:popover-open {
+    animation: popover-fade-in 0.2s ease-out;
+}
+
+@keyframes popover-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
 /* Print Utility */
 .print-only {
     display: none;
@@ -319,5 +386,11 @@ th {
     .container {
         padding: 0 !important;
         max-width: 100% !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .hide-mobile {
+        display: none !important;
     }
 }

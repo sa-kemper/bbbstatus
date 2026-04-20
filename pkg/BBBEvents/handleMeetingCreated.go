@@ -65,7 +65,7 @@ func handleMeetingCreated(ctx context.Context, dbQueries *db.Queries, meeting Me
 		fmt.Println(err)
 		return err
 	}
-	err = dbQueries.InsertMeetingEventForID(ctx, db.InsertMeetingEventForIDParams{InternalMeetingID: meeting.InternalMeetingID, EventType: EventMeetingCreated, EventTimestamp: pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true}})
+	err = dbQueries.InsertMeetingEventForID(ctx, db.InsertMeetingEventForIDParams{InternalMeetingID: meeting.InternalMeetingID, EventType: string(EventMeetingCreated), EventTimestamp: pgtype.Timestamp{Time: b.GetTimestamp(), Valid: true}})
 	if err != nil {
 		fmt.Println(err)
 		return err

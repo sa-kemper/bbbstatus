@@ -54,6 +54,9 @@ func initEchoFramework(conf *config.ConfigurationStruct) {
 		"formatDuration": func(t time.Duration) string { return t.String() },
 		"valFromIndex":   func(m map[string]int, s string) int { return m[s] },
 		"timestamp":      func() string { return strconv.Itoa(int(time.Now().Unix())) },
+		"timeDurationTsPtr": func(t time.Time, ptr *time.Time) string {
+			return ptr.Sub(t).String()
+		},
 	}
 
 	if _, err := os.Stat(gohtmlTemplateOverwriteFolder); err == nil {

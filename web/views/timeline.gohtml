@@ -13,16 +13,54 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-
 {{ define "timeline" }}
     <div class="card">
-        <h2>{{t "EventTimelineHeader"}}</h2>
-        <div class="timeline">
+        <h2>Event Timeline</h2>
+        <div class="timeline-container">
+            <div class="timeline-line"></div>
             {{ range . }}
                 <div class="timeline-item">
+                    <div class="timeline-icon">
+                        {{ if eq .EventType "meeting-created" }}
+                            <i class="fas fa-calendar-plus" style="color: var(--primary);"></i>
+                        {{ else if eq .EventType "user-joined" }}
+                            <i class="fas fa-user-plus" style="color: #16a34a;"></i>
+                        {{ else if eq .EventType "user-left" }}<i class="fas fa-user-minus" style="color: #dc2626;"></i>
+                        {{ else if or (eq .EventType "user-presenter-assigned") (eq .EventType "user-presenter-unassigned") }}
+                            <i class="fas fa-chalkboard-user" style="color: #8b5cf6;"></i>
+                        {{ else if or (eq .EventType "user-audio-voice-enabled") (eq .EventType "user-audio-unmuted") }}
+                            <i class="fas fa-microphone" style="color: #16a34a;"></i>
+                        {{ else if or (eq .EventType "user-audio-voice-disabled") (eq .EventType "user-audio-muted") }}
+                            <i class="fas fa-microphone-slash" style="color: #94a3b8;"></i>
+                        {{ else if eq .EventType "user-cam-broadcast-start" }}
+                            <i class="fas fa-video" style="color: #3b82f6;"></i>
+                        {{ else if eq .EventType "user-cam-broadcast-end" }}
+                            <i class="fas fa-video-slash" style="color: #94a3b8;"></i>
+                        {{ else if or (eq .EventType "meeting-screenshare-started") (eq .EventType "meeting-screenshare-stopped") }}
+                            <i class="fas fa-desktop" style="color: #6366f1;"></i>
+                        {{ else if eq .EventType "chat-group-message-sent" }}
+                            <i class="fas fa-comment-dots" style="color: #3b82f6;"></i>
+                        {{ else if eq .EventType "user-emoji-changed" }}
+                            <i class="fas fa-face-smile" style="color: #f59e0b;"></i>
+                        {{ else if eq .EventType "user-raise-hand-changed" }}
+                            <i class="fas fa-hand-paper" style="color: #f59e0b;"></i>
+                        {{ else if or (eq .EventType "poll-started") (eq .EventType "poll-responded") }}
+                            <i class="fas fa-poll" style="color: #0891b2;"></i>
+                        {{ else if or (eq .EventType "meeting-recording-started") (eq .EventType "meeting-rap-archive-started") }}
+                            <i class="fas fa-circle-dot pulse"></i>
+                        {{ else if or (eq .EventType "meeting-recording-stopped") (eq .EventType "meeting-rap-archive-ended") }}
+                            <i class="fas fa-circle-stop" style="color: #64748b;"></i>
+                        {{ else if eq .EventType "pad-content" }}
+                            <i class="fas fa-note-sticky" style="color: #f59e0b;"></i>
+                        {{ else if eq .EventType "meeting-ended" }}
+                            <i class="fas fa-flag-checkered" style="color: var(--text-main);"></i>
+                        {{ else }}<i class="fas fa-circle" style="color: var(--border); font-size: 6px;"></i>
+                        {{ end }}
+                    </div>
+
                     <div class="timeline-time">{{ .FormattedTime }}</div>
                     <div class="timeline-content">
-                        <p>{{ .TextRepresentation }}</p>
+                        {{ .TextRepresentation }}
                     </div>
                 </div>
             {{ end }}

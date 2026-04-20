@@ -37,7 +37,9 @@ type Gdpr string
 func main() {
 	var runtimeConfiguration = new(config.ConfigurationStruct)
 	var err = cleanenv.ReadConfig("config.toml", runtimeConfiguration)
-
+	if err != nil {
+		log.Fatal(err)
+	}
 	err = initDatabase(runtimeConfiguration)
 	if err != nil {
 		fmt.Println("[!] Error connecting to database, this is required for the operation of bbbstatus [!]")

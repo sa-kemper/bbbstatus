@@ -178,3 +178,5 @@ one = "user"
 other = "users"
 
 [ServerStatsMeetings]
+one = "meeting"
+other = "meetings"

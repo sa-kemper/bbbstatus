@@ -14,7 +14,7 @@
 		<header class="meetings-header">
 			<div>
 				<h1 class="page-title">{{t "MeetingListHeader"}}</h1>
-				<p class="text-muted" style="font-size: 0.9rem; font-weight: 500;">Live Monitor & Management</p>
+				<p class="text-muted" style="font-size: 0.9rem; font-weight: 500;">{{t "LiveMonitorandManagement"}}</p>
 			</div>
 			<div class="nav-group no-print">
 				<a href="{{ reverse "meetings" }}" class="control-item active">{{t "Meetings"}}</a>
@@ -32,7 +32,8 @@
 			      style="display:flex; width:100%; align-items:center; gap:20px;">
 				<div class="search-input-wrapper">
 					<i class="fas fa-search text-muted"></i>
-					<input type="text" name="query" placeholder="Suche..." value="{{ .Request.Query }}">
+					<input type="text" name="query" placeholder="{{t "MeetingsPageSearchPlaceholder"}}"
+					       value="{{ .Request.Query }}">
 				</div>
 				<div class="date-filters">
 					<input type="date" name="start-date" value="{{.Request.StartDate}}">
@@ -47,10 +48,11 @@
 			<table class="meeting-table">
 				<thead>
 				<tr style="background: #f8fafc; border-bottom: 1px solid var(--border);">
-					<th style="padding: 16px 32px;" class="card-title">Meeting & ID</th>
-					<th class="card-title hide-mobile">Server</th>
-					<th class="card-title text-center">User</th>
-					<th class="card-title text-right">Actions</th>
+					<th style="padding: 16px 32px;"
+					    class="card-title">{{t "MeetingsTableFirstColumnMeetingNameAndID"}}</th>
+					<th class="card-title hide-mobile">{{t "MeetingsTableSecondColumnServerHostname"}}</th>
+					<th class="card-title text-center">{{t "MeetingsTableThrirdColumnUserCount"}}</th>
+					<th class="card-title text-right">{{t "MeetingsTableFourhtColumnActions"}}</th>
 				</tr>
 				</thead>
 				<tbody>
@@ -115,7 +117,7 @@
 													</span>
 										</div>
 										<div class="info-item">
-											<span class="info-label">Erster User</span>
+											<span class="info-label">{{t "MeetingsMeetingDetailsFirstUserJoined"}}</span>
 											<span class="info-value">{{ if .BBBEventsMeeting }}"Hardcoded"{{ else }}—{{ end }}</span>
 										</div>
 									</div>
@@ -124,13 +126,13 @@
 										<div>
 											<span class="info-label">Recording</span>
 											<span class="info-value" style="font-size: 0.8rem;">
-                                            {{ if .BBBEventsMeeting.Record }}Verfügbar{{ else }}Kein Recording{{ end }}
+                                            {{ if .BBBEventsMeeting.Record }}{{t "MeetingsPageDetailsPopupRecordingAvailableStateLabel"}}{{ else }}{{t "MeetingsPageDetailsPopupRecordingNotAvailableStateLabel"}}{{ end }}
                                         </span>
 										</div>
 										{{ if .BBBEventsMeeting.Record }}
 											<a href="{{ reverse "recordings" }}?query={{ .BBBEventsMeeting.InternalMeetingID }}"
 											   class="btn btn-primary btn-sm">
-												<i class="fas fa-play"></i> Ansehen
+												<i class="fas fa-play"></i> {{t "MeetingsPageViewRecording"}}
 											</a>
 										{{ end }}
 									</div>
@@ -140,11 +142,11 @@
 								     style="padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px;">
 									<a href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}"
 									   class="btn btn-sm" style="flex:1; justify-content:center;">
-										<i class="fas fa-chart-bar"></i> Report
+										<i class="fas fa-chart-bar"></i> {{t "MeetingToReport"}}
 									</a>
 									<a href="{{ reverse "reportCsv" .BBBEventsMeeting.InternalMeetingID }}"
 									   class="btn btn-sm btn-excel" style="flex:1; justify-content:center;">
-										<i class="fas fa-file-excel"></i> Excel
+										<i class="fas fa-file-excel"></i> {{t "ReportOpenInExcelButton"}}
 									</a>
 								</div>
 							</div>

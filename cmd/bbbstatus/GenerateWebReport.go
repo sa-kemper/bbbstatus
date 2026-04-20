@@ -32,7 +32,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
@@ -456,9 +455,9 @@ func FillMeetingParticipants(ctx context.Context, dbQueries *db.Queries, interna
 		for _, state := range states {
 			switch state.EventType {
 			case "user-left":
-				if ts, ok := state.LatestTimestamp.(pgtype.Timestamp); ok {
-					if participant.LeaveTimestamp == nil && !ts.Time.IsZero() {
-						participant.LeaveTimestamp = &ts.Time
+				if ts, ok := state.LatestTimestamp.(time.Time); ok {
+					if participant.LeaveTimestamp == nil && !ts.IsZero() {
+						participant.LeaveTimestamp = &ts
 					}
 				}
 			case "user-presenter-as-signed":

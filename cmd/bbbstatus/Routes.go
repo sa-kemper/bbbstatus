@@ -41,6 +41,7 @@ type route struct {
 }
 
 var routes = []route{
+	{Name: "webhookEvent", Method: "POST", Path: "/event", HandlerFunc: bbbWebHookEvent},
 	{Name: "meetings", Method: "GET", Path: "/meetings/", HandlerFunc: showMeetings},
 	{Name: "recordings", Method: "GET", Path: "/recordings", HandlerFunc: showRecordings},
 	{Name: "forceCloseMeeting", Method: "GET", Path: "/action/close-meeting/:id", HandlerFunc: forceCloseMeeting},
@@ -48,7 +49,6 @@ var routes = []route{
 	{Name: "reportCsv", Method: "GET", Path: "/report/:id/csv", HandlerFunc: downloadMeetingReport},
 	{Name: "inspectReport", Method: "GET", Path: "/report/:id/inspect", HandlerFunc: showFilteredMeetingReport},
 	{Name: "inspectedReportCsv", Method: "GET", Path: "/report/:id/inspect/csv", HandlerFunc: downloadFilteredMeetingReport},
-	{Name: "webhookEvent", Method: "POST", Path: "/event", HandlerFunc: bbbWebHookEvent},
 	{Name: "statistics", Method: "GET", Path: "/statistics", HandlerFunc: statsPage},
 	{Name: "summary", Method: "GET", Path: "/summary", HandlerFunc: summaryPage},
 	{Name: "summaryCsv", Method: "GET", Path: "/summary/csv", HandlerFunc: summaryCSVHandler},

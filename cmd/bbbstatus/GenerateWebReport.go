@@ -450,7 +450,7 @@ func FillMeetingParticipants(ctx context.Context, dbQueries *db.Queries, interna
 		if err != nil {
 			fmt.Println("Error occurred getting user events state:", err)
 		}
-		participant := BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.GdprName, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool}
+		participant := BBBEvents.User{InternalUserID: dbUser.InternalUserID, ExternalUserID: dbUser.ExternalUserID, Name: dbUser.GdprName, Role: dbUser.Role, Guest: dbUser.IsGuest.Bool, JoinTimestamp: dbUser.JoinTimestamp.Time}
 
 		for _, state := range states {
 			switch state.EventType {
@@ -487,6 +487,13 @@ func FillMeetingParticipants(ctx context.Context, dbQueries *db.Queries, interna
 		}
 		participants = append(participants, participant)
 	}
+
+	sort.Slice(participants, func(i, j int) bool {
+		if participants[i].JoinTimestamp.IsZero() {
+
+		}
+		return participants[i].JoinTimestamp.Before(participants[j].JoinTimestamp)
+	})
 
 	return participants, err
 }

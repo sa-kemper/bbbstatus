@@ -142,18 +142,19 @@ func ConvertDBToBBBMeeting(dbMeeting db.Meeting) Meeting {
 
 // User represents a meeting participant
 type User struct {
-	InternalUserID string `json:"internal-user-id"`
-	ExternalUserID string `json:"external-user-id"`
-	Name           string `json:"name,omitempty"`
-	Role           string `json:"role,omitempty"`
-	Presenter      bool   `json:"presenter,omitempty"`
-	Guest          bool   `json:"guest"`
-	ListeningOnly  bool   `json:"listening-only,omitempty"`
-	SharingMic     bool   `json:"sharing-mic,omitempty"`
-	Muted          bool   `json:"muted,omitempty"`
-	Stream         string `json:"stream,omitempty"`
-	RaiseHand      bool   `json:"raise-hand,omitempty"`
-	Emoji          string `json:"emoji,omitempty"`
+	InternalUserID string    `json:"internal-user-id"`
+	ExternalUserID string    `json:"external-user-id"`
+	Name           string    `json:"name,omitempty"`
+	Role           string    `json:"role,omitempty"`
+	Presenter      bool      `json:"presenter,omitempty"`
+	Guest          bool      `json:"guest"`
+	ListeningOnly  bool      `json:"listening-only,omitempty"`
+	SharingMic     bool      `json:"sharing-mic,omitempty"`
+	Muted          bool      `json:"muted,omitempty"`
+	Stream         string    `json:"stream,omitempty"`
+	RaiseHand      bool      `json:"raise-hand,omitempty"`
+	Emoji          string    `json:"emoji,omitempty"`
+	JoinTimestamp  time.Time `json:"join-timestamp,omitempty"`
 	LeaveTimestamp *time.Time
 }
 

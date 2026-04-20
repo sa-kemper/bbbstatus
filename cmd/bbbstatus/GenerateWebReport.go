@@ -489,9 +489,6 @@ func FillMeetingParticipants(ctx context.Context, dbQueries *db.Queries, interna
 	}
 
 	sort.Slice(participants, func(i, j int) bool {
-		if participants[i].JoinTimestamp.IsZero() {
-
-		}
 		return participants[i].JoinTimestamp.Before(participants[j].JoinTimestamp)
 	})
 

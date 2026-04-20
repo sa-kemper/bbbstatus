@@ -222,7 +222,7 @@ const (
 	EventPollStarted               = BBBEventType("poll-started")
 	EventPollResponded             = BBBEventType("poll-responded")
 	EventMeetingEnded              = BBBEventType("meeting-ended")
-	EventMeetingRapArchiveEnded    = BBBEventType("meeting-rap-archive-ended") // TODO: use this as a counter for recordings of a meeting.
+	EventMeetingRapArchiveEnded    = BBBEventType("meeting-rap-archive-ended")
 	EventMeetingRapArchiveStarted  = BBBEventType("meeting-rap-archive-started")
 	EventSharedNotesChanged        = BBBEventType("pad-content")
 	MeetingRecordingStarted        = BBBEventType("meeting-recording-started")

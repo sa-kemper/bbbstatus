@@ -1,0 +1,221 @@
+/* --- recordings.css --- */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary);
+    color: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Filter Bar */
+.filter-bar {
+    background: white;
+    padding: 16px 24px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 40px;
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-form {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.search-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-grow: 1;
+    border-right: 1px solid var(--border);
+    padding-right: 24px;
+}
+
+.search-group i {
+    color: var(--text-muted);
+}
+
+.search-group input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.date-group {
+    display: flex;
+    gap: 24px;
+    border-right: 1px solid var(--border);
+    padding-right: 24px;
+}
+
+/* Grid & Cards */
+.recording-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 32px;
+}
+
+.recording-card {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-height: 380px;
+}
+
+.recording-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.recording-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.3;
+    margin: 0;
+    flex: 1;
+}
+
+/* Status Badges */
+.status-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.status-published {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-unpublished {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.recording-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: auto;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.detail-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.detail-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.breakout-badge .detail-value {
+    color: #8b5cf6;
+}
+
+/* Buttons in Card */
+.action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.btn-play {
+    background: #f1f5f9;
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    justify-content: center;
+    font-size: 0.8rem;
+    height: 40px;
+}
+
+.btn-play:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.btn-full {
+    grid-column: span 2;
+    background: var(--text-main);
+    color: white;
+    border: none;
+}
+
+.btn-full:hover {
+    background: #000;
+}
+
+/* Empty State */
+.not-found-card {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-muted);
+}
+
+.not-found-card i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+@media (max-width: 900px) {
+    .filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-group, .date-group {
+        border: none;
+        padding: 0;
+    }
+
+    .recording-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -16,7 +16,6 @@
 				<h1 class="page-title">{{t "MeetingListHeader"}}</h1>
 				<p class="text-muted" style="font-size: 0.9rem; font-weight: 500;">Live Monitor & Management</p>
 			</div>
-
 			<div class="nav-group no-print">
 				<a href="{{ reverse "meetings" }}" class="control-item active">{{t "Meetings"}}</a>
 				<a href="{{ reverse "recordings" }}" class="control-item">{{t "Recordings"}}</a>
@@ -24,7 +23,6 @@
 			</div>
 		</header>
 
-		<h2 class="card-title">Server Fleet Status</h2>
 		<div class="server-grid">
 			{{ template "server_diagram" . }}
 		</div>
@@ -34,16 +32,13 @@
 			      style="display:flex; width:100%; align-items:center; gap:20px;">
 				<div class="search-input-wrapper">
 					<i class="fas fa-search text-muted"></i>
-					<input type="text" name="query" placeholder="Suche nach Meeting Name..."
-					       value="{{ .Request.Query }}">
+					<input type="text" name="query" placeholder="Suche..." value="{{ .Request.Query }}">
 				</div>
-
 				<div class="date-filters">
 					<input type="date" name="start-date" value="{{.Request.StartDate}}">
 					<span class="text-muted">→</span>
 					<input type="date" name="end-date" value="{{.Request.EndDate}}">
 				</div>
-
 				<button type="submit" class="btn btn-primary">{{t "MeetingListFilterFilterButton"}}</button>
 			</form>
 		</div>
@@ -53,7 +48,7 @@
 				<thead>
 				<tr style="background: #f8fafc; border-bottom: 1px solid var(--border);">
 					<th style="padding: 16px 32px;" class="card-title">Meeting & ID</th>
-					<th class="card-title">Server Hostname</th>
+					<th class="card-title hide-mobile">Server</th>
 					<th class="card-title text-center">User</th>
 					<th class="card-title text-right">Actions</th>
 				</tr>
@@ -69,28 +64,91 @@
 							<span class="font-mono-xs"
 							      style="display:block; margin-top:4px;">{{ .BBBEventsMeeting.InternalMeetingID }}</span>
 						</td>
-						<td><span class="font-mono-xs">{{ .BbbHostname }}</span></td>
+						<td class="hide-mobile"><span class="font-mono-xs">{{ .BbbHostname }}</span></td>
 						<td class="text-center">
 							<span class="user-count-badge">{{ .UserCount }}</span>
 						</td>
 						<td>
 							<div class="action-btns">
-								<a href="{{ reverse "inspectReport" .BBBEventsMeeting.InternalMeetingID }}"
-								   class="btn btn-expandable"
-								   style="color: var(--primary); border-color: var(--primary-light);">
-									<i class="fas fa-eye"></i> <span>Inspect</span>
-								</a>
-								<a href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}"
-								   class="btn btn-expandable">
-									<i class="fas fa-chart-bar"></i> <span>Report</span>
+								<button popovertarget="inspect-{{ .BBBEventsMeeting.InternalMeetingID }}"
+								        class="btn btn-sm" title="Quick Info"
+								        style="color: var(--primary) ; anchor-name: CssAnchor-MeetingDetails-{{ .BBBEventsMeeting.InternalMeetingID }}">
+									<i class="fas fa-eye"></i> <span>Info</span>
+								</button>
+								<a href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}" class="btn btn-sm"
+								   title="Report">
+									<i class="fas fa-chart-bar"></i> <span class="hide-mobile">Report</span>
 								</a>
 							</div>
+
+							<div id="inspect-{{ .BBBEventsMeeting.InternalMeetingID }}" popover
+							     class="info-card-popover card"
+							     style="position-anchor: CssAnchor-MeetingDetails-{{ .BBBEventsMeeting.InternalMeetingID }}">
+								<div class="popover-header">
+									<h3 class="font-bold"
+									    style="font-size: 0.9rem; margin:0;">{{ .BBBEventsMeeting.Name }}</h3>
+									<button class="btn" style="border:none; padding:4px;"
+									        popovertarget="inspect-{{ .BBBEventsMeeting.InternalMeetingID }}"
+									        popovertargetaction="hide">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+
+								<div class="popover-body">
+									<div class="info-grid">
+										<div class="info-item">
+											<span class="info-label">Start</span>
+											<span class="info-value">{{ formatTime .BBBEventsMeeting.CreateTime }}</span>
+										</div>
+										<div class="info-item">
+											<span class="info-label">Ende</span>
+											<span class="info-value">{{ if .BBBEventsMeeting.MeetingEnded }}{{ formatTime .BBBEventsMeeting.MeetingEnded }}{{ else }}—{{ end }}</span>
+										</div>
+										<div class="info-item">
+											<span class="info-label">Dauer</span>
+											<span class="info-value">
+												{{ if .BBBEventsMeeting.MeetingEnded }}
+													{{ timeDurationTsPtr .BBBEventsMeeting.CreateTime .BBBEventsMeeting.MeetingEnded }}
+												{{ else }}
+													{{t "MeetingsPageMettingsDetailOngoingMeeting"}}
+												{{end}}
+													</span>
+										</div>
+										<div class="info-item">
+											<span class="info-label">Erster User</span>
+											<span class="info-value">{{ if .BBBEventsMeeting }}"Hardcoded"{{ else }}—{{ end }}</span>
+										</div>
+									</div>
+
+									<div class="recording-status-box">
+										<div>
+											<span class="info-label">Recording</span>
+											<span class="info-value" style="font-size: 0.8rem;">
+                                            {{ if .BBBEventsMeeting.Record }}Verfügbar{{ else }}Kein Recording{{ end }}
+                                        </span>
+										</div>
+										{{ if .BBBEventsMeeting.Record }}
+											<a href="{{ reverse "recordings" }}?query={{ .BBBEventsMeeting.InternalMeetingID }}"
+											   class="btn btn-primary btn-sm">
+												<i class="fas fa-play"></i> Ansehen
+											</a>
+										{{ end }}
+									</div>
+								</div>
+
+								<div class="popover-footer"
+								     style="padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px;">
+									<a href="{{ reverse "report" .BBBEventsMeeting.InternalMeetingID }}"
+									   class="btn btn-sm" style="flex:1; justify-content:center;">
+										<i class="fas fa-chart-bar"></i> Report
+									</a>
+									<a href="{{ reverse "reportCsv" .BBBEventsMeeting.InternalMeetingID }}"
+									   class="btn btn-sm btn-excel" style="flex:1; justify-content:center;">
+										<i class="fas fa-file-excel"></i> Excel
+									</a>
+								</div>
+							</div>
 						</td>
-					</tr>
-				{{ else }}
-					<tr>
-						<td colspan="4" class="text-center text-muted"
-						    style="padding: 40px;">{{t "MeetingNoMeetingsExist"}}</td>
 					</tr>
 				{{ end }}
 				</tbody>

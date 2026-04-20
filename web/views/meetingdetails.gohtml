@@ -17,12 +17,14 @@ limitations under the License.
 {{ define "meetingdetails" }}
     <div class="card">
         <h2>{{t "ReportMeetingDetailsHeader"}}</h2>
-        <div class="meeting-details">
+        <div style="display: flex; flex-direction: column; gap: 14px;">
             {{ range . }}
-                <div class="detail-item">
-                    <span class="detail-label">{{ .Name }}</span>
-                    <span class="detail-value">{{ .Value }}</span>
-                </div>
+                {{ if ne .Name "meeting name" }}
+                    <div style="display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                        <span style="font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">{{ .Name }}</span>
+                        <span style="font-size: 0.85rem; font-weight: 500; word-break: break-all; font-family: 'JetBrains Mono', monospace;">{{ .Value }}</span>
+                    </div>
+                {{ end }}
             {{ end }}
         </div>
     </div>

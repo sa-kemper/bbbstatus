@@ -85,9 +85,108 @@
     font-weight: 800;
     font-size: 0.8rem;
 }
-
 .action-btns {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 6px;
+}
+
+.action-btns .btn {
+    min-width: 40px;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none;
+    }
+
+    .action-btns span {
+        display: none;
+    }
+
+    /* Nur Icons auf Mobile */
+}
+
+/* Info Card Details */
+.popover-header {
+    background: #f8fafc;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popover-body {
+    padding: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.info-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+    display: block;
+}
+
+.info-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.recording-status-box {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .meeting-table td {
+        padding: 12px 16px; /* Weniger Platz auf Mobile */
+    }
+
+    .btn-expandable span {
+        display: none;
+    }
+
+    .btn-expandable {
+        width: 42px !important;
+    }
+}
+
+[popover].info-card-popover {
+    margin: 0 8px;
+    inset: auto;
+    position: absolute;
+    position-area: bottom;
+    width: 320px;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+    background: transparent;
+    backdrop-filter: blur(3px);
+}
+
+.popover-body {
+    padding: 16px;
+}
+
+.recording-row {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

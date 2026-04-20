@@ -210,7 +210,7 @@ func showMeetings(c echo.Context) (err error) {
 	defer conn.Close(ctx)
 	var meetings []MeetingListMeetingWrapper
 
-	filteredMeetings, err := HandleFilteredRequest(ctx, dbQueries, startDate, endDate, selectedServers, searchQuery, searchQuery, &meetings)
+	filteredMeetings, err := HandleFilteredRequest(ctx, dbQueries, startDate, endDate, selectedServers, searchQuery, &meetings)
 	if err != nil {
 		fmt.Println("error handling filtered request:", err)
 		return err

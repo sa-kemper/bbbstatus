@@ -16,6 +16,7 @@
 package main
 
 import (
+	"bbbstatus/internal/apiCredentialHelper"
 	"bbbstatus/internal/config"
 	"bbbstatus/locales"
 	"fmt"
@@ -45,6 +46,13 @@ func main() {
 		fmt.Println("[!] Error connecting to database, this is required for the operation of bbbstatus [!]")
 		log.Fatalln(err)
 		return
+	}
+
+	for _, server := range runtimeConfiguration.BBBServers {
+		err = apiCredentialHelper.UpdateApiKey(server.Hostname, server.SharedSecret)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	locales.InitI18n(FrontendTextMessages)  // initialize the localisation

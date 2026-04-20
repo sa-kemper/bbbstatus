@@ -70,11 +70,8 @@ func UpdateApiKey(hostname string, apikey string) error {
 
 	server, bbbServerLoadOK = credentialStoreBBBServers.Load(hostname)
 	bbbServer, castOK = server.(config.BbbServer)
-	if !bbbServerLoadOK {
-		return fmt.Errorf("credentialStoreBBBServers.Load() failed, cannot find credentials in  bbb server store")
-	}
 
-	if !castOK {
+	if !bbbServerLoadOK || !castOK {
 		bbbServer = config.BbbServer{Hostname: hostname, SharedSecret: apikey, ApiPort: "443"}
 		credentialStoreBBBServers.Store(hostname, bbbServer)
 		return nil

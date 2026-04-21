@@ -44,14 +44,14 @@
                     <input type="hidden" name="scope" value="year">
                     <div class="filter-input-group">
                         <label>{{t "StatsPageSelectScopeStartTime"}}</label>
-                        <input type="date" name="startTime" onchange="this.form.submit();"
+                        <input type="date" name="startTime" onblur="this.form.submit();"
                                value="{{ .Request.StartTime }}" min="{{ .Request.StartTimeMin }}"
                                max="{{ .Request.StartTimeMax }}">
                     </div>
                     <div class="filter-divider"></div>
                     <div class="filter-input-group">
                         <label>{{t "StatsPageSelectScopeStopTime"}}</label>
-                        <input type="date" name="stopTime" onchange="this.form.submit();"
+                        <input type="date" name="stopTime" onblur="this.form.submit();"
                                value="{{ .Request.StopTime }}" min="{{ .Request.StartTimeMin }}"
                                max="{{ .Request.StartTimeMax }}">
                     </div>

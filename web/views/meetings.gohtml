@@ -52,7 +52,7 @@
 					    class="card-title">{{t "MeetingsTableFirstColumnMeetingNameAndID"}}</th>
 					<th class="card-title hide-mobile">{{t "MeetingsTableSecondColumnServerHostname"}}</th>
 					<th class="card-title text-center">{{t "MeetingsTableThrirdColumnUserCount"}}</th>
-					<th class="card-title text-right">{{t "MeetingsTableFourhtColumnActions"}}</th>
+					<th class="card-title text-right" id="actions-column">{{t "MeetingsTableFourhtColumnActions"}}</th>
 				</tr>
 				</thead>
 				<tbody>
@@ -124,9 +124,9 @@
 
 									<div class="recording-status-box">
 										<div>
-											<span class="info-label">Recording</span>
+											<span class="info-label">{{t "MeetingRecordingStatusHeader"}}</span>
 											<span class="info-value" style="font-size: 0.8rem;">
-                                            {{ if .BBBEventsMeeting.Record }}{{t "MeetingsPageDetailsPopupRecordingAvailableStateLabel"}}{{ else }}{{t "MeetingsPageDetailsPopupRecordingNotAvailableStateLabel"}}{{ end }}
+                                            {{ if .BBBEventsMeeting.Record }}{{t "MeetingRecordingEnabled"}}{{ else }}{{t "MeetingRecordingDisabled"}}{{ end }}
                                         </span>
 										</div>
 										{{ if .BBBEventsMeeting.Record }}

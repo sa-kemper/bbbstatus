@@ -42,9 +42,9 @@ import (
 func init() { // Add all messages that are related to this file into the localization bundle
 	var msgs = []i18n.Message{
 		{ID: "meetingListHeader", Other: "meeting list"},
-		{ID: "Meetings", Other: "meetings"},
-		{ID: "Recordings", Other: "recordings"},
-		{ID: "Statistics", Other: "statistics"},
+		{ID: "Meetings", Other: "Meetings"},
+		{ID: "Recordings", Other: "Recordings"},
+		{ID: "Statistics", Other: "Statistics"},
 		{ID: "MeetingActive", Other: "active"},
 		{ID: "MeetingEnded", Other: "ended"},
 		{ID: "MeetingCreated", Other: "created"},

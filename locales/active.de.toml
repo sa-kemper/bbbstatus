@@ -389,7 +389,7 @@ other = "Suchen..."
 
 [MeetingsPageViewRecording]
 hash = "sha1-e3a47099dcaaba943d03b3955c3d8fcf1efb2d98"
-other = "Aufzeicnung sehen"
+other = "Aufzeichnung suchen"
 
 [MeetingsSearchPlaceholder]
 hash = "sha1-0fc9ab33953ac210e936824b143e727c4f23c7ac"

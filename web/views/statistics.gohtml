@@ -49,7 +49,7 @@
                     <label id="StatsPageSelectScopeTimePrintLabel"
                            class="print-only">{{t "StatsPageSelectScopeTimePrintLabel"}}</label>
                     <input type="{{ if eq .CurrentScope "week" }}week{{ else }}{{if eq .CurrentScope "month"}}month{{ else }}date{{ end }}{{ end }}"
-                           onchange="this.form.submit();" name="startTime"
+                           onblur="this.form.submit();" name="startTime"
                            value="{{ .StartTime }}" min="{{ .StartTimeMin }}" max="{{ .StartTimeMax }}" required
                            id="StatsPageTimeSelector">
                 </div>

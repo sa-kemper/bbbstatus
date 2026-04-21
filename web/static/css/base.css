@@ -270,7 +270,7 @@ th {
     margin-bottom: 2px;
 }
 
-.filter-input-group input {
+.filter-input-group input, input[type=date] {
     border: none;
     background: transparent;
     font-size: 0.95rem;

@@ -190,3 +190,7 @@
     justify-content: space-between;
     align-items: center;
 }
+
+#actions-column {
+    padding-right: 5rem;
+}

@@ -198,7 +198,7 @@ func showMeetings(c echo.Context) (err error) {
 	}
 
 	if startDate.IsZero() {
-		startDate = endDate.AddDate(0, -1, 0)
+		startDate = endDate.AddDate(0, 0, -7)
 	}
 
 	conn, err := pgx.Connect(ctx, cc.Config.DatabaseConfig.DatabaseConnectionString)

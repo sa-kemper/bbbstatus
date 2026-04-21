@@ -114,7 +114,7 @@ func getSummaryOfMeetingsForDates(c echo.Context) (struct {
 	// Parse user input, and correct its errors
 	userInputStartTime, err := time.Parse("2006-01-02", requestParams.StartTime)
 	if err != nil {
-		userInputStartTime = firstMeeting.(time.Time) // default back to the first meeting on invalid input
+		userInputStartTime = time.Now().AddDate(0, 0, -7) // default back to the first meeting on invalid input
 	}
 	requestParams.StartTime = userInputStartTime.Format("2006-01-02")
 

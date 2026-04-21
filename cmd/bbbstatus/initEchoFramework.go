@@ -51,11 +51,11 @@ func initEchoFramework(conf *config.ConfigurationStruct) {
 		"reverse":        func(string, ...interface{}) string { return "x" },
 		"formatTime":     func(t time.Time) string { return t.Format("15:04:05") },
 		"formatDate":     func(t time.Time) string { return t.Format("2006.01.02 - 15:04") },
-		"formatDuration": func(t time.Duration) string { return t.String() },
+		"formatDuration": func(t time.Duration) string { return t.Round(time.Second).String() },
 		"valFromIndex":   func(m map[string]int, s string) int { return m[s] },
 		"timestamp":      func() string { return strconv.Itoa(int(time.Now().Unix())) },
 		"timeDurationTsPtr": func(t time.Time, ptr *time.Time) string {
-			return ptr.Sub(t).String()
+			return ptr.Sub(t).Round(time.Second).String()
 		},
 	}
 
